@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wayra</string>
+    <string name="title_home">Inicio</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notificaciones</string>
+    <string name="title_students">Estudiantes</string>
+    <string name="title_payments">Pagos</string>
+    <string name="title_reports">Reportes</string>
+
+    <!-- Common -->
+    <string name="back">Volver</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <string name="edit">Editar</string>
+    <string name="search">Buscar</string>
+
+    <!-- Home Screen -->
+    <string name="home_welcome">Bienvenido a Wayra</string>
+    <string name="home_stats_title">Resumen</string>
+    <string name="home_active_students">Estudiantes Activos</string>
+    <string name="home_pending_payments">Pagos Pendientes</string>
+    <string name="home_total_collected">Total Recaudado</string>
+    <string name="home_quick_actions">Acciones Rápidas</string>
+    <string name="home_add_student">Agregar Estudiante</string>
+    <string name="home_register_payment">Registrar Pago</string>
+    <string name="home_view_reports">Ver Reportes</string>
+    <string name="home_assign_plan">Asignar Plan</string>
+    <string name="home_upcoming_payments">Próximos Pagos</string>
+    <string name="home_no_payments">No hay pagos próximos</string>
+
+    <!-- Students -->
+    <string name="students_title">Estudiantes</string>
+    <string name="students_add">Agregar Estudiante</string>
+    <string name="students_search">Buscar estudiante…</string>
+    <string name="students_empty">No hay estudiantes registrados</string>
+    <string name="students_active">Activo</string>
+    <string name="students_inactive">Inactivo</string>
+    <string name="add_student_title">Agregar Estudiante</string>
+    <string name="student_name">Nombre</string>
+    <string name="student_email">Email</string>
+    <string name="student_phone">Teléfono</string>
+    <string name="student_active">Estudiante activo</string>
+
+    <!-- Plans -->
+    <string name="plans_title">Planes</string>
+    <string name="plans_add">Agregar Plan</string>
+    <string name="plans_empty">No hay planes disponibles</string>
+    <string name="add_plan_title">Agregar Plan</string>
+    <string name="plan_name">Nombre del plan</string>
+    <string name="plan_price_hint">Precio</string>
+    <string name="plan_description_hint">Descripción</string>
+    <string name="load_initial_data">Cargar Datos Iniciales</string>
+
+    <!-- Payments -->
+    <string name="register_payment_title">Registrar Pago</string>
+    <string name="payment_student">Estudiante</string>
+    <string name="payment_select_student">Seleccionar estudiante</string>
+    <string name="payment_amount">Monto</string>
+    <string name="payment_method">Método de pago</string>
+    <string name="payment_notes">Notas</string>
+    <string name="payment_register">Registrar Pago</string>
+    <string name="payment_mercado_pago">Mercado Pago</string>
+    <string name="payment_cash">Efectivo</string>
+    <string name="payment_transfer">Transferencia</string>
+
+    <!-- Subscriptions -->
+    <string name="subscription_assign_plan">Asignar Plan</string>
+    <string name="subscription_select_plan">Seleccionar plan</string>
+    <string name="subscription_no_plan">Sin plan</string>
+</resources>
