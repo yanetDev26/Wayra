@@ -3,7 +3,6 @@ package com.app.wayra
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -21,18 +20,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.app.wayra.navigation.WayraNavHost
+import com.app.wayra.navigation.StudentsNavHost
 import com.app.wayra.ui.home.HomeScreen
 import com.app.wayra.ui.home.HomeViewModel
-import com.app.wayra.ui.students.StudentsScreen
-import com.app.wayra.ui.students.StudentsViewModel
 import com.app.wayra.ui.plans.PlansScreen
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.reports.ReportsScreen
-import com.app.wayra.ui.theme.WayraTheme
+import com.app.wayra.ui.students.StudentsViewModel
 import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.WayraTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -93,7 +92,7 @@ fun MainScreen() {
             0 -> {
                 // Tab Inicio: Dashboard con métricas y acciones rápidas
                 val homeViewModel: HomeViewModel = viewModel()
-                val navController = rememberNavController()
+                rememberNavController()
                 HomeScreen(
                     viewModel = homeViewModel,
                     modifier = Modifier.padding(innerPadding),
@@ -109,17 +108,13 @@ fun MainScreen() {
                 )
             }
             1 -> {
-                // Tab Alumnos: Gestión completa de estudiantes
+                // Tab Alumnos: ABM completo de estudiantes
                 val studentsViewModel: StudentsViewModel = viewModel()
-                StudentsScreen(
-                    viewModel = studentsViewModel,
-                    onNavigateBack = { /* No action needed in tab */ },
-                    onNavigateToAddStudent = {
-                        // TODO: Navegar a pantalla agregar estudiante
-                    },
-                    onNavigateToStudentDetail = { studentId ->
-                        // TODO: Navegar a detalle del estudiante
-                    }
+                val studentsNavController = rememberNavController()
+                StudentsNavHost(
+                    navController = studentsNavController,
+                    studentsViewModel = studentsViewModel,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
             2 -> {

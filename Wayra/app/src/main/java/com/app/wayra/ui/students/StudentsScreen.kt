@@ -1,14 +1,33 @@
 package com.app.wayra.ui.students
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,21 +47,24 @@ fun StudentsScreen(
     viewModel: StudentsViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToAddStudent: () -> Unit,
-    onNavigateToStudentDetail: (String) -> Unit
+    onNavigateToStudentDetail: (String) -> Unit,
+    showTopBar: Boolean = true
 ) {
     val filteredStudents by viewModel.filteredStudents.observeAsState(emptyList())
     val searchQuery by viewModel.searchQuery.observeAsState("")
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.students_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+            if (showTopBar) {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.students_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToAddStudent) {
@@ -56,6 +78,16 @@ fun StudentsScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Título solo si no hay topBar
+            if (!showTopBar) {
+                Text(
+                    text = stringResource(R.string.students_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+
             // Search Bar
             OutlinedTextField(
                 value = searchQuery,
