@@ -2,28 +2,42 @@ package com.app.wayra.ui.students
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
+import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
+import com.app.wayra.data.model.Subscription
+import com.app.wayra.ui.plans.PlansViewModel
+import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStudentScreen(
     onNavigateBack: () -> Unit,
     onStudentAdded: () -> Unit,
-    viewModel: StudentsViewModel = viewModel()
+    viewModel: StudentsViewModel = viewModel(),
+    plansViewModel: PlansViewModel = viewModel(),
+    subscriptionViewModel: SubscriptionViewModel = viewModel()
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(true) }
+    var selectedPlan by remember { mutableStateOf<Plan?>(null) }
+    var showPlanPicker by remember { mutableStateOf(false) }
+
+    val plans by plansViewModel.plans.observeAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -32,7 +46,7 @@ fun AddStudentScreen(
                 title = { Text(stringResource(R.string.add_student_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -68,6 +82,41 @@ fun AddStudentScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+
+            // Selector de Plan
+            OutlinedCard(
+                onClick = { showPlanPicker = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Plan",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = selectedPlan?.activityName ?: "Sin plan asignado",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        selectedPlan?.let { plan ->
+                            val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                            Text(
+                                text = formatter.format(plan.price),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -109,6 +158,20 @@ fun AddStudentScreen(
                                 )
                                 val result = viewModel.addStudent(student)
                                 if (result.isSuccess) {
+                                    // Si se seleccionó un plan, crear la suscripción
+                                    val studentId = result.getOrNull()
+                                    if (studentId != null && selectedPlan != null) {
+                                        Subscription(
+                                            studentId = studentId,
+                                            planId = selectedPlan!!.id,
+                                            startDate = System.currentTimeMillis(),
+                                            active = true
+                                        )
+                                        subscriptionViewModel.assignPlan(
+                                            student.copy(id = studentId),
+                                            selectedPlan
+                                        )
+                                    }
                                     onStudentAdded()
                                 }
                             }
@@ -120,6 +183,84 @@ fun AddStudentScreen(
                     Text(stringResource(R.string.save))
                 }
             }
+        }
+
+        // Diálogo de selección de plan
+        if (showPlanPicker) {
+            AlertDialog(
+                onDismissRequest = { showPlanPicker = false },
+                title = { Text("Seleccionar Plan") },
+                text = {
+                    Column {
+                        if (plans.isEmpty()) {
+                            Text("No hay planes disponibles")
+                        } else {
+                            // Opción para no asignar plan
+                            OutlinedCard(
+                                onClick = {
+                                    selectedPlan = null
+                                    showPlanPicker = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "Sin plan",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Text(
+                                        text = "No asignar plan al estudiante",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Lista de planes
+                            plans.forEach { plan ->
+                                OutlinedCard(
+                                    onClick = {
+                                        selectedPlan = plan
+                                        showPlanPicker = false
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Text(
+                                            text = plan.activityName,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                        val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                                        Text(
+                                            text = formatter.format(plan.price),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        if (plan.description.isNotBlank()) {
+                                            Text(
+                                                text = plan.description,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showPlanPicker = false }) {
+                        Text("Cerrar")
+                    }
+                }
+            )
         }
     }
 }

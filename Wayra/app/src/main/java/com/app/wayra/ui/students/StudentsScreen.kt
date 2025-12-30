@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
-import com.app.wayra.data.model.Student
+import com.app.wayra.ui.theme.WayraOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,10 +117,10 @@ fun StudentsScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(filteredStudents) { student ->
+                    items(filteredStudents) { studentWithPlan ->
                         StudentItem(
-                            student = student,
-                            onClick = { onNavigateToStudentDetail(student.id) }
+                            studentWithPlan = studentWithPlan,
+                            onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
                         )
                     }
                 }
@@ -131,58 +131,90 @@ fun StudentsScreen(
 
 @Composable
 fun StudentItem(
-    student: Student,
+    studentWithPlan: StudentWithPlan,
     onClick: () -> Unit
 ) {
+    val student = studentWithPlan.student
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = student.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = student.email,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-                Text(
-                    text = student.phone,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = student.name,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = student.email,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Text(
+                        text = student.phone,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+
+                // Status Badge
+                Surface(
+                    color = if (student.active) Color(0xFF4CAF50) else Color(0xFFFF9800),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text(
+                        text = if (student.active)
+                            stringResource(R.string.students_active)
+                        else
+                            stringResource(R.string.students_inactive),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
 
-            // Status Badge
-            Surface(
-                color = if (student.active) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.padding(start = 8.dp)
-            ) {
-                Text(
-                    text = if (student.active)
-                        stringResource(R.string.students_active)
-                    else
-                        stringResource(R.string.students_inactive),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                )
+            // Plan Badge
+            if (studentWithPlan.planName != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    color = WayraOrange.copy(alpha = 0.15f),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Plan: ",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Normal
+                        )
+                        Text(
+                            text = studentWithPlan.planName,
+                            fontSize = 12.sp,
+                            color = WayraOrange,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }

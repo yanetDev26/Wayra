@@ -3,11 +3,14 @@ package com.app.wayra.ui.students
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -17,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -41,18 +45,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
+import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
+import com.app.wayra.data.model.Subscription
+import com.app.wayra.ui.plans.PlansViewModel
+import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDetailScreen(
     studentId: String,
     onNavigateBack: () -> Unit,
-    viewModel: StudentsViewModel = viewModel()
+    viewModel: StudentsViewModel = viewModel(),
+    plansViewModel: PlansViewModel = viewModel(),
+    subscriptionViewModel: SubscriptionViewModel = viewModel()
 ) {
     val students by viewModel.students.observeAsState(emptyList())
     val student = students.find { it.id == studentId }
+    val plans by plansViewModel.plans.observeAsState(emptyList())
 
     var showEditDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -172,11 +185,22 @@ fun StudentDetailScreen(
         if (showEditDialog && student != null) {
             EditStudentDialog(
                 student = student,
+                plans = plans,
                 onDismiss = { showEditDialog = false },
-                onSave = { updatedStudent ->
+                onSave = { updatedStudent, selectedPlan ->
                     coroutineScope.launch {
                         val result = viewModel.updateStudent(studentId, updatedStudent)
                         if (result.isSuccess) {
+                            // Si se seleccionó un plan diferente, actualizar suscripción
+                            if (selectedPlan != null) {
+                                Subscription(
+                                    studentId = studentId,
+                                    planId = selectedPlan.id,
+                                    startDate = System.currentTimeMillis(),
+                                    active = true
+                                )
+                                subscriptionViewModel.assignPlan(updatedStudent, selectedPlan)
+                            }
                             viewModel.refreshData()
                             snackbarHostState.showSnackbar("Alumno actualizado")
                             showEditDialog = false
@@ -225,13 +249,16 @@ fun StudentDetailScreen(
 @Composable
 fun EditStudentDialog(
     student: Student,
+    plans: List<Plan>,
     onDismiss: () -> Unit,
-    onSave: (Student) -> Unit
+    onSave: (Student, Plan?) -> Unit
 ) {
     var name by remember { mutableStateOf(student.name) }
     var email by remember { mutableStateOf(student.email) }
     var phone by remember { mutableStateOf(student.phone) }
     var active by remember { mutableStateOf(student.active) }
+    var selectedPlan by remember { mutableStateOf<Plan?>(null) }
+    var showPlanPicker by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -256,6 +283,35 @@ fun EditStudentDialog(
                     label = { Text("Teléfono") },
                     singleLine = true
                 )
+
+                // Selector de Plan
+                OutlinedCard(
+                    onClick = { showPlanPicker = true }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Plan",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                text = selectedPlan?.activityName ?: "Sin cambios",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                        )
+                    }
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -271,12 +327,15 @@ fun EditStudentDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSave(student.copy(
-                        name = name,
-                        email = email,
-                        phone = phone,
-                        active = active
-                    ))
+                    onSave(
+                        student.copy(
+                            name = name,
+                            email = email,
+                            phone = phone,
+                            active = active
+                        ),
+                        selectedPlan
+                    )
                 }
             ) {
                 Text("Guardar")
@@ -288,6 +347,72 @@ fun EditStudentDialog(
             }
         }
     )
+
+    // Diálogo de selección de plan
+    if (showPlanPicker) {
+        AlertDialog(
+            onDismissRequest = { showPlanPicker = false },
+            title = { Text("Cambiar Plan") },
+            text = {
+                Column {
+                    if (plans.isEmpty()) {
+                        Text("No hay planes disponibles")
+                    } else {
+                        // Opción para no cambiar plan
+                        OutlinedCard(
+                            onClick = {
+                                selectedPlan = null
+                                showPlanPicker = false
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "No cambiar plan",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Lista de planes
+                        plans.forEach { plan ->
+                            OutlinedCard(
+                                onClick = {
+                                    selectedPlan = plan
+                                    showPlanPicker = false
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(
+                                        text = plan.activityName,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                                    Text(
+                                        text = formatter.format(plan.price),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showPlanPicker = false }) {
+                    Text("Cerrar")
+                }
+            }
+        )
+    }
 }
 
 @Composable
