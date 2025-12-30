@@ -16,13 +16,13 @@
     <string name="search">Buscar</string>
 
     <!-- Home Screen -->
-    <string name="home_welcome">Bienvenido a Wayra</string>
+    <string name="home_welcome">Bienvenido a Wayra Running Team</string>
     <string name="home_stats_title">Resumen</string>
-    <string name="home_active_students">Estudiantes Activos</string>
+    <string name="home_active_students">Alumnos Activos</string>
     <string name="home_pending_payments">Pagos Pendientes</string>
     <string name="home_total_collected">Total Recaudado</string>
     <string name="home_quick_actions">Acciones Rápidas</string>
-    <string name="home_add_student">Agregar Estudiante</string>
+    <string name="home_add_student">Agregar Alumno</string>
     <string name="home_register_payment">Registrar Pago</string>
     <string name="home_view_reports">Ver Reportes</string>
     <string name="home_assign_plan">Asignar Plan</string>

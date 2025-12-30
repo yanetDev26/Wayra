@@ -5,11 +5,13 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_logo"
         android:label="Wayra"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Wayra">
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="Wayra">
+            android:label="Wayra"
+            android:theme="@style/Theme.Wayra.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

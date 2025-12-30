@@ -3,11 +3,14 @@ package com.app.wayra
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,16 +20,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.app.wayra.navigation.WayraNavHost
+import com.app.wayra.ui.home.HomeScreen
+import com.app.wayra.ui.home.HomeViewModel
+import com.app.wayra.ui.students.StudentsScreen
+import com.app.wayra.ui.students.StudentsViewModel
+import com.app.wayra.ui.plans.PlansScreen
+import com.app.wayra.ui.plans.PlansViewModel
+import com.app.wayra.ui.reports.ReportsScreen
+import com.app.wayra.ui.theme.WayraTheme
+import com.app.wayra.ui.theme.WayraOrange
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Instalar splash screen antes de super.onCreate
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
         setContent {
-            MaterialTheme {
+            WayraTheme {
                 MainScreen()
             }
         }
@@ -36,7 +53,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Inicio", "Dashboard", "Notificaciones")
+    val items = listOf("Inicio", "Alumnos", "Planes", "Reportes")
 
     Scaffold(
         bottomBar = {
@@ -49,15 +66,24 @@ fun MainScreen() {
                                     id = when (index) {
                                         0 -> R.drawable.home
                                         1 -> R.drawable.group_running
+                                        2 -> R.drawable.plan
                                         else -> R.drawable.payment
                                     }
                                 ),
-                                contentDescription = item
+                                contentDescription = item,
+                                modifier = Modifier.size(24.dp)
                             )
                         },
                         label = { Text(item) },
                         selected = selectedItem == index,
-                        onClick = { selectedItem = index }
+                        onClick = { selectedItem = index },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = WayraOrange,
+                            selectedTextColor = WayraOrange,
+                            unselectedIconColor = WayraOrange.copy(alpha = 0.6f),
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            indicatorColor = WayraOrange.copy(alpha = 0.2f)
+                        )
                     )
                 }
             }
@@ -65,19 +91,53 @@ fun MainScreen() {
     ) { innerPadding ->
         when (selectedItem) {
             0 -> {
+                // Tab Inicio: Dashboard con métricas y acciones rápidas
+                val homeViewModel: HomeViewModel = viewModel()
                 val navController = rememberNavController()
-                WayraNavHost(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                HomeScreen(
+                    viewModel = homeViewModel,
+                    modifier = Modifier.padding(innerPadding),
+                    onNavigateToStudents = { selectedItem = 1 },
+                    onNavigateToPlans = { selectedItem = 2 },
+                    onNavigateToRegisterPayment = {
+                        // Navegar internamente dentro de Home
+                    },
+                    onNavigateToReports = { selectedItem = 3 },
+                    onNavigateToAssignPlan = {
+                        // Navegar internamente dentro de Home
+                    }
                 )
             }
             1 -> {
-                // Placeholder para Dashboard - necesitarás pasar el ViewModel apropiadamente
-                Text("Dashboard", modifier = Modifier.padding(innerPadding))
+                // Tab Alumnos: Gestión completa de estudiantes
+                val studentsViewModel: StudentsViewModel = viewModel()
+                StudentsScreen(
+                    viewModel = studentsViewModel,
+                    onNavigateBack = { /* No action needed in tab */ },
+                    onNavigateToAddStudent = {
+                        // TODO: Navegar a pantalla agregar estudiante
+                    },
+                    onNavigateToStudentDetail = { studentId ->
+                        // TODO: Navegar a detalle del estudiante
+                    }
+                )
             }
             2 -> {
-                // Placeholder para Notifications - necesitarás pasar el ViewModel apropiadamente
-                Text("Notificaciones", modifier = Modifier.padding(innerPadding))
+                // Tab Planes: Gestión de planes/actividades
+                val plansViewModel: PlansViewModel = viewModel()
+                PlansScreen(
+                    viewModel = plansViewModel,
+                    onNavigateBack = { /* No action needed in tab */ },
+                    onNavigateToAddPlan = {
+                        // TODO: Navegar a agregar plan
+                    }
+                )
+            }
+            3 -> {
+                // Tab Reportes: Análisis y reportes financieros
+                ReportsScreen(
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
     }
