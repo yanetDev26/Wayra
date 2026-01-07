@@ -3,8 +3,17 @@ package com.app.wayra
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -56,44 +65,11 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
-            ) {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(
-                                    id = when (index) {
-                                        0 -> R.drawable.home
-                                        1 -> R.drawable.group_running
-                                        2 -> R.drawable.plan
-                                        else -> R.drawable.payment
-                                    }
-                                ),
-                                contentDescription = item,
-                                modifier = Modifier.size(26.dp)
-                            )
-                        },
-                        label = {
-                            Text(
-                                text = item,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        },
-                        selected = selectedItem == index,
-                        onClick = { selectedItem = index },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = WayraOrange,
-                            selectedTextColor = WayraOrange,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            indicatorColor = WayraOrange.copy(alpha = 0.15f)
-                        )
-                    )
-                }
-            }
+            ModernBottomBar(
+                items = items,
+                selectedItem = selectedItem,
+                onItemSelected = { selectedItem = it }
+            )
         }
     ) { innerPadding ->
         when (selectedItem) {
@@ -140,6 +116,82 @@ fun MainScreen() {
                 // Tab Reportes: Análisis y reportes financieros
                 ReportsScreen(
                     modifier = Modifier.padding(innerPadding)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ModernBottomBar(
+    items: List<String>,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Línea superior decorativa
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(WayraOrange.copy(alpha = 0.1f))
+        )
+
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 12.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+        ) {
+            items.forEachIndexed { index, item ->
+                val isSelected = selectedItem == index
+                val iconSize by animateDpAsState(
+                    targetValue = if (isSelected) 28.dp else 24.dp,
+                    animationSpec = tween(durationMillis = 300),
+                    label = "iconSize"
+                )
+
+                NavigationBarItem(
+                    icon = {
+                        Box(
+                            modifier = Modifier.padding(top = 4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    id = when (index) {
+                                        0 -> R.drawable.home
+                                        1 -> R.drawable.group_running
+                                        2 -> R.drawable.plan
+                                        else -> R.drawable.payment
+                                    }
+                                ),
+                                contentDescription = item,
+                                modifier = Modifier.size(iconSize)
+                            )
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = item,
+                            style = if (isSelected)
+                                MaterialTheme.typography.labelMedium
+                            else
+                                MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    },
+                    selected = isSelected,
+                    onClick = { onItemSelected(index) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = WayraOrange,
+                        selectedTextColor = WayraOrange,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        indicatorColor = WayraOrange.copy(alpha = 0.12f)
+                    )
                 )
             }
         }

@@ -43,7 +43,8 @@ fun StudentsNavHost(
                 onNavigateToStudentDetail = { studentId ->
                     navController.navigate(StudentsScreens.StudentDetail.createRoute(studentId))
                 },
-                showTopBar = false // No mostrar topBar en la tab
+                showTopBar = false, // No mostrar topBar en la tab
+                modifier = modifier
             )
         }
 

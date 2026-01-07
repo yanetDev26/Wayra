@@ -1,8 +1,11 @@
 package com.app.wayra.ui.plans
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -13,12 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
+import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
@@ -50,7 +55,11 @@ fun PlansScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToAddPlan) {
+            FloatingActionButton(
+                onClick = onNavigateToAddPlan,
+                containerColor = WayraOrange,
+                contentColor = Color.White
+            ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.plans_add))
             }
         },
@@ -62,42 +71,70 @@ fun PlansScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Botón para cargar planes iniciales (solo se muestra si no hay planes)
-            if (plans.isEmpty()) {
-                OutlinedButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.loadInitialPlans()
-                            snackbarHostState.showSnackbar(
-                                message = "Planes iniciales cargados correctamente",
-                                duration = SnackbarDuration.Short
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                ) {
-                    Text(stringResource(R.string.load_initial_data))
-                }
-            }
-
             if (plans.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(R.string.plans_empty),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(48.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text = "🏋️",
+                                fontSize = 48.sp
+                            )
+                            Text(
+                                text = stringResource(R.string.plans_empty),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Botón para cargar planes iniciales
+                            Button(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        viewModel.loadInitialPlans()
+                                        snackbarHostState.showSnackbar(
+                                            message = "Planes iniciales cargados correctamente",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = WayraOrange
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.load_initial_data),
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(plans) { plan ->
-                        PlanItem(
+                        PlanItemModern(
                             plan = plan,
                             onEdit = {
                                 selectedPlan = plan
@@ -137,10 +174,17 @@ fun PlansScreen(
         if (showDeleteDialog && selectedPlan != null) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Eliminar Plan") },
-                text = { Text("¿Estás seguro de que deseas eliminar ${selectedPlan!!.activityName}?") },
+                title = {
+                    Text(
+                        "Eliminar Plan",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text("¿Estás seguro de que deseas eliminar ${selectedPlan!!.activityName}?")
+                },
                 confirmButton = {
-                    TextButton(
+                    Button(
                         onClick = {
                             coroutineScope.launch {
                                 val result = viewModel.deletePlan(selectedPlan!!.id)
@@ -151,17 +195,164 @@ fun PlansScreen(
                                     snackbarHostState.showSnackbar("Error al eliminar")
                                 }
                             }
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
+                        shape = RoundedCornerShape(10.dp)
                     ) {
-                        Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                        Text("Eliminar")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
+                    TextButton(
+                        onClick = { showDeleteDialog = false },
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
                         Text("Cancelar")
                     }
-                }
+                },
+                shape = RoundedCornerShape(20.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun PlanItemModern(
+    plan: Plan,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                // Contenido principal
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    // Icono decorativo
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(
+                                color = WayraOrange.copy(alpha = 0.15f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "🏋️",
+                            fontSize = 28.sp
+                        )
+                    }
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = plan.activityName,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        if (plan.description.isNotBlank()) {
+                            Text(
+                                text = plan.description,
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Precio destacado
+                        Surface(
+                            color = Color(0xFF4CAF50).copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = "💰",
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = formatCurrency(plan.price),
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF2E7D32)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Botones de acción
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilledTonalButton(
+                    onClick = onEdit,
+                    modifier = Modifier.height(40.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = WayraOrange.copy(alpha = 0.15f),
+                        contentColor = WayraOrange
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Editar",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Editar", fontSize = 13.sp)
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.height(40.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Eliminar",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Eliminar", fontSize = 13.sp)
+                }
+            }
         }
     }
 }
@@ -245,32 +436,55 @@ fun EditPlanDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Editar Plan") },
+        title = {
+            Text(
+                "Editar Plan",
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = activityName,
                     onValueChange = { activityName = it },
                     label = { Text("Nombre del Plan") },
-                    singleLine = true
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = WayraOrange,
+                        focusedLabelColor = WayraOrange,
+                        cursorColor = WayraOrange
+                    )
                 )
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text("Descripción") },
                     singleLine = false,
-                    maxLines = 3
+                    maxLines = 3,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = WayraOrange,
+                        focusedLabelColor = WayraOrange,
+                        cursorColor = WayraOrange
+                    )
                 )
                 OutlinedTextField(
                     value = price,
                     onValueChange = { price = it },
                     label = { Text("Precio") },
-                    singleLine = true
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = WayraOrange,
+                        focusedLabelColor = WayraOrange,
+                        cursorColor = WayraOrange
+                    )
                 )
             }
         },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     val priceValue = price.toDoubleOrNull() ?: plan.price
                     onSave(
@@ -281,16 +495,24 @@ fun EditPlanDialog(
                         )
                     )
                 },
-                enabled = activityName.isNotBlank() && price.toDoubleOrNull() != null
+                enabled = activityName.isNotBlank() && price.toDoubleOrNull() != null,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = WayraOrange
+                ),
+                shape = RoundedCornerShape(10.dp)
             ) {
                 Text("Guardar")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                shape = RoundedCornerShape(10.dp)
+            ) {
                 Text("Cancelar")
             }
-        }
+        },
+        shape = RoundedCornerShape(20.dp)
     )
 }
 
