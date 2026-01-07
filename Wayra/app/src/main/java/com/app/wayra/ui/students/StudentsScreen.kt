@@ -105,14 +105,14 @@ fun StudentsScreen(
                     .padding(16.dp)
             )
 
-            // FAB posicionado manualmente (ajustado para navbar de 80dp + línea decorativa)
+            // FAB posicionado manualmente (ajustado para navbar flotante moderna)
             FloatingActionButton(
                 onClick = onNavigateToAddStudent,
                 containerColor = WayraOrange,
                 contentColor = Color.White,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 100.dp, end = 16.dp)
+                    .padding(bottom = 92.dp, end = 16.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.students_add))
             }
