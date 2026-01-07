@@ -1,6 +1,9 @@
 package com.app.wayra.ui.home
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,7 +27,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,180 +89,321 @@ fun HomeContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
     ) {
-        // Header
-        Text(
-            text = stringResource(R.string.home_welcome),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Text(
-            text = currentDate,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Stats Section Title
-        Text(
-            text = stringResource(R.string.home_stats_title),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Statistics Cards
-        StatCard(
-            title = stringResource(R.string.home_active_students),
-            value = stats.activeStudents.toString(),
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        StatCard(
-            title = stringResource(R.string.home_pending_payments),
-            value = stats.pendingPayments.toString(),
-            color = Color(0xFFFF9800)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        StatCard(
-            title = stringResource(R.string.home_total_collected),
-            value = formatCurrency(stats.totalCollected),
-            color = Color(0xFF4CAF50),
-            valueSize = 24.sp
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Quick Actions Section
-        Text(
-            text = stringResource(R.string.home_quick_actions),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Header con logo
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(vertical = 24.dp, horizontal = 16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            OutlinedButton(
-                onClick = onAddStudentClick,
-                modifier = Modifier.weight(1f)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.home_add_student),
-                    fontSize = 10.sp,
-                    maxLines = 2
-                )
-            }
+                // Logo del gimnasio con fondo circular
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_wayra),
+                        contentDescription = "Logo Wayra",
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(CircleShape)
+                    )
+                }
 
-            OutlinedButton(
-                onClick = onRegisterPaymentClick,
-                modifier = Modifier.weight(1f)
-            ) {
+                // Título de bienvenida
                 Text(
-                    text = stringResource(R.string.home_register_payment),
-                    fontSize = 10.sp,
-                    maxLines = 2
+                    text = stringResource(R.string.home_welcome),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            }
 
-            OutlinedButton(
-                onClick = onViewReportsClick,
-                modifier = Modifier.weight(1f)
-            ) {
                 Text(
-                    text = stringResource(R.string.home_view_reports),
-                    fontSize = 10.sp,
-                    maxLines = 2
+                    text = currentDate,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Contenido con padding
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            OutlinedButton(
-                onClick = onNavigateToStudents,
-                modifier = Modifier.weight(1f)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Statistics Cards en grid
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.students_title),
-                    fontSize = 10.sp,
-                    maxLines = 1
+                StatCardCompact(
+                    title = stringResource(R.string.home_active_students),
+                    value = stats.activeStudents.toString(),
+                    emoji = "👥",
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.weight(1f)
+                )
+
+                StatCardCompact(
+                    title = stringResource(R.string.home_pending_payments),
+                    value = stats.pendingPayments.toString(),
+                    emoji = "⚠️",
+                    backgroundColor = Color(0xFFFFF3E0),
+                    contentColor = Color(0xFFE65100),
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            OutlinedButton(
-                onClick = onNavigateToPlans,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = stringResource(R.string.plans_title),
-                    fontSize = 10.sp,
-                    maxLines = 1
-                )
-            }
+            Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedButton(
-                onClick = onNavigateToAssignPlan,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = stringResource(R.string.home_assign_plan),
-                    fontSize = 10.sp,
-                    maxLines = 2
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Upcoming Payments Section
-        Text(
-            text = stringResource(R.string.home_upcoming_payments),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (upcomingPayments.isEmpty()) {
+            // Total collected - card destacada
             Card(
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                    containerColor = Color(0xFF4CAF50)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.home_no_payments),
-                    modifier = Modifier.padding(24.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "💰",
+                                fontSize = 24.sp
+                            )
+                            Text(
+                                text = stringResource(R.string.home_total_collected),
+                                fontSize = 14.sp,
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Text(
+                            text = formatCurrency(stats.totalCollected),
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             }
-        } else {
-            upcomingPayments.forEach { payment ->
-                PaymentItem(payment = payment)
-                Spacer(modifier = Modifier.height(8.dp))
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Quick Actions Section
+            Text(
+                text = stringResource(R.string.home_quick_actions),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Acciones principales destacadas
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    FilledTonalButton(
+                        onClick = onAddStudentClick,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_add_student),
+                            fontSize = 11.sp,
+                            maxLines = 2,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    FilledTonalButton(
+                        onClick = onRegisterPaymentClick,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_register_payment),
+                            fontSize = 11.sp,
+                            maxLines = 2,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onNavigateToStudents,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.students_title),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = onNavigateToPlans,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.plans_title),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                OutlinedButton(
+                    onClick = onViewReportsClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_view_reports),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // Upcoming Payments Section
+            Text(
+                text = stringResource(R.string.home_upcoming_payments),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (upcomingPayments.isEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "✓",
+                            fontSize = 40.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.home_no_payments),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            } else {
+                upcomingPayments.forEach { payment ->
+                    PaymentItemModern(payment = payment)
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun StatCardCompact(
+    title: String,
+    value: String,
+    emoji: String,
+    backgroundColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = emoji,
+                fontSize = 28.sp
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = value,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = contentColor
+            )
+            Text(
+                text = title,
+                fontSize = 12.sp,
+                color = contentColor.copy(alpha = 0.8f),
+                modifier = Modifier.padding(top = 4.dp),
+                maxLines = 2
+            )
         }
     }
 }
@@ -294,6 +444,69 @@ fun StatCard(
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PaymentItemModern(
+    payment: Payment,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Indicador de estado visual
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(
+                            color = Color(0xFFFF9800),
+                            shape = CircleShape
+                        )
+                )
+
+                Column {
+                    Text(
+                        text = "Alumno ${payment.studentId}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    payment.dueDate?.let { dueDate ->
+                        Text(
+                            text = formatDueDate(dueDate),
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = formatCurrency(payment.amount),
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

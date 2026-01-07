@@ -56,7 +56,10 @@ fun MainScreen() {
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp
+            ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = {
@@ -70,18 +73,23 @@ fun MainScreen() {
                                     }
                                 ),
                                 contentDescription = item,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(26.dp)
                             )
                         },
-                        label = { Text(item) },
+                        label = {
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
                         selected = selectedItem == index,
                         onClick = { selectedItem = index },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = WayraOrange,
                             selectedTextColor = WayraOrange,
-                            unselectedIconColor = WayraOrange.copy(alpha = 0.6f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            indicatorColor = WayraOrange.copy(alpha = 0.2f)
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = WayraOrange.copy(alpha = 0.15f)
                         )
                     )
                 }

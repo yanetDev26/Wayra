@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,7 @@ import com.app.wayra.R
 import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.model.Subscription
+import com.app.wayra.data.repository.SubscriptionRepository
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import kotlinx.coroutines.launch
@@ -71,6 +73,25 @@ fun StudentDetailScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Estado para la suscripción activa y plan actual
+    var activeSubscription by remember { mutableStateOf<Subscription?>(null) }
+    var currentPlan by remember { mutableStateOf<Plan?>(null) }
+    var refreshTrigger by remember { mutableStateOf(0) }
+    val subscriptionRepository = remember { SubscriptionRepository() }
+
+    // Cargar suscripción activa cuando cambia el studentId o refreshTrigger
+    LaunchedEffect(studentId, refreshTrigger) {
+        val subscription = subscriptionRepository.getActiveSubscription(studentId)
+        activeSubscription = subscription
+    }
+
+    // Buscar el plan correspondiente cuando cambia la suscripción o la lista de planes
+    LaunchedEffect(activeSubscription, plans) {
+        currentPlan = activeSubscription?.let { subscription ->
+            plans.find { it.id == subscription.planId }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -151,9 +172,25 @@ fun StudentDetailScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    DetailRow(label = "Plan", value = "Plan Mensual")
-                    DetailRow(label = "Precio", value = "$5,000")
-                    DetailRow(label = "Estado", value = "Activo")
+                    if (currentPlan != null && activeSubscription != null) {
+                        DetailRow(label = "Plan", value = currentPlan!!.activityName)
+                        val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                        DetailRow(label = "Precio", value = formatter.format(currentPlan!!.price))
+                        DetailRow(
+                            label = "Estado",
+                            value = if (activeSubscription!!.active) "Activo" else "Inactivo"
+                        )
+                        activeSubscription!!.startDate?.let { startDate ->
+                            val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("es-AR"))
+                            DetailRow(label = "Fecha de inicio", value = dateFormat.format(Date(startDate)))
+                        }
+                    } else {
+                        Text(
+                            text = "Sin plan asignado",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                 }
             }
 
@@ -193,13 +230,9 @@ fun StudentDetailScreen(
                         if (result.isSuccess) {
                             // Si se seleccionó un plan diferente, actualizar suscripción
                             if (selectedPlan != null) {
-                                Subscription(
-                                    studentId = studentId,
-                                    planId = selectedPlan.id,
-                                    startDate = System.currentTimeMillis(),
-                                    active = true
-                                )
                                 subscriptionViewModel.assignPlan(updatedStudent, selectedPlan)
+                                // Refrescar la suscripción actual
+                                refreshTrigger++
                             }
                             viewModel.refreshData()
                             snackbarHostState.showSnackbar("Alumno actualizado")
