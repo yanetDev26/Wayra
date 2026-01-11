@@ -17,6 +17,7 @@ import com.app.wayra.data.model.Student
 import com.app.wayra.data.model.Subscription
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
@@ -153,7 +154,7 @@ fun AddStudentScreen(
                                     name = name,
                                     email = email,
                                     phone = phone,
-                                    registrationDate = null,
+                                    registrationDate = Timestamp.now(),
                                     active = isActive
                                 )
                                 val result = viewModel.addStudent(student)

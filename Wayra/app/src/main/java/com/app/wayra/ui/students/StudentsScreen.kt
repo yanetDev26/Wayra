@@ -17,13 +17,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,21 +61,24 @@ fun StudentsScreen(
             topBar = {
                 TopAppBar(
                     title = { Text(stringResource(R.string.students_title)) },
-                    navigationIcon = {
-                        IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    actions = {
+                        IconButton(
+                            onClick = onNavigateToAddStudent,
+                            modifier = Modifier
+                                .background(
+                                    color = WayraOrange,
+                                    shape = CircleShape
+                                )
+                                .size(48.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(R.string.students_add),
+                                tint = Color.White
+                            )
                         }
                     }
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = onNavigateToAddStudent,
-                    containerColor = WayraOrange,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.students_add))
-                }
             }
         ) { paddingValues ->
             StudentsContent(
@@ -85,6 +86,7 @@ fun StudentsScreen(
                 searchQuery = searchQuery,
                 viewModel = viewModel,
                 onNavigateToStudentDetail = onNavigateToStudentDetail,
+                onNavigateToAddStudent = onNavigateToAddStudent,
                 showTitle = false,
                 modifier = Modifier
                     .fillMaxSize()
@@ -93,29 +95,42 @@ fun StudentsScreen(
             )
         }
     } else {
-        Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.students_title)) },
+                    actions = {
+                        IconButton(
+                            onClick = onNavigateToAddStudent,
+                            modifier = Modifier
+                                .background(
+                                    color = WayraOrange,
+                                    shape = CircleShape
+                                )
+                                .size(48.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(R.string.students_add),
+                                tint = Color.White
+                            )
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
             StudentsContent(
                 filteredStudents = filteredStudents,
                 searchQuery = searchQuery,
                 viewModel = viewModel,
                 onNavigateToStudentDetail = onNavigateToStudentDetail,
-                showTitle = true,
+                onNavigateToAddStudent = onNavigateToAddStudent,
+                showTitle = false,
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
                     .padding(16.dp)
             )
-
-            // FAB posicionado manualmente (ajustado para navbar flotante moderna)
-            FloatingActionButton(
-                onClick = onNavigateToAddStudent,
-                containerColor = WayraOrange,
-                contentColor = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 92.dp, end = 16.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.students_add))
-            }
         }
     }
 }
@@ -126,18 +141,41 @@ private fun StudentsContent(
     searchQuery: String,
     viewModel: StudentsViewModel,
     onNavigateToStudentDetail: (String) -> Unit,
+    onNavigateToAddStudent: () -> Unit = {},
     showTitle: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         // Título solo si no hay topBar
         if (showTitle) {
-            Text(
-                text = stringResource(R.string.students_title),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.students_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                IconButton(
+                    onClick = onNavigateToAddStudent,
+                    modifier = Modifier
+                        .background(
+                            color = WayraOrange,
+                            shape = CircleShape
+                        )
+                        .size(48.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.students_add),
+                        tint = Color.White
+                    )
+                }
+            }
         }
 
         // Search Bar

@@ -1,6 +1,6 @@
 package com.app.wayra.data.model
 
-import java.security.Timestamp
+import com.google.firebase.Timestamp
 
 data class Student (
     val id: String = "",
