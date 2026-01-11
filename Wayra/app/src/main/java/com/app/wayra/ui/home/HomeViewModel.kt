@@ -14,8 +14,10 @@ import java.util.*
 
 data class HomeStats(
     val activeStudents: Int = 0,
-    val pendingPayments: Int = 0,
-    val totalCollected: Double = 0.0
+    val newStudentsThisMonth: Int = 0,
+    val totalCollected: Double = 0.0,
+    val pendingThisMonth: Int = 0,
+    val pendingLastMonth: Int = 0
 )
 
 class HomeViewModel : ViewModel() {
@@ -72,11 +74,17 @@ class HomeViewModel : ViewModel() {
 
         // Cargar estadísticas
         viewModelScope.launch {
-            val (_, pendingCount, totalCollected) = paymentRepository.getMonthlyStats()
+            val (_, _, totalCollected) = paymentRepository.getMonthlyStats()
+            val pendingThisMonth = paymentRepository.getStudentsWithPendingPaymentsThisMonth()
+            val pendingLastMonth = paymentRepository.getStudentsWithPendingPaymentsLastMonth()
+            val newStudentsThisMonth = studentRepository.getNewStudentsThisMonth()
+
             val currentStats = _stats.value ?: HomeStats()
             _stats.value = currentStats.copy(
-                pendingPayments = pendingCount,
-                totalCollected = totalCollected
+                newStudentsThisMonth = newStudentsThisMonth,
+                totalCollected = totalCollected,
+                pendingThisMonth = pendingThisMonth,
+                pendingLastMonth = pendingLastMonth
             )
         }
     }

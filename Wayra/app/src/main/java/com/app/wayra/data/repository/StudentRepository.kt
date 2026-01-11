@@ -114,4 +114,26 @@ class StudentRepository {
             Result.failure(e)
         }
     }
+
+    // Obtener cantidad de estudiantes nuevos este mes
+    suspend fun getNewStudentsThisMonth(): Int {
+        return try {
+            val calendar = java.util.Calendar.getInstance()
+            // Inicio del mes actual
+            calendar.set(java.util.Calendar.DAY_OF_MONTH, 1)
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            calendar.set(java.util.Calendar.MINUTE, 0)
+            calendar.set(java.util.Calendar.SECOND, 0)
+            val startOfMonth = com.google.firebase.Timestamp(java.util.Date(calendar.timeInMillis))
+
+            val snapshot = studentsCollection
+                .whereGreaterThanOrEqualTo("registrationDate", startOfMonth)
+                .get()
+                .await()
+
+            snapshot.size()
+        } catch (e: Exception) {
+            0
+        }
+    }
 }

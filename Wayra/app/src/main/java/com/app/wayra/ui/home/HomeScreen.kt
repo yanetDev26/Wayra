@@ -144,11 +144,37 @@ fun HomeContent(
                 )
 
                 StatCardCompact(
-                    title = stringResource(R.string.home_pending_payments),
-                    value = stats.pendingPayments.toString(),
-                    emoji = "⚠️",
-                    backgroundColor = Color(0xFFFFF3E0),
-                    contentColor = Color(0xFFE65100),
+                    title = "Nuevos este mes",
+                    value = stats.newStudentsThisMonth.toString(),
+                    emoji = "✨",
+                    backgroundColor = Color(0xFFE8F5E9),
+                    contentColor = Color(0xFF2E7D32),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Tarjetas de deudores
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                StatCardCompact(
+                    title = "Faltan abonar este mes",
+                    value = stats.pendingThisMonth.toString(),
+                    emoji = "📅",
+                    backgroundColor = Color(0xFFFFEBEE),
+                    contentColor = Color(0xFFC62828),
+                    modifier = Modifier.weight(1f)
+                )
+
+                StatCardCompact(
+                    title = "Faltan abonar mes pasado",
+                    value = stats.pendingLastMonth.toString(),
+                    emoji = "🔴",
+                    backgroundColor = Color(0xFFFFCDD2),
+                    contentColor = Color(0xFFB71C1C),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -503,8 +529,10 @@ fun HomeScreenPreview() {
         HomeContent(
             stats = HomeStats(
                 activeStudents = 24,
-                pendingPayments = 8,
-                totalCollected = 45000.0
+                newStudentsThisMonth = 4,
+                totalCollected = 45000.0,
+                pendingThisMonth = 5,
+                pendingLastMonth = 3
             ),
             currentDate = "25 de Diciembre, 2025",
             upcomingPayments = listOf(
