@@ -225,6 +225,7 @@ fun StudentDetailScreen(
                 plans = plans,
                 onDismiss = { showEditDialog = false },
                 onSave = { updatedStudent, selectedPlan ->
+                    showEditDialog = false
                     coroutineScope.launch {
                         val result = viewModel.updateStudent(studentId, updatedStudent)
                         if (result.isSuccess) {
@@ -236,7 +237,6 @@ fun StudentDetailScreen(
                             }
                             viewModel.refreshData()
                             snackbarHostState.showSnackbar("Alumno actualizado")
-                            showEditDialog = false
                         } else {
                             snackbarHostState.showSnackbar("Error al actualizar")
                         }
@@ -250,10 +250,11 @@ fun StudentDetailScreen(
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
                 title = { Text("Eliminar Alumno") },
-                text = { Text("¿Estás seguro de que deseas eliminar a ${student?.name}?") },
+                text = { Text("¿Estás seguro de que deseas eliminar a ${student?.getFullName()}?") },
                 confirmButton = {
                     TextButton(
                         onClick = {
+                            showDeleteDialog = false
                             coroutineScope.launch {
                                 val result = viewModel.deleteStudent(studentId)
                                 if (result.isSuccess) {
@@ -262,7 +263,6 @@ fun StudentDetailScreen(
                                 } else {
                                     snackbarHostState.showSnackbar("Error al eliminar")
                                 }
-                                showDeleteDialog = false
                             }
                         }
                     ) {

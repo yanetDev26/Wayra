@@ -1,6 +1,8 @@
 package com.app.wayra.ui.plans
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,19 +84,26 @@ fun PlansScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.plans_title)) },
                 actions = {
-                    IconButton(
-                        onClick = onNavigateToAddPlan,
+                    Box(
                         modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(48.dp)
                             .background(
                                 color = WayraOrange,
                                 shape = CircleShape
                             )
-                            .size(48.dp)
+                            .clickable(
+                                onClick = onNavigateToAddPlan,
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = stringResource(R.string.plans_add),
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -193,12 +202,12 @@ fun PlansScreen(
                 plan = selectedPlan!!,
                 onDismiss = { showEditDialog = false },
                 onSave = { updatedPlan ->
+                    showEditDialog = false
                     coroutineScope.launch {
                         val result = viewModel.updatePlan(selectedPlan!!.id, updatedPlan)
                         if (result.isSuccess) {
                             viewModel.refreshData()
                             snackbarHostState.showSnackbar("Plan actualizado")
-                            showEditDialog = false
                         } else {
                             snackbarHostState.showSnackbar("Error al actualizar")
                         }

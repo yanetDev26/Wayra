@@ -1,9 +1,10 @@
 package com.app.wayra.data.model
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 
 data class Student (
-    val id: String = "",
+    @get:Exclude val id: String = "",
     val name: String = "",
     val surname: String = "",
     val email: String = "",

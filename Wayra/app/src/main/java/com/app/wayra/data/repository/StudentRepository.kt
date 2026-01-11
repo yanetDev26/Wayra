@@ -33,16 +33,6 @@ class StudentRepository {
         awaitClose { subscription.remove() }
     }
 
-    // Obtener estudiante por ID
-    suspend fun getStudentById(studentId: String): Student? {
-        return try {
-            val doc = studentsCollection.document(studentId).get().await()
-            doc.toObject(Student::class.java)?.copy(id = doc.id)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     // Agregar nuevo estudiante
     suspend fun addStudent(student: Student): Result<String> {
         return try {
