@@ -36,11 +36,7 @@ fun WayraNavHost(
             val viewModel: HomeViewModel = viewModel()
             HomeScreen(
                 viewModel = viewModel,
-                onNavigateToStudents = { navController.navigate(Screen.Students.route) },
-                onNavigateToPlans = { navController.navigate(Screen.Plans.route) },
-                onNavigateToRegisterPayment = { navController.navigate(Screen.RegisterPayment.route) },
-                onNavigateToReports = { navController.navigate(Screen.Reports.route) },
-                onNavigateToAssignPlan = { navController.navigate(Screen.AssignPlan.route) }
+                onNavigateToRegisterPayment = { navController.navigate(Screen.RegisterPayment.route) }
             )
         }
 

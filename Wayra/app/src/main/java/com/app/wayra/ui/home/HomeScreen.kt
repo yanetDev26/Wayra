@@ -48,11 +48,7 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToStudents: () -> Unit = {},
-    onNavigateToPlans: () -> Unit = {},
-    onNavigateToRegisterPayment: () -> Unit = {},
-    onNavigateToReports: () -> Unit = {},
-    onNavigateToAssignPlan: () -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
@@ -62,12 +58,7 @@ fun HomeScreen(
         stats = stats,
         currentDate = currentDate,
         upcomingPayments = upcomingPayments,
-        onAddStudentClick = onNavigateToStudents,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
-        onViewReportsClick = onNavigateToReports,
-        onNavigateToStudents = onNavigateToStudents,
-        onNavigateToPlans = onNavigateToPlans,
-        onNavigateToAssignPlan = onNavigateToAssignPlan,
         modifier = modifier
     )
 }
@@ -77,12 +68,7 @@ fun HomeContent(
     stats: HomeStats,
     currentDate: String,
     upcomingPayments: List<Payment>,
-    onAddStudentClick: () -> Unit,
     onRegisterPaymentClick: () -> Unit,
-    onViewReportsClick: () -> Unit,
-    onNavigateToStudents: () -> Unit = {},
-    onNavigateToPlans: () -> Unit = {},
-    onNavigateToAssignPlan: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -224,91 +210,19 @@ fun HomeContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Acciones principales destacadas
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+            // Acción principal: Registrar pago
+            FilledTonalButton(
+                onClick = onRegisterPaymentClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    FilledTonalButton(
-                        onClick = onAddStudentClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_add_student),
-                            fontSize = 11.sp,
-                            maxLines = 2,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    FilledTonalButton(
-                        onClick = onRegisterPaymentClick,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_register_payment),
-                            fontSize = 11.sp,
-                            maxLines = 2,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onNavigateToStudents,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.students_title),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = onNavigateToPlans,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.plans_title),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-
-                OutlinedButton(
-                    onClick = onViewReportsClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_view_reports),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.home_register_payment),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -603,12 +517,7 @@ fun HomeScreenPreview() {
                     status = PaymentStatus.PENDIENTE
                 )
             ),
-            onAddStudentClick = {},
-            onRegisterPaymentClick = {},
-            onViewReportsClick = {},
-            onNavigateToStudents = {},
-            onNavigateToPlans = {},
-            onNavigateToAssignPlan = {}
+            onRegisterPaymentClick = {}
         )
     }
 }

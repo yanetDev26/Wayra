@@ -78,13 +78,7 @@ fun MainScreen() {
                 HomeScreen(
                     viewModel = homeViewModel,
                     modifier = Modifier.padding(innerPadding),
-                    onNavigateToStudents = { selectedItem = 1 },
-                    onNavigateToPlans = { selectedItem = 2 },
                     onNavigateToRegisterPayment = {
-                        // Navegar internamente dentro de Home
-                    },
-                    onNavigateToReports = { selectedItem = 3 },
-                    onNavigateToAssignPlan = {
                         // Navegar internamente dentro de Home
                     }
                 )
