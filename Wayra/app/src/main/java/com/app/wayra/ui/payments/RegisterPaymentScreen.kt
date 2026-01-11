@@ -1,20 +1,41 @@
 package com.app.wayra.ui.payments
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.app.wayra.R
 import com.app.wayra.data.model.PaymentMethod
-import com.app.wayra.data.model.Student
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,7 +92,7 @@ fun RegisterPaymentScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = selectedStudent?.name ?: stringResource(R.string.payment_select_student),
+                            text = selectedStudent?.getFullName() ?: stringResource(R.string.payment_select_student),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -162,7 +183,7 @@ fun RegisterPaymentScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(student.name, modifier = Modifier.fillMaxWidth())
+                            Text(student.getFullName(), modifier = Modifier.fillMaxWidth())
                         }
                     }
                 }
@@ -182,7 +203,7 @@ fun RegisterPaymentScreen(
             title = { Text(stringResource(R.string.payment_method)) },
             text = {
                 Column {
-                    PaymentMethod.values().forEach { method ->
+                    PaymentMethod.entries.forEach { method ->
                         TextButton(
                             onClick = {
                                 viewModel.selectPaymentMethod(method)

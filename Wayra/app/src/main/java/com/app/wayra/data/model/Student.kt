@@ -5,8 +5,11 @@ import com.google.firebase.Timestamp
 data class Student (
     val id: String = "",
     val name: String = "",
+    val surname: String = "",
     val email: String = "",
     val registrationDate: Timestamp? = null,
     val phone: String = "",
     val active: Boolean = true
-)
+) {
+    fun getFullName(): String = "$name $surname".trim()
+}

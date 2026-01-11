@@ -93,4 +93,25 @@ class StudentRepository {
 
         awaitClose { subscription.remove() }
     }
+
+    // Migración: Agregar campo surname a todos los estudiantes existentes
+    suspend fun migrateStudentsAddSurname(): Result<Int> {
+        return try {
+            val snapshot = studentsCollection.get().await()
+            var count = 0
+
+            snapshot.documents.forEach { doc ->
+                val data = doc.data
+                // Solo actualizar si no tiene el campo surname
+                if (data != null && !data.containsKey("surname")) {
+                    doc.reference.update("surname", "").await()
+                    count++
+                }
+            }
+
+            Result.success(count)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

@@ -44,6 +44,10 @@ class StudentsViewModel : ViewModel() {
 
     init {
         loadStudents()
+        // Ejecutar migración automática para agregar campo surname
+        viewModelScope.launch {
+            studentRepository.migrateStudentsAddSurname()
+        }
     }
 
     private fun loadStudents() {
@@ -93,11 +97,17 @@ class StudentsViewModel : ViewModel() {
         } else {
             allStudentsWithPlan.filter {
                 it.student.name.contains(query, ignoreCase = true) ||
+                it.student.surname.contains(query, ignoreCase = true) ||
+                it.student.getFullName().contains(query, ignoreCase = true) ||
                 it.student.email.contains(query, ignoreCase = true) ||
                 it.student.phone.contains(query, ignoreCase = true) ||
                 (it.planName?.contains(query, ignoreCase = true) == true)
             }
         }
+    }
+
+    suspend fun migrateStudentsAddSurname(): Result<Int> {
+        return studentRepository.migrateStudentsAddSurname()
     }
 
     suspend fun addStudent(student: Student): Result<String> {

@@ -32,6 +32,7 @@ fun AddStudentScreen(
     subscriptionViewModel: SubscriptionViewModel = viewModel()
 ) {
     var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(true) }
@@ -63,7 +64,15 @@ fun AddStudentScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text(stringResource(R.string.student_name)) },
+                label = { Text("Nombre") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            OutlinedTextField(
+                value = surname,
+                onValueChange = { surname = it },
+                label = { Text("Apellido") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -148,10 +157,11 @@ fun AddStudentScreen(
 
                 Button(
                     onClick = {
-                        if (name.isNotBlank() && email.isNotBlank()) {
+                        if (name.isNotBlank() && surname.isNotBlank() && email.isNotBlank()) {
                             coroutineScope.launch {
                                 val student = Student(
                                     name = name,
+                                    surname = surname,
                                     email = email,
                                     phone = phone,
                                     registrationDate = Timestamp.now(),
@@ -179,7 +189,7 @@ fun AddStudentScreen(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = name.isNotBlank() && email.isNotBlank()
+                    enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank()
                 ) {
                     Text(stringResource(R.string.save))
                 }

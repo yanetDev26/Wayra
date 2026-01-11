@@ -136,7 +136,7 @@ fun StudentDetailScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    DetailRow(label = "Nombre", value = student?.name ?: "Cargando...")
+                    DetailRow(label = "Nombre", value = student?.getFullName() ?: "Cargando...")
                     DetailRow(label = "Email", value = student?.email ?: "-")
                     DetailRow(label = "Teléfono", value = student?.phone ?: "-")
 
@@ -287,6 +287,7 @@ fun EditStudentDialog(
     onSave: (Student, Plan?) -> Unit
 ) {
     var name by remember { mutableStateOf(student.name) }
+    var surname by remember { mutableStateOf(student.surname) }
     var email by remember { mutableStateOf(student.email) }
     var phone by remember { mutableStateOf(student.phone) }
     var active by remember { mutableStateOf(student.active) }
@@ -302,6 +303,12 @@ fun EditStudentDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nombre") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = surname,
+                    onValueChange = { surname = it },
+                    label = { Text("Apellido") },
                     singleLine = true
                 )
                 OutlinedTextField(
@@ -363,6 +370,7 @@ fun EditStudentDialog(
                     onSave(
                         student.copy(
                             name = name,
+                            surname = surname,
                             email = email,
                             phone = phone,
                             active = active

@@ -2,6 +2,7 @@ package com.app.wayra.ui.subscriptions
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -45,7 +46,7 @@ fun AssignPlanScreen(
                 title = { Text(stringResource(R.string.subscription_assign_plan)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -76,7 +77,7 @@ fun AssignPlanScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = selectedStudent?.name ?: stringResource(R.string.payment_select_student),
+                            text = selectedStudent?.getFullName() ?: stringResource(R.string.payment_select_student),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -154,7 +155,7 @@ fun AssignPlanScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(student.name, modifier = Modifier.fillMaxWidth())
+                            Text(student.getFullName(), modifier = Modifier.fillMaxWidth())
                         }
                     }
                     if (students.none { it.active }) {

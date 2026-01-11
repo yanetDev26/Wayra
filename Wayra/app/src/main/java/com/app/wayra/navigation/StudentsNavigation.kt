@@ -36,15 +36,13 @@ fun StudentsNavHost(
         composable(StudentsScreens.StudentsList.route) {
             StudentsScreen(
                 viewModel = studentsViewModel,
-                onNavigateBack = { /* No hacer nada, estamos en una tab */ },
                 onNavigateToAddStudent = {
                     navController.navigate(StudentsScreens.AddStudent.route)
                 },
                 onNavigateToStudentDetail = { studentId ->
                     navController.navigate(StudentsScreens.StudentDetail.createRoute(studentId))
                 },
-                showTopBar = false, // No mostrar topBar en la tab
-                modifier = modifier
+                showTopBar = false
             )
         }
 

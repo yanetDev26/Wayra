@@ -48,7 +48,6 @@ fun WayraNavHost(
             val viewModel: StudentsViewModel = viewModel()
             StudentsScreen(
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
                 onNavigateToAddStudent = { navController.navigate(Screen.AddStudent.route) },
                 onNavigateToStudentDetail = { studentId ->
                     navController.navigate(Screen.StudentDetail.createRoute(studentId))
