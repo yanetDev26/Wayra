@@ -76,6 +76,7 @@ fun HomeContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(bottom = 80.dp)
     ) {
         // Header con logo
         Box(

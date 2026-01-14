@@ -26,7 +26,8 @@ fun ReportsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 80.dp)
         ) {
             item {
                 ReportCard(
