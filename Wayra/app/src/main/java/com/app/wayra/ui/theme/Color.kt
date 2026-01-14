@@ -9,7 +9,6 @@ val White = Color(0xFFFFFFFF)
 
 // Variaciones del naranja
 val OrangeLight = Color(0xFFFF8A3D)
-val OrangeDark = Color(0xFFB24E12)
 
 // Colores de superficie y fondo
 val SurfaceBlack = Color(0xFF121212)

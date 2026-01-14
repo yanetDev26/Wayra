@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
+import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.PaymentRepository
+import com.app.wayra.data.repository.PlanRepository
 import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.data.repository.SubscriptionRepository
 import kotlinx.coroutines.flow.catch
@@ -19,6 +21,7 @@ class PaymentViewModel : ViewModel() {
     private val studentRepository = StudentRepository()
     private val paymentRepository = PaymentRepository()
     private val subscriptionRepository = SubscriptionRepository()
+    private val planRepository = PlanRepository()
 
     private val _students = MutableLiveData<List<Student>>().apply {
         value = emptyList()
@@ -27,6 +30,9 @@ class PaymentViewModel : ViewModel() {
 
     private val _selectedStudent = MutableLiveData<Student?>()
     val selectedStudent: LiveData<Student?> = _selectedStudent
+
+    private val _selectedPlan = MutableLiveData<Plan?>()
+    val selectedPlan: LiveData<Plan?> = _selectedPlan
 
     private val _amount = MutableLiveData<String>().apply {
         value = ""
@@ -64,6 +70,37 @@ class PaymentViewModel : ViewModel() {
 
     fun selectStudent(student: Student) {
         _selectedStudent.value = student
+        // Cargar el plan asociado al estudiante automáticamente
+        loadStudentPlan(student.id)
+    }
+
+    private fun loadStudentPlan(studentId: String) {
+        viewModelScope.launch {
+            try {
+                // Obtener la suscripción activa del estudiante
+                val subscription = subscriptionRepository.getActiveSubscription(studentId)
+
+                if (subscription != null) {
+                    // Obtener el plan asociado a la suscripción
+                    val plan = planRepository.getPlanById(subscription.planId)
+
+                    if (plan != null) {
+                        _selectedPlan.value = plan
+                        // Establecer automáticamente el monto del plan
+                        _amount.value = plan.price.toString()
+                    } else {
+                        _selectedPlan.value = null
+                        _amount.value = ""
+                    }
+                } else {
+                    _selectedPlan.value = null
+                    _amount.value = ""
+                }
+            } catch (_: Exception) {
+                _selectedPlan.value = null
+                _amount.value = ""
+            }
+        }
     }
 
     fun setAmount(value: String) {
@@ -109,6 +146,7 @@ class PaymentViewModel : ViewModel() {
 
     private fun clearForm() {
         _selectedStudent.value = null
+        _selectedPlan.value = null
         _amount.value = ""
         _selectedPaymentMethod.value = PaymentMethod.EFECTIVO
         _notes.value = ""

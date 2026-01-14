@@ -1,8 +1,6 @@
 package com.app.wayra.ui.plans
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,26 +82,11 @@ fun PlansScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.plans_title)) },
                 actions = {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(48.dp)
-                            .background(
-                                color = WayraOrange,
-                                shape = CircleShape
-                            )
-                            .clickable(
-                                onClick = onNavigateToAddPlan,
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    IconButton(onClick = onNavigateToAddPlan) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = stringResource(R.string.plans_add),
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = WayraOrange
                         )
                     }
                 }
@@ -397,73 +380,6 @@ fun PlanItemModern(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Eliminar", fontSize = 13.sp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PlanItem(
-    plan: Plan,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = plan.activityName,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (plan.description.isNotBlank()) {
-                        Text(
-                            text = plan.description,
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = formatCurrency(plan.price),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        IconButton(onClick = onEdit) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Editar",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                        IconButton(onClick = onDelete) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Eliminar",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
                 }
             }
         }

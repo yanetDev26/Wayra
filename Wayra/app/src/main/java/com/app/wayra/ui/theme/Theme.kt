@@ -1,6 +1,5 @@
 package com.app.wayra.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -9,12 +8,12 @@ import androidx.compose.ui.graphics.Color
 private val DarkColorScheme = darkColorScheme(
     primary = WayraOrange,
     onPrimary = White,
-    primaryContainer = OrangeDark,
+    primaryContainer = OrangeLight,
     onPrimaryContainer = White,
 
     secondary = WayraOrange,
     onSecondary = White,
-    secondaryContainer = OrangeDark,
+    secondaryContainer = OrangeLight,
     onSecondaryContainer = White,
 
     tertiary = WayraOrange,

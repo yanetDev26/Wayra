@@ -57,6 +57,7 @@
     <string name="payment_student">Estudiante</string>
     <string name="payment_select_student">Seleccionar estudiante</string>
     <string name="payment_amount">Monto</string>
+    <string name="payment_plan_and_amount">Plan y Monto</string>
     <string name="payment_method">Método de pago</string>
     <string name="payment_notes">Notas</string>
     <string name="payment_register">Registrar Pago</string>

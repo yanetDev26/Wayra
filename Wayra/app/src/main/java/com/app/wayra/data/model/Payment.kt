@@ -1,5 +1,7 @@
 package com.app.wayra.data.model
 
+import com.google.firebase.firestore.Exclude
+
 enum class PaymentMethod {
     MERCADO_PAGO,
     EFECTIVO,
@@ -13,7 +15,7 @@ enum class PaymentStatus {
 }
 
 data class Payment(
-    val id: String = "",
+    @get:Exclude val id: String = "",
     val studentId: String = "",
     val subscriptionId: String = "",
     val amount: Double = 0.0,

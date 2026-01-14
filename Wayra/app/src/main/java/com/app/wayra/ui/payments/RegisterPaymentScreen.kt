@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -36,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.app.wayra.R
 import com.app.wayra.data.model.PaymentMethod
@@ -51,6 +49,7 @@ fun RegisterPaymentScreen(
 ) {
     val students by viewModel.students.observeAsState(emptyList())
     val selectedStudent by viewModel.selectedStudent.observeAsState()
+    val selectedPlan by viewModel.selectedPlan.observeAsState()
     val amount by viewModel.amount.observeAsState("")
     val selectedPaymentMethod by viewModel.selectedPaymentMethod.observeAsState(PaymentMethod.EFECTIVO)
     val notes by viewModel.notes.observeAsState("")
@@ -108,16 +107,46 @@ fun RegisterPaymentScreen(
                 }
             }
 
-            // Amount
-            OutlinedTextField(
-                value = amount,
-                onValueChange = { viewModel.setAmount(it) },
-                label = { Text(stringResource(R.string.payment_amount)) },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                prefix = { Text("$") }
-            )
+            // Plan y Monto (solo lectura, se carga automáticamente)
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.payment_plan_and_amount),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (selectedPlan != null) {
+                        Text(
+                            text = selectedPlan!!.activityName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        Text(
+                            text = "$ ${amount}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    } else {
+                        Text(
+                            text = if (selectedStudent != null) {
+                                "El estudiante no tiene un plan asignado"
+                            } else {
+                                "Selecciona un estudiante para ver el plan"
+                            },
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+            }
 
             // Payment Method Selector
             OutlinedCard(
@@ -203,7 +232,7 @@ fun RegisterPaymentScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading && selectedStudent != null && amount.isNotBlank()
+                enabled = !isLoading && selectedStudent != null && selectedPlan != null && amount.isNotBlank()
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(

@@ -2,7 +2,6 @@ package com.app.wayra.ui.students
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,26 +60,11 @@ fun StudentsScreen(
                 TopAppBar(
                     title = { Text(stringResource(R.string.students_title)) },
                     actions = {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(48.dp)
-                                .background(
-                                    color = WayraOrange,
-                                    shape = CircleShape
-                                )
-                                .clickable(
-                                    onClick = onNavigateToAddStudent,
-                                    indication = null,
-                                    interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        IconButton(onClick = onNavigateToAddStudent) {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = stringResource(R.string.students_add),
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
+                                tint = WayraOrange
                             )
                         }
                     }
@@ -106,26 +90,11 @@ fun StudentsScreen(
                 TopAppBar(
                     title = { Text(stringResource(R.string.students_title)) },
                     actions = {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(48.dp)
-                                .background(
-                                    color = WayraOrange,
-                                    shape = CircleShape
-                                )
-                                .clickable(
-                                    onClick = onNavigateToAddStudent,
-                                    indication = null,
-                                    interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        IconButton(onClick = onNavigateToAddStudent) {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = stringResource(R.string.students_add),
-                                tint = Color.White,
-                                modifier = Modifier.size(24.dp)
+                                tint = WayraOrange
                             )
                         }
                     }
