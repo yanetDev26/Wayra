@@ -11,7 +11,8 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreen(
-    onNavigateToMonthlyIncome: () -> Unit = {}
+    onNavigateToMonthlyIncome: () -> Unit = {},
+    onNavigateToPendingPayments: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -39,7 +40,8 @@ fun ReportsScreen(
             item {
                 ReportCard(
                     title = "Pagos Pendientes",
-                    description = "Estudiantes con pagos atrasados"
+                    description = "Estudiantes con pagos atrasados",
+                    onClick = onNavigateToPendingPayments
                 )
             }
 
