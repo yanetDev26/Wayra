@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.app.wayra.navigation.HomeNavHost
+import com.app.wayra.navigation.ReportsNavHost
 import com.app.wayra.navigation.StudentsNavHost
 import com.app.wayra.ui.home.HomeViewModel
 import com.app.wayra.ui.plans.PlansScreen
 import com.app.wayra.ui.plans.PlansViewModel
-import com.app.wayra.ui.reports.ReportsScreen
 import com.app.wayra.ui.splash.SplashScreen
 import com.app.wayra.ui.students.StudentsViewModel
 import com.app.wayra.ui.theme.WayraOrange
@@ -106,8 +106,9 @@ fun MainScreen() {
                 )
             }
             3 -> {
-                ReportsScreen(
-                    modifier = Modifier.padding(innerPadding)
+                val reportsNavController = rememberNavController()
+                ReportsNavHost(
+                    navController = reportsNavController
                 )
             }
         }

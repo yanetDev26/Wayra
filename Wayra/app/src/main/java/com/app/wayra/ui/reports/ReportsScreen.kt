@@ -8,31 +8,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreen(
-    modifier: Modifier = Modifier
+    onNavigateToMonthlyIncome: () -> Unit = {}
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Reportes Financieros",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Reportes Financieros") }
+            )
+        }
+    ) { paddingValues ->
         LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
         ) {
             item {
                 ReportCard(
                     title = "Ingresos del Mes",
-                    description = "Total recaudado en el mes actual"
+                    description = "Total recaudado en el mes actual",
+                    onClick = onNavigateToMonthlyIncome
                 )
             }
 
@@ -70,7 +70,8 @@ fun ReportsScreen(
 @Composable
 private fun ReportCard(
     title: String,
-    description: String
+    description: String,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -92,7 +93,7 @@ private fun ReportCard(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
-                onClick = { /* TODO: Implementar navegación al reporte */ },
+                onClick = onClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Ver Reporte")

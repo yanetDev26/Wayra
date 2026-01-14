@@ -21,6 +21,9 @@ import com.app.wayra.ui.payments.RegisterPaymentScreen
 import com.app.wayra.ui.payments.PaymentDetailScreen
 import com.app.wayra.ui.payments.PaymentViewModel
 import com.app.wayra.ui.subscriptions.AssignPlanScreen
+import com.app.wayra.ui.reports.ReportsScreen
+import com.app.wayra.ui.reports.ReportsViewModel
+import com.app.wayra.ui.reports.MonthlyIncomeReportScreen
 
 @Composable
 fun WayraNavHost(
@@ -119,7 +122,17 @@ fun WayraNavHost(
         }
 
         composable(Screen.Reports.route) {
-            // TODO: Implementar pantalla de reportes
+            ReportsScreen(
+                onNavigateToMonthlyIncome = { navController.navigate(Screen.MonthlyIncomeReport.route) }
+            )
+        }
+
+        composable(Screen.MonthlyIncomeReport.route) {
+            val viewModel: ReportsViewModel = viewModel()
+            MonthlyIncomeReportScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

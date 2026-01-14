@@ -1,6 +1,7 @@
 package com.app.wayra.data.repository
 
 import com.app.wayra.data.model.Payment
+import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -240,4 +241,77 @@ class PaymentRepository {
             0
         }
     }
+
+    // Obtener todos los pagos del mes actual
+    suspend fun getMonthlyPayments(): List<Payment> {
+        return try {
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            val startOfMonth = calendar.timeInMillis
+
+            val snapshot = paymentsCollection
+                .whereEqualTo("status", PaymentStatus.PAGADO.name)
+                .whereGreaterThanOrEqualTo("paymentDate", startOfMonth)
+                .orderBy("paymentDate", Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Payment::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // Obtener estadísticas detalladas de ingresos del mes
+    suspend fun getMonthlyIncomeDetails(): MonthlyIncomeStats {
+        return try {
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            val startOfMonth = calendar.timeInMillis
+
+            // Obtener todos los pagos del mes
+            val snapshot = paymentsCollection
+                .whereEqualTo("status", PaymentStatus.PAGADO.name)
+                .whereGreaterThanOrEqualTo("paymentDate", startOfMonth)
+                .get()
+                .await()
+
+            val payments = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Payment::class.java)?.copy(id = doc.id)
+            }
+
+            // Calcular estadísticas
+            val totalIncome = payments.sumOf { it.amount }
+            val totalPayments = payments.size
+            val paymentsByMethod = payments.groupBy { it.paymentMethod ?: PaymentMethod.EFECTIVO }
+                .mapValues { entry ->
+                    Pair(entry.value.size, entry.value.sumOf { it.amount })
+                }
+
+            MonthlyIncomeStats(
+                totalIncome = totalIncome,
+                totalPayments = totalPayments,
+                paymentsByMethod = paymentsByMethod,
+                payments = payments
+            )
+        } catch (_: Exception) {
+            MonthlyIncomeStats(0.0, 0, emptyMap(), emptyList())
+        }
+    }
 }
+
+// Data class para estadísticas de ingresos mensuales
+data class MonthlyIncomeStats(
+    val totalIncome: Double,
+    val totalPayments: Int,
+    val paymentsByMethod: Map<PaymentMethod, Pair<Int, Double>>, // Método -> (cantidad, total)
+    val payments: List<Payment>
+)

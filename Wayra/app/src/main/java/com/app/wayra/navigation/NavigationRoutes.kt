@@ -8,9 +8,6 @@ sealed class Screen(val route: String) {
     }
     object AddStudent : Screen("add_student")
     object Plans : Screen("plans")
-    object PlanDetail : Screen("plan_detail/{planId}") {
-        fun createRoute(planId: String) = "plan_detail/$planId"
-    }
     object AddPlan : Screen("add_plan")
     object AssignPlan : Screen("assign_plan")
     object RegisterPayment : Screen("register_payment")
@@ -18,4 +15,5 @@ sealed class Screen(val route: String) {
         fun createRoute(paymentId: String) = "payment_detail/$paymentId"
     }
     object Reports : Screen("reports")
+    object MonthlyIncomeReport : Screen("monthly_income_report")
 }
