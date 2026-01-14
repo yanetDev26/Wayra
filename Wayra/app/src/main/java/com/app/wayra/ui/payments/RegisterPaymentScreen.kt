@@ -7,13 +7,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -55,6 +58,8 @@ fun RegisterPaymentScreen(
     val coroutineScope = rememberCoroutineScope()
     var showStudentPicker by remember { mutableStateOf(false) }
     var showPaymentMethodPicker by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
@@ -66,7 +71,8 @@ fun RegisterPaymentScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -156,15 +162,57 @@ fun RegisterPaymentScreen(
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        if (viewModel.registerPayment()) {
+                        isLoading = true
+
+                        // Validar datos antes de intentar registrar
+                        if (selectedStudent == null) {
+                            snackbarHostState.showSnackbar("Por favor selecciona un estudiante")
+                            isLoading = false
+                            return@launch
+                        }
+
+                        if (amount.isBlank()) {
+                            snackbarHostState.showSnackbar("Por favor ingresa un monto")
+                            isLoading = false
+                            return@launch
+                        }
+
+                        val amountValue = amount.toDoubleOrNull()
+                        if (amountValue == null) {
+                            snackbarHostState.showSnackbar("El monto debe ser un número válido")
+                            isLoading = false
+                            return@launch
+                        }
+
+                        if (amountValue <= 0) {
+                            snackbarHostState.showSnackbar("El monto debe ser mayor a 0")
+                            isLoading = false
+                            return@launch
+                        }
+
+                        // Intentar registrar el pago
+                        val success = viewModel.registerPayment()
+                        isLoading = false
+
+                        if (success) {
+                            snackbarHostState.showSnackbar("Pago registrado exitosamente")
                             onPaymentRegistered()
+                        } else {
+                            snackbarHostState.showSnackbar("Error al registrar el pago. Verifica que el estudiante tenga una suscripción activa.")
                         }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = selectedStudent != null && amount.isNotBlank()
+                enabled = !isLoading && selectedStudent != null && amount.isNotBlank()
             ) {
-                Text(stringResource(R.string.payment_register))
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(stringResource(R.string.payment_register))
+                }
             }
         }
     }

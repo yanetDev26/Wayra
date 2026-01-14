@@ -18,6 +18,7 @@ import com.app.wayra.ui.plans.PlansScreen
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.plans.AddPlanScreen
 import com.app.wayra.ui.payments.RegisterPaymentScreen
+import com.app.wayra.ui.payments.PaymentDetailScreen
 import com.app.wayra.ui.payments.PaymentViewModel
 import com.app.wayra.ui.subscriptions.AssignPlanScreen
 
@@ -36,7 +37,10 @@ fun WayraNavHost(
             val viewModel: HomeViewModel = viewModel()
             HomeScreen(
                 viewModel = viewModel,
-                onNavigateToRegisterPayment = { navController.navigate(Screen.RegisterPayment.route) }
+                onNavigateToRegisterPayment = { navController.navigate(Screen.RegisterPayment.route) },
+                onNavigateToPaymentDetail = { paymentId ->
+                    navController.navigate(Screen.PaymentDetail.createRoute(paymentId))
+                }
             )
         }
 
@@ -98,6 +102,19 @@ fun WayraNavHost(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onPaymentRegistered = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.PaymentDetail.route,
+            arguments = listOf(navArgument("paymentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val paymentId = backStackEntry.arguments?.getString("paymentId") ?: ""
+            val viewModel: PaymentViewModel = viewModel()
+            PaymentDetailScreen(
+                paymentId = paymentId,
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = viewModel
             )
         }
 

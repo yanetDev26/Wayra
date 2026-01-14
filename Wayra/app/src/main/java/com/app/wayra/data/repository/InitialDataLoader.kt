@@ -2,14 +2,7 @@ package com.app.wayra.data.repository
 
 import com.app.wayra.data.model.Plan
 
-/**
- * Clase para cargar los datos iniciales de la app
- */
 object InitialDataLoader {
-
-    /**
-     * Los 5 planes de entrenamiento de Wayra
-     */
     fun getInitialPlans(): List<Plan> {
         return listOf(
             Plan(
@@ -40,10 +33,6 @@ object InitialDataLoader {
         )
     }
 
-    /**
-     * Carga los planes iniciales en Firebase
-     * Llama a esta función UNA SOLA VEZ cuando inicies la app por primera vez
-     */
     suspend fun loadInitialPlans(planRepository: PlanRepository): Result<Unit> {
         return try {
             val plans = getInitialPlans()

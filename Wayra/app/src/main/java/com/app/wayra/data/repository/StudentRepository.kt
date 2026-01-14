@@ -53,10 +53,43 @@ class StudentRepository {
         }
     }
 
-    // Eliminar estudiante
+    // Eliminar estudiante con borrado en cascada de suscripciones y pagos
     suspend fun deleteStudent(studentId: String): Result<Unit> {
         return try {
-            studentsCollection.document(studentId).delete().await()
+            // Obtener todas las suscripciones del estudiante
+            val subscriptionsSnapshot = firestore.collection("subscriptions")
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .await()
+
+            // Usar batch para operaciones atómicas
+            val batch = firestore.batch()
+
+            // Para cada suscripción, obtener y eliminar todos los pagos relacionados
+            for (subscriptionDoc in subscriptionsSnapshot.documents) {
+                val subscriptionId = subscriptionDoc.id
+
+                // Obtener todos los pagos de esta suscripción
+                val paymentsSnapshot = firestore.collection("payments")
+                    .whereEqualTo("subscriptionId", subscriptionId)
+                    .get()
+                    .await()
+
+                // Agregar eliminación de pagos al batch
+                paymentsSnapshot.documents.forEach { paymentDoc ->
+                    batch.delete(paymentDoc.reference)
+                }
+
+                // Agregar eliminación de la suscripción al batch
+                batch.delete(subscriptionDoc.reference)
+            }
+
+            // Agregar eliminación del estudiante al batch
+            batch.delete(studentsCollection.document(studentId))
+
+            // Ejecutar todas las eliminaciones atómicamente
+            batch.commit().await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -122,7 +155,7 @@ class StudentRepository {
                 .await()
 
             snapshot.size()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0
         }
     }

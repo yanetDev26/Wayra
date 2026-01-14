@@ -91,7 +91,7 @@ class PaymentRepository {
         return try {
             val doc = paymentsCollection.document(paymentId).get().await()
             doc.toObject(Payment::class.java)?.copy(id = doc.id)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -110,6 +110,16 @@ class PaymentRepository {
     suspend fun updatePayment(paymentId: String, payment: Payment): Result<Unit> {
         return try {
             paymentsCollection.document(paymentId).set(payment).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Eliminar pago
+    suspend fun deletePayment(paymentId: String): Result<Unit> {
+        return try {
+            paymentsCollection.document(paymentId).delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -145,7 +155,7 @@ class PaymentRepository {
             }
 
             Triple(0, pendingCount, totalCollected) // El primer valor (active students) vendrá de StudentRepository
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Triple(0, 0, 0.0)
         }
     }
@@ -184,7 +194,7 @@ class PaymentRepository {
                 .distinct()
 
             uniqueStudents.size
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0
         }
     }
@@ -226,7 +236,7 @@ class PaymentRepository {
                 .distinct()
 
             uniqueStudents.size
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0
         }
     }

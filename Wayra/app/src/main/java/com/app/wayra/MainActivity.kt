@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,15 +29,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.app.wayra.navigation.HomeNavHost
 import com.app.wayra.navigation.StudentsNavHost
-import com.app.wayra.ui.home.HomeScreen
 import com.app.wayra.ui.home.HomeViewModel
 import com.app.wayra.ui.plans.PlansScreen
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.reports.ReportsScreen
+import com.app.wayra.ui.splash.SplashScreen
 import com.app.wayra.ui.students.StudentsViewModel
 import com.app.wayra.ui.theme.WayraOrange
 import com.app.wayra.ui.theme.WayraTheme
@@ -44,14 +45,19 @@ import com.app.wayra.ui.theme.WayraTheme
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Instalar splash screen antes de super.onCreate
-        installSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         setContent {
             WayraTheme {
-                MainScreen()
+                var showSplash by remember { mutableStateOf(true) }
+
+                if (showSplash) {
+                    SplashScreen(
+                        onSplashFinished = { showSplash = false }
+                    )
+                } else {
+                    MainScreen()
+                }
             }
         }
     }
@@ -59,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-    var selectedItem by remember { mutableStateOf(0) }
+    var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Inicio", "Alumnos", "Planes", "Reportes")
 
     Scaffold(
@@ -73,19 +79,15 @@ fun MainScreen() {
     ) { innerPadding ->
         when (selectedItem) {
             0 -> {
-                // Tab Inicio: Dashboard con métricas y acciones rápidas
                 val homeViewModel: HomeViewModel = viewModel()
-                rememberNavController()
-                HomeScreen(
-                    viewModel = homeViewModel,
-                    modifier = Modifier.padding(innerPadding),
-                    onNavigateToRegisterPayment = {
-                        // Navegar internamente dentro de Home
-                    }
+                val homeNavController = rememberNavController()
+                HomeNavHost(
+                    navController = homeNavController,
+                    homeViewModel = homeViewModel,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
             1 -> {
-                // Tab Alumnos: ABM completo de estudiantes
                 val studentsViewModel: StudentsViewModel = viewModel()
                 val studentsNavController = rememberNavController()
                 StudentsNavHost(
@@ -94,7 +96,6 @@ fun MainScreen() {
                 )
             }
             2 -> {
-                // Tab Planes: Gestión de planes/actividades
                 val plansViewModel: PlansViewModel = viewModel()
                 PlansScreen(
                     viewModel = plansViewModel,
@@ -105,7 +106,6 @@ fun MainScreen() {
                 )
             }
             3 -> {
-                // Tab Reportes: Análisis y reportes financieros
                 ReportsScreen(
                     modifier = Modifier.padding(innerPadding)
                 )
@@ -150,7 +150,7 @@ fun ModernBottomBar(
                         painter = painterResource(
                             id = when (index) {
                                 0 -> R.drawable.home
-                                1 -> R.drawable.group_running
+                                1 -> R.drawable.running
                                 2 -> R.drawable.plan
                                 else -> R.drawable.payment
                             }

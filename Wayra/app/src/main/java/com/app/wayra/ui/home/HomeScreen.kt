@@ -20,7 +20,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
@@ -48,7 +46,8 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRegisterPayment: () -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {},
+    onNavigateToPaymentDetail: (String) -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
@@ -59,6 +58,7 @@ fun HomeScreen(
         currentDate = currentDate,
         upcomingPayments = upcomingPayments,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
+        onPaymentClick = onNavigateToPaymentDetail,
         modifier = modifier
     )
 }
@@ -69,6 +69,7 @@ fun HomeContent(
     currentDate: String,
     upcomingPayments: List<Payment>,
     onRegisterPaymentClick: () -> Unit,
+    onPaymentClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -293,7 +294,10 @@ fun HomeContent(
                 }
             } else {
                 upcomingPayments.forEach { payment ->
-                    PaymentItemModern(payment = payment)
+                    PaymentItemModern(
+                        payment = payment,
+                        onClick = { onPaymentClick(payment.id) }
+                    )
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
@@ -349,49 +353,10 @@ fun StatCardCompact(
 }
 
 @Composable
-fun StatCard(
-    title: String,
-    value: String,
-    color: Color,
-    modifier: Modifier = Modifier,
-    valueSize: TextUnit = 32.sp
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = value,
-                    fontSize = valueSize,
-                    fontWeight = FontWeight.Bold,
-                    color = color,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun PaymentItemModern(
     payment: Payment,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -399,7 +364,8 @@ fun PaymentItemModern(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -444,57 +410,6 @@ fun PaymentItemModern(
             Text(
                 text = formatCurrency(payment.amount),
                 fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-@Composable
-fun PaymentItem(
-    payment: Payment,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Alumno ${payment.studentId}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Plan",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-                payment.dueDate?.let { dueDate ->
-                    Text(
-                        text = formatDueDate(dueDate),
-                        fontSize = 12.sp,
-                        color = Color(0xFFFF9800),
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-            Text(
-                text = formatCurrency(payment.amount),
-                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )

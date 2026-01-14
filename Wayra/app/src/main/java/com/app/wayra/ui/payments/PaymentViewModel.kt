@@ -43,6 +43,9 @@ class PaymentViewModel : ViewModel() {
     }
     val notes: LiveData<String> = _notes
 
+    private val _currentPayment = MutableLiveData<Payment?>()
+    val currentPayment: LiveData<Payment?> = _currentPayment
+
     init {
         loadStudents()
     }
@@ -109,5 +112,70 @@ class PaymentViewModel : ViewModel() {
         _amount.value = ""
         _selectedPaymentMethod.value = PaymentMethod.EFECTIVO
         _notes.value = ""
+    }
+
+    // Cargar pago específico para ver/editar
+    suspend fun loadPayment(paymentId: String): Boolean {
+        val payment = paymentRepository.getPaymentById(paymentId)
+        return if (payment != null) {
+            _currentPayment.value = payment
+            _amount.value = payment.amount.toString()
+            _selectedPaymentMethod.value = payment.paymentMethod ?: PaymentMethod.EFECTIVO
+            _notes.value = payment.notes
+
+            // Cargar el estudiante asociado
+            _students.value?.find { it.id == payment.studentId }?.let { student ->
+                _selectedStudent.value = student
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    // Actualizar pago existente
+    suspend fun updatePayment(paymentId: String): Result<Unit> {
+        val amountValue = _amount.value?.toDoubleOrNull() ?: return Result.failure(Exception("Monto inválido"))
+
+        if (amountValue <= 0) return Result.failure(Exception("El monto debe ser mayor a 0"))
+
+        val currentPayment = _currentPayment.value ?: return Result.failure(Exception("No hay pago cargado"))
+
+        val updatedPayment = currentPayment.copy(
+            amount = amountValue,
+            paymentMethod = _selectedPaymentMethod.value,
+            notes = _notes.value ?: ""
+        )
+
+        return paymentRepository.updatePayment(paymentId, updatedPayment)
+    }
+
+    // Eliminar pago
+    suspend fun deletePayment(paymentId: String): Result<Unit> {
+        return paymentRepository.deletePayment(paymentId)
+    }
+
+    // Marcar pago como pagado
+    suspend fun markAsPaid(paymentId: String): Result<Unit> {
+        val payment = _currentPayment.value ?: return Result.failure(Exception("No hay pago cargado"))
+
+        val updatedPayment = payment.copy(
+            status = PaymentStatus.PAGADO,
+            paymentDate = System.currentTimeMillis()
+        )
+
+        return paymentRepository.updatePayment(paymentId, updatedPayment)
+    }
+
+    // Marcar pago como pendiente
+    suspend fun markAsPending(paymentId: String): Result<Unit> {
+        val payment = _currentPayment.value ?: return Result.failure(Exception("No hay pago cargado"))
+
+        val updatedPayment = payment.copy(
+            status = PaymentStatus.PENDIENTE,
+            paymentDate = null
+        )
+
+        return paymentRepository.updatePayment(paymentId, updatedPayment)
     }
 }

@@ -32,7 +32,6 @@ fun StudentsNavHost(
         startDestination = StudentsScreens.StudentsList.route,
         modifier = modifier
     ) {
-        // Pantalla principal: Lista de estudiantes
         composable(StudentsScreens.StudentsList.route) {
             StudentsScreen(
                 viewModel = studentsViewModel,
@@ -46,7 +45,6 @@ fun StudentsNavHost(
             )
         }
 
-        // Pantalla: Agregar estudiante
         composable(StudentsScreens.AddStudent.route) {
             AddStudentScreen(
                 onNavigateBack = {
@@ -59,7 +57,6 @@ fun StudentsNavHost(
             )
         }
 
-        // Pantalla: Detalle/Editar/Eliminar estudiante
         composable(
             route = StudentsScreens.StudentDetail.route,
             arguments = listOf(navArgument("studentId") { type = NavType.StringType })
