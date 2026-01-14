@@ -26,7 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,7 +82,15 @@ fun HomeContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF2C2C2C), // Gris oscuro
+                            Color(0xFF1A1A1A), // Negro medio
+                            Color(0xFF000000)  // Negro puro
+                        )
+                    )
+                )
                 .padding(vertical = 24.dp, horizontal = 16.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -90,37 +98,17 @@ fun HomeContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Logo del gimnasio con fondo circular
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_wayra),
-                        contentDescription = "Logo Wayra",
-                        modifier = Modifier
-                            .size(76.dp)
-                            .clip(CircleShape)
-                    )
-                }
-
-                // Título de bienvenida
-                Text(
-                    text = stringResource(R.string.home_welcome),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                // Logo del gimnasio
+                Image(
+                    painter = painterResource(id = R.drawable.logo_wayra),
+                    contentDescription = "Logo Wayra",
+                    modifier = Modifier.size(120.dp)
                 )
 
                 Text(
                     text = currentDate,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f)
                 )
             }
         }

@@ -58,9 +58,9 @@ fun SplashScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFFF8A3D), // Naranja claro
-                        Color(0xFFEC6C1C), // Naranja medio (Wayra Orange)
-                        Color(0xFFB24E12)  // Naranja oscuro
+                        Color(0xFF2C2C2C), // Gris oscuro
+                        Color(0xFF1A1A1A), // Negro medio
+                        Color(0xFF000000)  // Negro puro
                     )
                 )
             ),
