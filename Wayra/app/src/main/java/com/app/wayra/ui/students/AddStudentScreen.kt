@@ -6,11 +6,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
@@ -40,9 +47,37 @@ fun AddStudentScreen(
     var isActive by remember { mutableStateOf(true) }
     var selectedPlan by remember { mutableStateOf<Plan?>(null) }
     var showPlanPicker by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
 
     val plans by plansViewModel.plans.observeAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
+
+    // Función para validar email
+    fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    // Función para validar número de celular argentino
+    fun isValidPhone(phone: String): Boolean {
+        // Celulares argentinos: 10 dígitos (código de área + número)
+        val digits = phone.replace(Regex("[^0-9]"), "").length
+        return digits == 10
+    }
+
+    // Función para formatear el número con espacios (sin el 9 inicial)
+    fun formatPhone(phone: String): String {
+        return when {
+            phone.isEmpty() -> ""
+            phone.length <= 4 -> phone
+            phone.length <= 10 -> {
+                val part1 = phone.substring(0, minOf(4, phone.length))
+                val part2 = if (phone.length > 4) phone.substring(4) else ""
+                "$part1${if (part2.isNotEmpty()) " $part2" else ""}"
+            }
+            else -> phone
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -69,7 +104,10 @@ fun AddStudentScreen(
                 onValueChange = { name = it },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words
+                )
             )
 
             OutlinedTextField(
@@ -77,23 +115,77 @@ fun AddStudentScreen(
                 onValueChange = { surname = it },
                 label = { Text("Apellido") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words
+                )
             )
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    emailError = email.isNotBlank() && !isValidEmail(email)
+                },
                 label = { Text(stringResource(R.string.student_email)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                isError = emailError,
+                supportingText = {
+                    if (emailError) {
+                        Text("Formato de email inválido")
+                    }
+                }
             )
 
             OutlinedTextField(
                 value = phone,
-                onValueChange = { phone = it },
+                onValueChange = { newValue ->
+                    // Solo permitir números y limitar a 10 dígitos
+                    val filtered = newValue.filter { it.isDigit() }.take(10)
+                    phone = filtered
+                    phoneError = phone.isNotBlank() && !isValidPhone(phone)
+                },
                 label = { Text(stringResource(R.string.student_phone)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                visualTransformation = { text ->
+                    val prefix = "+54 9 "
+                    val formatted = formatPhone(text.text)
+                    TransformedText(
+                        AnnotatedString(prefix + formatted),
+                        object : OffsetMapping {
+                            override fun originalToTransformed(offset: Int): Int {
+                                // Calcular el offset considerando los espacios agregados
+                                val beforeCursor = text.text.substring(0, minOf(offset, text.text.length))
+                                val formattedBeforeCursor = formatPhone(beforeCursor)
+                                return prefix.length + formattedBeforeCursor.length
+                            }
+                            override fun transformedToOriginal(offset: Int): Int {
+                                if (offset <= prefix.length) return 0
+                                val textPart = (offset - prefix.length).coerceAtLeast(0)
+                                return text.text.take(textPart).count { it.isDigit() }
+                            }
+                        }
+                    )
+                },
+                isError = phoneError,
+                supportingText = {
+                    if (phoneError) {
+                        Text("Debe tener 10 dígitos (ej: 3492 566468)")
+                    } else {
+                        Text(
+                            "Código de área + número (10 dígitos)",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             )
 
             // Selector de Plan
@@ -160,30 +252,38 @@ fun AddStudentScreen(
 
                 Button(
                     onClick = {
-                        if (name.isNotBlank() && surname.isNotBlank() && email.isNotBlank()) {
+                        // Capturar el plan en una variable local para el smart cast
+                        val plan = selectedPlan
+                        if (name.isNotBlank() && surname.isNotBlank() &&
+                            email.isNotBlank() && isValidEmail(email) &&
+                            phone.isNotBlank() && isValidPhone(phone) &&
+                            plan != null) {
                             coroutineScope.launch {
+                                // Agregar prefijo +54 9 al teléfono
+                                val fullPhone = "+549$phone"
+
                                 val student = Student(
                                     name = name,
                                     surname = surname,
                                     email = email,
-                                    phone = phone,
+                                    phone = fullPhone,
                                     registrationDate = Timestamp.now(),
                                     active = isActive
                                 )
                                 val result = viewModel.addStudent(student)
                                 if (result.isSuccess) {
-                                    // Si se seleccionó un plan, crear la suscripción
+                                    // Crear la suscripción con el plan seleccionado
                                     val studentId = result.getOrNull()
-                                    if (studentId != null && selectedPlan != null) {
+                                    if (studentId != null) {
                                         Subscription(
                                             studentId = studentId,
-                                            planId = selectedPlan!!.id,
+                                            planId = plan.id,
                                             startDate = System.currentTimeMillis(),
                                             active = true
                                         )
                                         subscriptionViewModel.assignPlan(
                                             student.copy(id = studentId),
-                                            selectedPlan
+                                            plan
                                         )
                                     }
                                     onStudentAdded()
@@ -192,7 +292,11 @@ fun AddStudentScreen(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = name.isNotBlank() && surname.isNotBlank() && email.isNotBlank()
+                    enabled = name.isNotBlank() &&
+                            surname.isNotBlank() &&
+                            email.isNotBlank() && !emailError && isValidEmail(email) &&
+                            phone.isNotBlank() && !phoneError && isValidPhone(phone) &&
+                            selectedPlan != null
                 ) {
                     Text(stringResource(R.string.save))
                 }
