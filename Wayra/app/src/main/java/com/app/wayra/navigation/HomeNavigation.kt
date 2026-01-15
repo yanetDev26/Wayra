@@ -17,9 +17,7 @@ import com.app.wayra.ui.payments.RegisterPaymentScreen
 sealed class HomeScreens(val route: String) {
     object Home : HomeScreens("home")
     object RegisterPayment : HomeScreens("register_payment")
-    object PaymentDetail : HomeScreens("payment_detail/{paymentId}") {
-        fun createRoute(paymentId: String) = "payment_detail/$paymentId"
-    }
+    object PaymentDetail : HomeScreens("payment_detail/{paymentId}")
 }
 
 @Composable
@@ -39,9 +37,6 @@ fun HomeNavHost(
                 viewModel = homeViewModel,
                 onNavigateToRegisterPayment = {
                     navController.navigate(HomeScreens.RegisterPayment.route)
-                },
-                onNavigateToPaymentDetail = { paymentId ->
-                    navController.navigate(HomeScreens.PaymentDetail.createRoute(paymentId))
                 }
             )
         }
@@ -55,6 +50,7 @@ fun HomeNavHost(
                     navController.popBackStack()
                 },
                 onPaymentRegistered = {
+                    homeViewModel.refreshData()
                     navController.popBackStack()
                 }
             )

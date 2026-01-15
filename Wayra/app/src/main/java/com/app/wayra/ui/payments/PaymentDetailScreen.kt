@@ -221,7 +221,7 @@ fun PaymentDetailScreen(
                         } else {
                             DetailRow(
                                 label = "Monto:",
-                                value = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                value = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                     .format(payment.amount)
                             )
                         }

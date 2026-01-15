@@ -146,7 +146,7 @@ fun PlanStatisticsReportScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(stats.totalMonthlyRevenue),
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
@@ -175,7 +175,7 @@ fun PlanStatisticsReportScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(stats.totalRevenue),
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
@@ -284,7 +284,7 @@ fun PlanStatCard(planStat: PlanStats) {
                             fontSize = 18.sp
                         )
                         Text(
-                            text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                            text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                 .format(planStat.price) + " / mes",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -312,7 +312,7 @@ fun PlanStatCard(planStat: PlanStats) {
                 StatItem(
                     modifier = Modifier.weight(1f),
                     label = "Mes Actual",
-                    value = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                    value = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                         .format(planStat.monthlyRevenue),
                     icon = "📅"
                 )
@@ -347,7 +347,7 @@ fun PlanStatCard(planStat: PlanStats) {
                         )
                     }
                     Text(
-                        text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                             .format(planStat.totalRevenue),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,

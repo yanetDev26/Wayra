@@ -111,7 +111,7 @@ fun IncomeProjectionReportScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(projection.monthlyExpectedIncome),
                                     fontSize = 36.sp,
                                     color = Color.White,
@@ -175,7 +175,7 @@ fun IncomeProjectionReportScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(projection.averageRevenuePerStudent),
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
@@ -303,7 +303,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                             .format(monthProjection.expectedIncome),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
@@ -349,7 +349,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                             )
                         }
                         Text(
-                            text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                            text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                 .format(monthProjection.pendingAmount),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,

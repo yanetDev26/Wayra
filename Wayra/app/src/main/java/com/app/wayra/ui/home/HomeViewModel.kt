@@ -33,7 +33,6 @@ class HomeViewModel : ViewModel() {
     private val _upcomingPayments = MutableLiveData<List<Payment>>().apply {
         value = emptyList()
     }
-    val upcomingPayments: LiveData<List<Payment>> = _upcomingPayments
 
     private val _currentDate = MutableLiveData<String>()
     val currentDate: LiveData<String> = _currentDate
@@ -44,7 +43,7 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun loadCurrentDate() {
-        val dateFormat = SimpleDateFormat("d 'de' MMMM, yyyy", Locale("es", "ES"))
+        val dateFormat = SimpleDateFormat("d 'de' MMMM, yyyy", Locale.forLanguageTag("es-ES"))
         _currentDate.value = dateFormat.format(Date())
     }
 

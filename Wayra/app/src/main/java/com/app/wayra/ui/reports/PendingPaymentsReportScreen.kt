@@ -1,5 +1,6 @@
 package com.app.wayra.ui.reports
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -119,7 +120,7 @@ fun PendingPaymentsReportScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalPending),
                                     fontSize = 36.sp,
                                     color = Color.White,
@@ -142,7 +143,7 @@ fun PendingPaymentsReportScreen(
                             StatCard(
                                 title = "Vencidos",
                                 value = "${stats.overdueCount}",
-                                subtitle = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                subtitle = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                     .format(stats.totalOverdue),
                                 color = Color(0xFFFF6B6B),
                                 modifier = Modifier.weight(1f)
@@ -265,6 +266,7 @@ fun StatCard(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun PendingPaymentCard(payment: Payment) {
     val isOverdue = (payment.dueDate ?: Long.MAX_VALUE) < System.currentTimeMillis()

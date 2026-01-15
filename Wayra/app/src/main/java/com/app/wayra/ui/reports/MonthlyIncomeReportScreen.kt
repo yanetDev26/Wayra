@@ -114,7 +114,7 @@ fun MonthlyIncomeReportScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalIncome),
                                     fontSize = 36.sp,
                                     color = Color.White,
@@ -286,7 +286,7 @@ fun PaymentMethodCard(
                 }
             }
             Text(
-                text = NumberFormat.getCurrencyInstance(Locale("es", "AR")).format(total),
+                text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR")).format(total),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = WayraOrange

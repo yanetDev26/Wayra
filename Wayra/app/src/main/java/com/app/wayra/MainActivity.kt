@@ -68,6 +68,11 @@ fun MainScreen() {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Inicio", "Alumnos", "Planes", "Reportes")
 
+    // ViewModels compartidos para mantener el estado
+    val homeViewModel: HomeViewModel = viewModel()
+    val studentsViewModel: StudentsViewModel = viewModel()
+    val plansViewModel: PlansViewModel = viewModel()
+
     Scaffold(
         bottomBar = {
             ModernBottomBar(
@@ -79,7 +84,6 @@ fun MainScreen() {
     ) { innerPadding ->
         when (selectedItem) {
             0 -> {
-                val homeViewModel: HomeViewModel = viewModel()
                 val homeNavController = rememberNavController()
                 HomeNavHost(
                     navController = homeNavController,
@@ -88,15 +92,14 @@ fun MainScreen() {
                 )
             }
             1 -> {
-                val studentsViewModel: StudentsViewModel = viewModel()
                 val studentsNavController = rememberNavController()
                 StudentsNavHost(
                     navController = studentsNavController,
-                    studentsViewModel = studentsViewModel
+                    studentsViewModel = studentsViewModel,
+                    homeViewModel = homeViewModel
                 )
             }
             2 -> {
-                val plansViewModel: PlansViewModel = viewModel()
                 PlansScreen(
                     viewModel = plansViewModel,
                     onNavigateBack = { /* No action needed in tab */ },

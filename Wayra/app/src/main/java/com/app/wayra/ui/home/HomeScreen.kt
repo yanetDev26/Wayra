@@ -39,30 +39,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
-import com.app.wayra.data.model.Payment
-import com.app.wayra.data.model.PaymentStatus
 import java.text.NumberFormat
-import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRegisterPayment: () -> Unit = {},
-    onNavigateToPaymentDetail: (String) -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
-    val upcomingPayments by viewModel.upcomingPayments.observeAsState(emptyList())
+
+    // Refrescar datos cuando la pantalla vuelve a estar visible
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.refreshData()
+    }
 
     HomeContent(
         stats = stats,
         currentDate = currentDate,
-        upcomingPayments = upcomingPayments,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
-        onPaymentClick = onNavigateToPaymentDetail,
         modifier = modifier
     )
 }
@@ -71,12 +68,10 @@ fun HomeScreen(
 fun HomeContent(
     stats: HomeStats,
     currentDate: String,
-    upcomingPayments: List<Payment>,
     onRegisterPaymentClick: () -> Unit,
-    onPaymentClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var showAmount by remember { mutableStateOf(true) }
+    var showAmount by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -263,58 +258,6 @@ fun HomeContent(
                     fontWeight = FontWeight.SemiBold
                 )
             }
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Upcoming Payments Section
-            Text(
-                text = stringResource(R.string.home_upcoming_payments),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (upcomingPayments.isEmpty()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "✓",
-                            fontSize = 40.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.home_no_payments),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            } else {
-                upcomingPayments.forEach { payment ->
-                    PaymentItemModern(
-                        payment = payment,
-                        onClick = { onPaymentClick(payment.id) }
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -364,89 +307,9 @@ fun StatCardCompact(
     }
 }
 
-@Composable
-fun PaymentItemModern(
-    payment: Payment,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Indicador de estado visual
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(
-                            color = Color(0xFFFF9800),
-                            shape = CircleShape
-                        )
-                )
-
-                Column {
-                    Text(
-                        text = "Alumno ${payment.studentId}",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    payment.dueDate?.let { dueDate ->
-                        Text(
-                            text = formatDueDate(dueDate),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = formatCurrency(payment.amount),
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
 private fun formatCurrency(amount: Double): String {
-    val format = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+    val format = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
     return format.format(amount)
-}
-
-private fun formatDueDate(dueDate: Long): String {
-    val date = Date(dueDate)
-    val now = Calendar.getInstance()
-    val dueCalendar = Calendar.getInstance().apply { time = date }
-
-    val diffInDays = ((dueCalendar.timeInMillis - now.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
-
-    return when {
-        diffInDays == 0 -> "Vence hoy"
-        diffInDays == 1 -> "Vence mañana"
-        diffInDays > 1 -> "Vence en $diffInDays días"
-        else -> "Vencido"
-    }
 }
 
 @Preview(showBackground = true)
@@ -462,16 +325,6 @@ fun HomeScreenPreview() {
                 pendingLastMonth = 3
             ),
             currentDate = "25 de Diciembre, 2025",
-            upcomingPayments = listOf(
-                Payment(
-                    id = "1",
-                    studentId = "Juan Pérez",
-                    subscriptionId = "sub1",
-                    amount = 5000.0,
-                    dueDate = System.currentTimeMillis() + (2 * 24 * 60 * 60 * 1000),
-                    status = PaymentStatus.PENDIENTE
-                )
-            ),
             onRegisterPaymentClick = {}
         )
     }

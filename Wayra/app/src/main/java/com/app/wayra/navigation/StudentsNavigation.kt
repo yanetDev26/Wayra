@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.app.wayra.ui.home.HomeViewModel
 import com.app.wayra.ui.students.AddStudentScreen
 import com.app.wayra.ui.students.StudentDetailScreen
 import com.app.wayra.ui.students.StudentsScreen
@@ -25,7 +26,8 @@ sealed class StudentsScreens(val route: String) {
 fun StudentsNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    studentsViewModel: StudentsViewModel = viewModel()
+    studentsViewModel: StudentsViewModel = viewModel(),
+    homeViewModel: HomeViewModel
 ) {
     NavHost(
         navController = navController,
@@ -52,6 +54,7 @@ fun StudentsNavHost(
                 },
                 onStudentAdded = {
                     studentsViewModel.refreshData()
+                    homeViewModel.refreshData()
                     navController.popBackStack()
                 }
             )

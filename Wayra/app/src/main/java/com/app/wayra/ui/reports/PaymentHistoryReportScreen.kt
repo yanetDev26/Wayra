@@ -28,6 +28,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -173,7 +174,7 @@ fun PaymentHistoryReportScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(filteredPayments.sumOf { it.amount }),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
@@ -346,7 +347,7 @@ fun StudentDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
         )
 
@@ -394,7 +395,7 @@ fun StatusDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
         )
 
@@ -442,7 +443,7 @@ fun PaymentMethodDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
         )
 
@@ -540,7 +541,7 @@ fun PaymentHistoryCard(
 
             // Lado derecho: Monto
             Text(
-                text = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+                text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                     .format(payment.amount),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
