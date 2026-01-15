@@ -159,4 +159,16 @@ class StudentRepository {
             0
         }
     }
+
+    // Obtener todos los estudiantes (una sola vez)
+    suspend fun getAllStudents(): List<Student> {
+        return try {
+            val snapshot = studentsCollection.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Student::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 }

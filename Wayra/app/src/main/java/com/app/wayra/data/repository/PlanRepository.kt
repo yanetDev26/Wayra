@@ -38,7 +38,7 @@ class PlanRepository {
         return try {
             val doc = plansCollection.document(planId).get().await()
             doc.toObject(Plan::class.java)?.copy(id = doc.id)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -70,6 +70,18 @@ class PlanRepository {
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    // Obtener todos los planes (una sola vez, no Flow)
+    suspend fun getPlansOnce(): List<Plan> {
+        return try {
+            val snapshot = plansCollection.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Plan::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
         }
     }
 }

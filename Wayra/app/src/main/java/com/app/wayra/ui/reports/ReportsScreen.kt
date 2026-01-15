@@ -12,7 +12,10 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ReportsScreen(
     onNavigateToMonthlyIncome: () -> Unit = {},
-    onNavigateToPendingPayments: () -> Unit = {}
+    onNavigateToPendingPayments: () -> Unit = {},
+    onNavigateToPlanStatistics: () -> Unit = {},
+    onNavigateToPaymentHistory: () -> Unit = {},
+    onNavigateToIncomeProjection: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -48,21 +51,24 @@ fun ReportsScreen(
             item {
                 ReportCard(
                     title = "Estadísticas por Plan",
-                    description = "Distribución de estudiantes por plan"
+                    description = "Distribución de estudiantes por plan",
+                    onClick = onNavigateToPlanStatistics
                 )
             }
 
             item {
                 ReportCard(
                     title = "Historial de Pagos",
-                    description = "Consulta pagos por fecha o estudiante"
+                    description = "Consulta pagos por fecha o estudiante",
+                    onClick = onNavigateToPaymentHistory
                 )
             }
 
             item {
                 ReportCard(
                     title = "Proyección de Ingresos",
-                    description = "Estimado de ingresos próximos meses"
+                    description = "Estimado de ingresos próximos meses",
+                    onClick = onNavigateToIncomeProjection
                 )
             }
         }

@@ -67,7 +67,7 @@ class SubscriptionRepository {
             snapshot.documents.firstOrNull()?.let { doc ->
                 doc.toObject(Subscription::class.java)?.copy(id = doc.id)
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -117,6 +117,37 @@ class SubscriptionRepository {
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    // Obtener todas las suscripciones activas
+    suspend fun getAllActiveSubscriptions(): List<Subscription> {
+        return try {
+            val snapshot = subscriptionsCollection
+                .whereEqualTo("active", true)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Subscription::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // Obtener cantidad de estudiantes por plan
+    suspend fun getStudentCountByPlan(planId: String): Int {
+        return try {
+            val snapshot = subscriptionsCollection
+                .whereEqualTo("planId", planId)
+                .whereEqualTo("active", true)
+                .get()
+                .await()
+
+            snapshot.size()
+        } catch (_: Exception) {
+            0
         }
     }
 }

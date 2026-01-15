@@ -267,6 +267,18 @@ class PaymentRepository {
         }
     }
 
+    // Obtener todos los pagos (una sola vez)
+    suspend fun getAllPayments(): List<Payment> {
+        return try {
+            val snapshot = paymentsCollection.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Payment::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
     // Obtener estadísticas detalladas de ingresos del mes
     suspend fun getMonthlyIncomeDetails(): MonthlyIncomeStats {
         return try {
@@ -414,4 +426,21 @@ data class PendingPaymentsStats(
     val allPendingPayments: List<Payment>,
     val overduePayments: List<Payment>,
     val upcomingPayments: List<Payment>
+)
+
+// Data class para estadísticas por plan
+data class PlanStats(
+    val planId: String,
+    val planName: String,
+    val price: Double,
+    val activeStudents: Int,
+    val totalRevenue: Double,
+    val monthlyRevenue: Double
+)
+
+data class PlanStatisticsReport(
+    val planStats: List<PlanStats>,
+    val totalActiveStudents: Int,
+    val totalMonthlyRevenue: Double,
+    val totalRevenue: Double
 )
