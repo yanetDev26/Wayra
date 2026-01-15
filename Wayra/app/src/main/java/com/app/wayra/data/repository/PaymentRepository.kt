@@ -144,16 +144,19 @@ class PaymentRepository {
                 .await()
             val pendingCount = pendingSnapshot.size()
 
-            // Total recaudado este mes
+            // Total recaudado este mes - obtener todos los pagos pagados y filtrar por fecha
             val paidSnapshot = paymentsCollection
                 .whereEqualTo("status", PaymentStatus.PAGADO.name)
-                .whereGreaterThanOrEqualTo("paymentDate", startOfMonth)
                 .get()
                 .await()
 
-            val totalCollected = paidSnapshot.documents.sumOf { doc ->
-                doc.toObject(Payment::class.java)?.amount ?: 0.0
-            }
+            val totalCollected = paidSnapshot.documents
+                .mapNotNull { doc -> doc.toObject(Payment::class.java) }
+                .filter { payment ->
+                    val paymentDate = payment.paymentDate ?: 0L
+                    paymentDate >= startOfMonth
+                }
+                .sumOf { it.amount }
 
             Triple(0, pendingCount, totalCollected) // El primer valor (active students) vendrá de StudentRepository
         } catch (_: Exception) {
@@ -173,24 +176,26 @@ class PaymentRepository {
             val startOfMonth = calendar.timeInMillis
 
             // Fin del mes actual
-            calendar.add(Calendar.MONTH, 1)
-            calendar.add(Calendar.DAY_OF_MONTH, -1)
-            calendar.set(Calendar.HOUR_OF_DAY, 23)
-            calendar.set(Calendar.MINUTE, 59)
-            calendar.set(Calendar.SECOND, 59)
-            val endOfMonth = calendar.timeInMillis
+            val endCalendar = Calendar.getInstance()
+            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
+            endCalendar.set(Calendar.MINUTE, 59)
+            endCalendar.set(Calendar.SECOND, 59)
+            val endOfMonth = endCalendar.timeInMillis
 
-            // Obtener pagos pendientes o vencidos con dueDate en este mes
+            // Obtener todos los pagos pendientes y vencidos
             val snapshot = paymentsCollection
-                .whereGreaterThanOrEqualTo("dueDate", startOfMonth)
-                .whereLessThanOrEqualTo("dueDate", endOfMonth)
+                .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
                 .get()
                 .await()
 
-            // Filtrar solo pendientes y vencidos, y contar estudiantes únicos
+            // Filtrar por fecha en memoria y contar estudiantes únicos
             val uniqueStudents = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
-                .filter { it.status == PaymentStatus.PENDIENTE || it.status == PaymentStatus.VENCIDO }
+                .filter { payment ->
+                    val dueDate = payment.dueDate ?: 0L
+                    dueDate in startOfMonth..endOfMonth
+                }
                 .map { it.studentId }
                 .distinct()
 
@@ -215,24 +220,27 @@ class PaymentRepository {
             val startOfLastMonth = calendar.timeInMillis
 
             // Fin del mes pasado
-            calendar.add(Calendar.MONTH, 1)
-            calendar.add(Calendar.DAY_OF_MONTH, -1)
-            calendar.set(Calendar.HOUR_OF_DAY, 23)
-            calendar.set(Calendar.MINUTE, 59)
-            calendar.set(Calendar.SECOND, 59)
-            val endOfLastMonth = calendar.timeInMillis
+            val endCalendar = Calendar.getInstance()
+            endCalendar.add(Calendar.MONTH, -1)
+            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
+            endCalendar.set(Calendar.MINUTE, 59)
+            endCalendar.set(Calendar.SECOND, 59)
+            val endOfLastMonth = endCalendar.timeInMillis
 
-            // Obtener pagos pendientes o vencidos con dueDate en el mes pasado
+            // Obtener todos los pagos pendientes y vencidos
             val snapshot = paymentsCollection
-                .whereGreaterThanOrEqualTo("dueDate", startOfLastMonth)
-                .whereLessThanOrEqualTo("dueDate", endOfLastMonth)
+                .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
                 .get()
                 .await()
 
-            // Filtrar solo pendientes y vencidos, y contar estudiantes únicos
+            // Filtrar por fecha en memoria y contar estudiantes únicos
             val uniqueStudents = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
-                .filter { it.status == PaymentStatus.PENDIENTE || it.status == PaymentStatus.VENCIDO }
+                .filter { payment ->
+                    val dueDate = payment.dueDate ?: 0L
+                    dueDate in startOfLastMonth..endOfLastMonth
+                }
                 .map { it.studentId }
                 .distinct()
 

@@ -2,6 +2,7 @@ package com.app.wayra.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -72,6 +76,8 @@ fun HomeContent(
     onPaymentClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var showAmount by remember { mutableStateOf(true) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -204,11 +210,28 @@ fun HomeContent(
                             )
                         }
                         Text(
-                            text = formatCurrency(stats.totalCollected),
+                            text = if (showAmount) formatCurrency(stats.totalCollected) else "••••••",
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+
+                    // Botón de ojo para mostrar/ocultar
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = Color.White.copy(alpha = 0.2f),
+                                shape = CircleShape
+                            )
+                            .clickable { showAmount = !showAmount },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (showAmount) "👁️" else "🙈",
+                            fontSize = 20.sp
                         )
                     }
                 }
