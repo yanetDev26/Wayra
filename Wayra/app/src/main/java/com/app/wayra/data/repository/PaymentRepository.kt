@@ -297,16 +297,20 @@ class PaymentRepository {
             calendar.set(Calendar.SECOND, 0)
             val startOfMonth = calendar.timeInMillis
 
-            // Obtener todos los pagos del mes
+            // Obtener todos los pagos pagados y filtrar por fecha en memoria
             val snapshot = paymentsCollection
                 .whereEqualTo("status", PaymentStatus.PAGADO.name)
-                .whereGreaterThanOrEqualTo("paymentDate", startOfMonth)
                 .get()
                 .await()
 
-            val payments = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Payment::class.java)?.copy(id = doc.id)
-            }
+            val payments = snapshot.documents
+                .mapNotNull { doc ->
+                    doc.toObject(Payment::class.java)?.copy(id = doc.id)
+                }
+                .filter { payment ->
+                    val paymentDate = payment.paymentDate ?: 0L
+                    paymentDate >= startOfMonth
+                }
 
             // Calcular estadísticas
             val totalIncome = payments.sumOf { it.amount }
