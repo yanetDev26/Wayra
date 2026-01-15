@@ -8,12 +8,12 @@ import androidx.compose.ui.graphics.Color
 private val DarkColorScheme = darkColorScheme(
     primary = WayraOrange,
     onPrimary = White,
-    primaryContainer = OrangeLight,
+    primaryContainer = WayraOrange,
     onPrimaryContainer = White,
 
     secondary = WayraOrange,
     onSecondary = White,
-    secondaryContainer = OrangeLight,
+    secondaryContainer = WayraOrange,
     onSecondaryContainer = White,
 
     tertiary = WayraOrange,
@@ -36,7 +36,6 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun WayraTheme(
-    darkTheme: Boolean = true, // Siempre usar tema oscuro
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

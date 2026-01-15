@@ -76,8 +76,6 @@ fun StudentsScreen(
                 searchQuery = searchQuery,
                 viewModel = viewModel,
                 onNavigateToStudentDetail = onNavigateToStudentDetail,
-                onNavigateToAddStudent = onNavigateToAddStudent,
-                showTitle = false,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -106,8 +104,6 @@ fun StudentsScreen(
                 searchQuery = searchQuery,
                 viewModel = viewModel,
                 onNavigateToStudentDetail = onNavigateToStudentDetail,
-                onNavigateToAddStudent = onNavigateToAddStudent,
-                showTitle = false,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -123,42 +119,9 @@ private fun StudentsContent(
     searchQuery: String,
     viewModel: StudentsViewModel,
     onNavigateToStudentDetail: (String) -> Unit,
-    onNavigateToAddStudent: () -> Unit = {},
-    showTitle: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        // Título solo si no hay topBar
-        if (showTitle) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.students_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(
-                    onClick = onNavigateToAddStudent,
-                    modifier = Modifier
-                        .background(
-                            color = WayraOrange,
-                            shape = CircleShape
-                        )
-                        .size(48.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(R.string.students_add),
-                        tint = Color.White
-                    )
-                }
-            }
-        }
 
         // Search Bar
         OutlinedTextField(
@@ -196,32 +159,23 @@ private fun StudentsContent(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(48.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "🏃",
-                            fontSize = 48.sp
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.students_empty),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    Text(
+                        text = "🏃",
+                        fontSize = 48.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.students_empty),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         } else {

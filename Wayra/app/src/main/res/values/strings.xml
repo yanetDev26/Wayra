@@ -30,23 +30,21 @@
     <string name="home_no_payments">No hay pagos próximos</string>
 
     <!-- Students -->
-    <string name="students_title">Estudiantes</string>
-    <string name="students_add">Agregar Estudiante</string>
-    <string name="students_search">Buscar estudiante…</string>
-    <string name="students_empty">No hay estudiantes registrados</string>
+    <string name="students_title">Alumnos</string>
+    <string name="students_add">Agregar Alumno</string>
+    <string name="students_search">Buscar alumno…</string>
+    <string name="students_empty">No hay alumnos registrados</string>
     <string name="students_active">Activo</string>
     <string name="students_inactive">Inactivo</string>
-    <string name="add_student_title">Agregar Estudiante</string>
     <string name="student_name">Nombre</string>
     <string name="student_email">Email</string>
     <string name="student_phone">Teléfono</string>
-    <string name="student_active">Estudiante activo</string>
+    <string name="student_active">Alumno activo</string>
 
     <!-- Plans -->
     <string name="plans_title">Planes</string>
     <string name="plans_add">Agregar Plan</string>
     <string name="plans_empty">No hay planes disponibles</string>
-    <string name="add_plan_title">Agregar Plan</string>
     <string name="plan_name">Nombre del plan</string>
     <string name="plan_price_hint">Precio</string>
     <string name="plan_description_hint">Descripción</string>
