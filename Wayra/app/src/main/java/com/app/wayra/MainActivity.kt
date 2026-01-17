@@ -154,9 +154,9 @@ fun ModernBottomBar(
                         painter = painterResource(
                             id = when (index) {
                                 0 -> R.drawable.home
-                                1 -> R.drawable.running
+                                1 -> R.drawable.runner
                                 2 -> R.drawable.plan
-                                else -> R.drawable.payment
+                                else -> R.drawable.report
                             }
                         ),
                         contentDescription = item,

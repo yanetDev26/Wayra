@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -51,7 +53,6 @@ fun HomeScreen(
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
 
-    // Refrescar datos cuando la pantalla vuelve a estar visible
     androidx.compose.runtime.LaunchedEffect(Unit) {
         viewModel.refreshData()
     }
@@ -114,13 +115,11 @@ fun HomeContent(
             }
         }
 
-        // Contenido con padding
         Column(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Statistics Cards en grid
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -128,7 +127,7 @@ fun HomeContent(
                 StatCardCompact(
                     title = stringResource(R.string.home_active_students),
                     value = stats.activeStudents.toString(),
-                    emoji = "👥",
+                    iconRes = R.drawable.gym_active,
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f)
@@ -137,7 +136,7 @@ fun HomeContent(
                 StatCardCompact(
                     title = "Nuevos este mes",
                     value = stats.newStudentsThisMonth.toString(),
-                    emoji = "✨",
+                    iconRes = R.drawable.gym_new_active,
                     backgroundColor = Color(0xFFE8F5E9),
                     contentColor = Color(0xFF2E7D32),
                     modifier = Modifier.weight(1f)
@@ -152,18 +151,18 @@ fun HomeContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 StatCardCompact(
-                    title = "Faltan abonar este mes",
+                    title = "Pendientes abonar este mes",
                     value = stats.pendingThisMonth.toString(),
-                    emoji = "📅",
+                    iconRes = R.drawable.gym_pay,
                     backgroundColor = Color(0xFFFFEBEE),
                     contentColor = Color(0xFFC62828),
                     modifier = Modifier.weight(1f)
                 )
 
                 StatCardCompact(
-                    title = "Faltan abonar mes pasado",
+                    title = "Pendientes abonar mes pasado",
                     value = stats.pendingLastMonth.toString(),
-                    emoji = "🔴",
+                    iconRes = R.drawable.gym_pay_past_month,
                     backgroundColor = Color(0xFFFFCDD2),
                     contentColor = Color(0xFFB71C1C),
                     modifier = Modifier.weight(1f)
@@ -172,7 +171,6 @@ fun HomeContent(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Total collected - card destacada
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -193,10 +191,13 @@ fun HomeContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = "💰",
-                                fontSize = 24.sp
+                            Icon(
+                                painter = painterResource(id = R.drawable.payment),
+                                contentDescription = "Icono de pago",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
                             )
+
                             Text(
                                 text = stringResource(R.string.home_total_collected),
                                 fontSize = 14.sp,
@@ -213,10 +214,10 @@ fun HomeContent(
                         )
                     }
 
-                    // Botón de ojo para mostrar/ocultar
                     Box(
                         modifier = Modifier
                             .size(40.dp)
+                            .clip(CircleShape)
                             .background(
                                 color = Color.White.copy(alpha = 0.2f),
                                 shape = CircleShape
@@ -224,10 +225,21 @@ fun HomeContent(
                             .clickable { showAmount = !showAmount },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = if (showAmount) "👁️" else "🙈",
-                            fontSize = 20.sp
-                        )
+                        if (showAmount) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.eye_on),
+                                contentDescription = "Icono de ojo",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.eye_off),
+                                contentDescription = "Icono de ojo cerrado",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -266,7 +278,7 @@ fun HomeContent(
 fun StatCardCompact(
     title: String,
     value: String,
-    emoji: String,
+    iconRes: Int? = null,
     backgroundColor: Color,
     contentColor: Color,
     modifier: Modifier = Modifier
@@ -285,10 +297,15 @@ fun StatCardCompact(
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(
-                text = emoji,
-                fontSize = 28.sp
-            )
+            when {
+                iconRes != null -> {
+                    Image(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = title,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = value,
