@@ -1,6 +1,5 @@
 package com.app.wayra.ui.plans
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,12 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,7 +63,6 @@ import java.util.Locale
 @Composable
 fun PlansScreen(
     viewModel: PlansViewModel,
-    onNavigateBack: () -> Unit,
     onNavigateToAddPlan: () -> Unit
 ) {
     val plans by viewModel.plans.observeAsState(emptyList())
@@ -278,22 +274,6 @@ fun PlanItemModern(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Icono decorativo
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                color = WayraOrange.copy(alpha = 0.15f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "🏋️",
-                            fontSize = 28.sp
-                        )
-                    }
-
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = plan.activityName,
@@ -322,16 +302,23 @@ fun PlanItemModern(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
-                                Text(
-                                    text = "💰",
-                                    fontSize = 16.sp
-                                )
-                                Text(
-                                    text = formatCurrency(plan.price),
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF2E7D32)
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.payment),
+                                        contentDescription = "Icono de pago",
+                                        tint = Color.Unspecified,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = formatCurrency(plan.price),
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF2E7D32)
+                                    )
+                                }
                             }
                         }
                     }
@@ -356,9 +343,10 @@ fun PlanItemModern(
                     )
                 ) {
                     Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Editar",
-                        modifier = Modifier.size(18.dp)
+                        painter = painterResource(id = R.drawable.edit),
+                        contentDescription = "Icono de editar",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Editar", fontSize = 13.sp)
@@ -375,9 +363,10 @@ fun PlanItemModern(
                     )
                 ) {
                     Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Eliminar",
-                        modifier = Modifier.size(18.dp)
+                        painter = painterResource(id = R.drawable.delete),
+                        contentDescription = "Icono de eliminar",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Eliminar", fontSize = 13.sp)
