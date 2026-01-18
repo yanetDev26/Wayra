@@ -3,7 +3,6 @@ package com.app.wayra.data.model
 import com.google.firebase.firestore.Exclude
 
 enum class PaymentMethod {
-    MERCADO_PAGO,
     EFECTIVO,
     TRANSFERENCIA
 }

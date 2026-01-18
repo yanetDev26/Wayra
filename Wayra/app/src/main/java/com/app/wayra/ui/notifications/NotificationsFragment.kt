@@ -29,7 +29,7 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        notificationsViewModel = ViewModelProvider(this).get(NotificationsViewModel::class.java)
+        notificationsViewModel = ViewModelProvider(this)[NotificationsViewModel::class.java]
 
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

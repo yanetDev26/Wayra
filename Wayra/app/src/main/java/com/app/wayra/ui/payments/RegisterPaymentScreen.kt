@@ -128,7 +128,7 @@ fun RegisterPaymentScreen(
                             modifier = Modifier.padding(top = 4.dp)
                         )
                         Text(
-                            text = "$ ${amount}",
+                            text = "$ $amount",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(top = 4.dp)
@@ -306,7 +306,6 @@ fun RegisterPaymentScreen(
 @Composable
 fun getPaymentMethodLabel(method: PaymentMethod): String {
     return when (method) {
-        PaymentMethod.MERCADO_PAGO -> stringResource(R.string.payment_mercado_pago)
         PaymentMethod.EFECTIVO -> stringResource(R.string.payment_cash)
         PaymentMethod.TRANSFERENCIA -> stringResource(R.string.payment_transfer)
     }

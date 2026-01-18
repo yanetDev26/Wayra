@@ -302,7 +302,7 @@ fun EditStudentDialog(
     var email by remember { mutableStateOf(student.email) }
     var phone by remember { mutableStateOf(student.phone) }
     var active by remember { mutableStateOf(student.active) }
-    var selectedPlan by remember { mutableStateOf<Plan?>(currentPlan) }
+    var selectedPlan by remember { mutableStateOf(currentPlan) }
     var showPlanPicker by remember { mutableStateOf(false) }
 
     AlertDialog(

@@ -345,7 +345,6 @@ fun getCurrentMonthName(): String {
 
 fun getPaymentMethodName(method: PaymentMethod): String {
     return when (method) {
-        PaymentMethod.MERCADO_PAGO -> "Mercado Pago"
         PaymentMethod.EFECTIVO -> "Efectivo"
         PaymentMethod.TRANSFERENCIA -> "Transferencia"
     }
@@ -353,7 +352,6 @@ fun getPaymentMethodName(method: PaymentMethod): String {
 
 fun getPaymentMethodIcon(method: PaymentMethod): String {
     return when (method) {
-        PaymentMethod.MERCADO_PAGO -> "💳"
         PaymentMethod.EFECTIVO -> "💵"
         PaymentMethod.TRANSFERENCIA -> "🏦"
     }
