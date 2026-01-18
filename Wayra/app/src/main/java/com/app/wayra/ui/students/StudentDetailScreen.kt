@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -76,6 +78,7 @@ fun StudentDetailScreen(
 
     var showEditDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -258,29 +261,54 @@ fun StudentDetailScreen(
         // Diálogo de eliminar
         if (showDeleteDialog) {
             AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
+                onDismissRequest = {
+                    if (!isDeleting) {
+                        showDeleteDialog = false
+                    }
+                },
                 title = { Text("Eliminar Alumno") },
                 text = { Text("¿Estás seguro de que deseas eliminar a ${student?.getFullName()}?") },
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            showDeleteDialog = false
                             coroutineScope.launch {
+                                isDeleting = true
                                 val result = viewModel.deleteStudent(studentId)
+                                isDeleting = false
                                 if (result.isSuccess) {
+                                    showDeleteDialog = false
                                     snackbarHostState.showSnackbar("Alumno eliminado")
                                     onNavigateBack()
                                 } else {
+                                    showDeleteDialog = false
                                     snackbarHostState.showSnackbar("Error al eliminar")
                                 }
                             }
-                        }
+                        },
+                        enabled = !isDeleting
                     ) {
-                        Text("Eliminar", color = Color.Red)
+                        if (isDeleting) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    color = Color.Red,
+                                    strokeWidth = 2.dp
+                                )
+                                Text("Eliminando...", color = Color.Red)
+                            }
+                        } else {
+                            Text("Eliminar", color = Color.Red)
+                        }
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
+                    TextButton(
+                        onClick = { showDeleteDialog = false },
+                        enabled = !isDeleting
+                    ) {
                         Text("Cancelar")
                     }
                 }

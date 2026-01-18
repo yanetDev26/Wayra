@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.wayra.data.model.Plan
-import com.app.wayra.data.repository.InitialDataLoader
 import com.app.wayra.data.repository.PlanRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -45,10 +44,6 @@ class PlansViewModel : ViewModel() {
 
     suspend fun deletePlan(planId: String): Result<Unit> {
         return planRepository.deletePlan(planId)
-    }
-
-    suspend fun loadInitialPlans() {
-        InitialDataLoader.loadInitialPlans(planRepository)
     }
 
     fun refreshData() {

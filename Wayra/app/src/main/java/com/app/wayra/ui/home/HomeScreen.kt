@@ -50,7 +50,8 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRegisterPayment: () -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {},
+    onNavigateToPendingPayments: (String) -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
@@ -63,6 +64,7 @@ fun HomeScreen(
         stats = stats,
         currentDate = currentDate,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
+        onPendingPaymentsClick = onNavigateToPendingPayments,
         modifier = modifier
     )
 }
@@ -72,6 +74,7 @@ fun HomeContent(
     stats: HomeStats,
     currentDate: String,
     onRegisterPaymentClick: () -> Unit,
+    onPendingPaymentsClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAmount by remember { mutableStateOf(false) }
@@ -148,7 +151,9 @@ fun HomeContent(
                         iconRes = R.drawable.gym_pay,
                         backgroundColor = Color(0xFFFFEBEE),
                         contentColor = Color(0xFFC62828),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onPendingPaymentsClick("this_month") }
                     )
 
                     StatCardCompact(
@@ -157,7 +162,9 @@ fun HomeContent(
                         iconRes = R.drawable.gym_pay_past_month,
                         backgroundColor = Color(0xFFFFCDD2),
                         contentColor = Color(0xFFB71C1C),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onPendingPaymentsClick("last_month") }
                     )
                 }
 
@@ -325,7 +332,8 @@ fun HomeScreenPreview() {
                 pendingLastMonth = 3
             ),
             currentDate = "25 de Diciembre, 2025",
-            onRegisterPaymentClick = {}
+            onRegisterPaymentClick = {},
+            onPendingPaymentsClick = {}
         )
     }
 }

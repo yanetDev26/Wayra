@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,10 +50,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
-import com.app.wayra.ui.theme.WayraOrange
-import com.app.wayra.data.model.Subscription
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
+import com.app.wayra.ui.theme.WayraOrange
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -75,6 +76,7 @@ fun AddStudentScreen(
     var showPlanPicker by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     val plans by plansViewModel.plans.observeAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
@@ -290,6 +292,8 @@ fun AddStudentScreen(
                             phone.isNotBlank() && isValidPhone(phone) &&
                             plan != null) {
                             coroutineScope.launch {
+                                isLoading = true
+
                                 // Agregar prefijo +54 9 al teléfono
                                 val fullPhone = "+549$phone"
 
@@ -306,30 +310,36 @@ fun AddStudentScreen(
                                     // Crear la suscripción con el plan seleccionado
                                     val studentId = result.getOrNull()
                                     if (studentId != null) {
-                                        Subscription(
-                                            studentId = studentId,
-                                            planId = plan.id,
-                                            startDate = System.currentTimeMillis(),
-                                            active = true
-                                        )
+                                        // assignPlan creará automáticamente la suscripción y el pago pendiente
                                         subscriptionViewModel.assignPlan(
                                             student.copy(id = studentId),
                                             plan
                                         )
                                     }
+                                    isLoading = false
                                     onStudentAdded()
+                                } else {
+                                    isLoading = false
                                 }
                             }
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = name.isNotBlank() &&
+                    enabled = !isLoading && name.isNotBlank() &&
                             surname.isNotBlank() &&
                             email.isNotBlank() && !emailError && isValidEmail(email) &&
                             phone.isNotBlank() && !phoneError && isValidPhone(phone) &&
                             selectedPlan != null
                 ) {
-                    Text(stringResource(R.string.save))
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = androidx.compose.ui.graphics.Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(stringResource(R.string.save))
+                    }
                 }
             }
 

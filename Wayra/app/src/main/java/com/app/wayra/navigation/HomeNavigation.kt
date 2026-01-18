@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.app.wayra.ui.home.HomeScreen
 import com.app.wayra.ui.home.HomeViewModel
+import com.app.wayra.ui.home.PendingPaymentsScreen
 import com.app.wayra.ui.payments.PaymentDetailScreen
 import com.app.wayra.ui.payments.PaymentViewModel
 import com.app.wayra.ui.payments.RegisterPaymentScreen
@@ -18,6 +19,7 @@ sealed class HomeScreens(val route: String) {
     object Home : HomeScreens("home")
     object RegisterPayment : HomeScreens("register_payment")
     object PaymentDetail : HomeScreens("payment_detail/{paymentId}")
+    object PendingPayments : HomeScreens("pending_payments/{periodType}")
 }
 
 @Composable
@@ -37,6 +39,9 @@ fun HomeNavHost(
                 viewModel = homeViewModel,
                 onNavigateToRegisterPayment = {
                     navController.navigate(HomeScreens.RegisterPayment.route)
+                },
+                onNavigateToPendingPayments = { periodType ->
+                    navController.navigate("pending_payments/$periodType")
                 }
             )
         }
@@ -69,6 +74,20 @@ fun HomeNavHost(
                     navController.popBackStack()
                 },
                 viewModel = paymentViewModel
+            )
+        }
+
+        // Pantalla: Pagos pendientes
+        composable(
+            route = HomeScreens.PendingPayments.route,
+            arguments = listOf(navArgument("periodType") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val periodType = backStackEntry.arguments?.getString("periodType") ?: "this_month"
+            PendingPaymentsScreen(
+                periodType = periodType,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }

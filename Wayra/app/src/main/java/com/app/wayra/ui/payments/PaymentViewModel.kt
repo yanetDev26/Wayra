@@ -13,8 +13,10 @@ import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.PlanRepository
 import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.data.repository.SubscriptionRepository
+import com.app.wayra.ui.home.PaymentPeriod
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class PaymentViewModel : ViewModel() {
 
@@ -43,6 +45,11 @@ class PaymentViewModel : ViewModel() {
         value = PaymentMethod.EFECTIVO
     }
     val selectedPaymentMethod: LiveData<PaymentMethod> = _selectedPaymentMethod
+
+    private val _selectedPaymentPeriod = MutableLiveData<PaymentPeriod>().apply {
+        value = PaymentPeriod.CURRENT_MONTH
+    }
+    val selectedPaymentPeriod: LiveData<PaymentPeriod> = _selectedPaymentPeriod
 
     private val _notes = MutableLiveData<String>().apply {
         value = ""
@@ -111,6 +118,10 @@ class PaymentViewModel : ViewModel() {
         _selectedPaymentMethod.value = method
     }
 
+    fun selectPaymentPeriod(period: PaymentPeriod) {
+        _selectedPaymentPeriod.value = period
+    }
+
     fun setNotes(value: String) {
         _notes.value = value
     }
@@ -124,10 +135,26 @@ class PaymentViewModel : ViewModel() {
         // Obtener suscripción activa del estudiante
         val subscription = subscriptionRepository.getActiveSubscription(student.id)
 
+        // Calcular la fecha de vencimiento según el período seleccionado
+        val calendar = Calendar.getInstance()
+        when (_selectedPaymentPeriod.value) {
+            PaymentPeriod.LAST_MONTH -> calendar.add(Calendar.MONTH, -1)
+            PaymentPeriod.CURRENT_MONTH -> { /* No hacer nada, usar mes actual */ }
+            PaymentPeriod.NEXT_MONTH -> calendar.add(Calendar.MONTH, 1)
+            null -> { /* Por defecto, mes actual */ }
+        }
+        // Establecer al último día del mes seleccionado
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        val dueDate = calendar.timeInMillis
+
         val payment = Payment(
             studentId = student.id,
             subscriptionId = subscription?.id ?: "",
             amount = amountValue,
+            dueDate = dueDate,
             paymentDate = System.currentTimeMillis(),
             paymentMethod = _selectedPaymentMethod.value,
             status = PaymentStatus.PAGADO,
@@ -149,6 +176,7 @@ class PaymentViewModel : ViewModel() {
         _selectedPlan.value = null
         _amount.value = ""
         _selectedPaymentMethod.value = PaymentMethod.EFECTIVO
+        _selectedPaymentPeriod.value = PaymentPeriod.CURRENT_MONTH
         _notes.value = ""
     }
 

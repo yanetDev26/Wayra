@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -144,31 +143,11 @@ fun PlansScreen(
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Botón para cargar planes iniciales
-                            Button(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        viewModel.loadInitialPlans()
-                                        snackbarHostState.showSnackbar(
-                                            message = "Planes iniciales cargados correctamente",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = WayraOrange
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.load_initial_data),
-                                    modifier = Modifier.padding(vertical = 4.dp)
-                                )
-                            }
+                            Text(
+                                text = "Presiona el botón + para agregar tu primer plan",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }
