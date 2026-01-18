@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
+import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.WayraOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,11 +66,15 @@ fun StudentsScreen(
                         IconButton(onClick = onNavigateToAddStudent) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = stringResource(R.string.students_add),
-                                tint = WayraOrange
+                                contentDescription = stringResource(R.string.students_add)
                             )
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = WayraOrange,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    )
                 )
             }
         ) { paddingValues ->
@@ -80,7 +86,6 @@ fun StudentsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
             )
         }
     } else {
@@ -92,11 +97,15 @@ fun StudentsScreen(
                         IconButton(onClick = onNavigateToAddStudent) {
                             Icon(
                                 Icons.Default.Add,
-                                contentDescription = stringResource(R.string.students_add),
-                                tint = WayraOrange
+                                contentDescription = stringResource(R.string.students_add)
                             )
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = WayraOrange,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    )
                 )
             }
         ) { paddingValues ->
@@ -108,7 +117,6 @@ fun StudentsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp)
             )
         }
     }
@@ -122,7 +130,8 @@ private fun StudentsContent(
     onNavigateToStudentDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    WayraBackground(modifier = modifier) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
         // Search Bar
         OutlinedTextField(
@@ -191,6 +200,7 @@ private fun StudentsContent(
                     )
                 }
             }
+        }
         }
     }
 }

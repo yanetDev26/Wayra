@@ -8,20 +8,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 
-// Tipografía Agenor Neue
 val AgenorNeue = FontFamily(
     Font(R.font.agenor_neue_regular, FontWeight.Normal)
 )
 
 val Typography = Typography(
-    // Display styles
     displayLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
         fontSize = 57.sp,
         lineHeight = 64.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
     displayMedium = TextStyle(
         fontFamily = AgenorNeue,
@@ -29,7 +27,7 @@ val Typography = Typography(
         fontSize = 45.sp,
         lineHeight = 52.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
     displaySmall = TextStyle(
         fontFamily = AgenorNeue,
@@ -37,16 +35,15 @@ val Typography = Typography(
         fontSize = 36.sp,
         lineHeight = 44.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
-    // Headline styles
     headlineLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
         fontSize = 32.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
     headlineMedium = TextStyle(
         fontFamily = AgenorNeue,
@@ -54,7 +51,7 @@ val Typography = Typography(
         fontSize = 28.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
     headlineSmall = TextStyle(
         fontFamily = AgenorNeue,
@@ -62,16 +59,15 @@ val Typography = Typography(
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
-    // Title styles
     titleLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
-        color = White
+        color = Cream
     ),
     titleMedium = TextStyle(
         fontFamily = AgenorNeue,
@@ -79,7 +75,7 @@ val Typography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp,
-        color = White
+        color = Cream
     ),
     titleSmall = TextStyle(
         fontFamily = AgenorNeue,
@@ -87,16 +83,15 @@ val Typography = Typography(
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
-        color = White
+        color = Cream
     ),
-    // Body styles
     bodyLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = White
+        color = Cream
     ),
     bodyMedium = TextStyle(
         fontFamily = AgenorNeue,
@@ -104,7 +99,7 @@ val Typography = Typography(
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp,
-        color = White
+        color = Cream
     ),
     bodySmall = TextStyle(
         fontFamily = AgenorNeue,
@@ -112,16 +107,15 @@ val Typography = Typography(
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp,
-        color = White
+        color = Cream
     ),
-    // Label styles
     labelLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
-        color = White
+        color = Cream
     ),
     labelMedium = TextStyle(
         fontFamily = AgenorNeue,
@@ -129,7 +123,7 @@ val Typography = Typography(
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
-        color = White
+        color = Cream
     ),
     labelSmall = TextStyle(
         fontFamily = AgenorNeue,
@@ -137,6 +131,6 @@ val Typography = Typography(
         fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
-        color = White
+        color = Cream
     )
 )

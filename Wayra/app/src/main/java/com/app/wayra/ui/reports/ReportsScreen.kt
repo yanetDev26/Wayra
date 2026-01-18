@@ -5,8 +5,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.theme.WayraOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,18 +23,26 @@ fun ReportsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Reportes Financieros") }
+                title = { Text("Reportes Financieros") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Color.White
+                )
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        WayraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
         ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+            ) {
             item {
                 ReportCard(
                     title = "Ingresos del Mes",
@@ -70,6 +81,7 @@ fun ReportsScreen(
                     description = "Estimado de ingresos próximos meses",
                     onClick = onNavigateToIncomeProjection
                 )
+            }
             }
         }
     }

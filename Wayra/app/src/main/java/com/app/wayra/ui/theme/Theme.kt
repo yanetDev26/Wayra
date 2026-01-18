@@ -7,25 +7,25 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = WayraOrange,
-    onPrimary = White,
+    onPrimary = Cream,
     primaryContainer = WayraOrange,
-    onPrimaryContainer = White,
+    onPrimaryContainer = Cream,
 
     secondary = WayraOrange,
-    onSecondary = White,
+    onSecondary = Cream,
     secondaryContainer = WayraOrange,
-    onSecondaryContainer = White,
+    onSecondaryContainer = Cream,
 
     tertiary = WayraOrange,
-    onTertiary = White,
+    onTertiary = Cream,
 
-    background = Black,
-    onBackground = White,
+    background = Black ,
+    onBackground = Cream,
 
-    surface = SurfaceBlack,
-    onSurface = White,
-    surfaceVariant = SurfaceDark,
-    onSurfaceVariant = White,
+    surface = Black,
+    onSurface = Cream,
+    surfaceVariant = Black,
+    onSurfaceVariant = Cream,
 
     error = Color(0xFFCF6679),
     onError = Black,

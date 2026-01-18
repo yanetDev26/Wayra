@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,6 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
+import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -74,201 +76,182 @@ fun HomeContent(
 ) {
     var showAmount by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 80.dp)
-    ) {
-        // Header con logo
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF2C2C2C), // Gris oscuro
-                            Color(0xFF1A1A1A), // Negro medio
-                            Color(0xFF000000)  // Negro puro
-                        )
-                    )
-                )
-                .padding(vertical = 24.dp, horizontal = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Logo del gimnasio
-                Image(
-                    painter = painterResource(id = R.drawable.logo_wayra),
-                    contentDescription = "Logo Wayra",
-                    modifier = Modifier.size(120.dp)
-                )
-
-                Text(
-                    text = currentDate,
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-            }
-        }
-
+    WayraBackground(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 80.dp)
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            // Header con logo
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                StatCardCompact(
-                    title = stringResource(R.string.home_active_students),
-                    value = stats.activeStudents.toString(),
-                    iconRes = R.drawable.gym_active,
-                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.weight(1f)
-                )
-
-                StatCardCompact(
-                    title = "Nuevos este mes",
-                    value = stats.newStudentsThisMonth.toString(),
-                    iconRes = R.drawable.gym_new_active,
-                    backgroundColor = Color(0xFFE8F5E9),
-                    contentColor = Color(0xFF2E7D32),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Tarjetas de deudores
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatCardCompact(
-                    title = "Pendientes abonar este mes",
-                    value = stats.pendingThisMonth.toString(),
-                    iconRes = R.drawable.gym_pay,
-                    backgroundColor = Color(0xFFFFEBEE),
-                    contentColor = Color(0xFFC62828),
-                    modifier = Modifier.weight(1f)
-                )
-
-                StatCardCompact(
-                    title = "Pendientes abonar mes pasado",
-                    value = stats.pendingLastMonth.toString(),
-                    iconRes = R.drawable.gym_pay_past_month,
-                    backgroundColor = Color(0xFFFFCDD2),
-                    contentColor = Color(0xFFB71C1C),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4CAF50)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.payment),
-                                contentDescription = "Icono de pago",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(20.dp)
-                            )
+                    // Logo del gimnasio
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_wayra),
+                        contentDescription = "Logo Wayra",
+                        modifier = Modifier.size(130.dp)
+                    )
 
-                            Text(
-                                text = stringResource(R.string.home_total_collected),
-                                fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                        Text(
-                            text = if (showAmount) formatCurrency(stats.totalCollected) else "••••••",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(
-                                color = Color.White.copy(alpha = 0.2f),
-                                shape = CircleShape
-                            )
-                            .clickable { showAmount = !showAmount },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (showAmount) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.eye_on),
-                                contentDescription = "Icono de ojo",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.eye_off),
-                                contentDescription = "Icono de ojo cerrado",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+                    Text(
+                        text = currentDate,
+                        fontSize = 14.sp,
+                        color = Gray
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Quick Actions Section
-            Text(
-                text = stringResource(R.string.home_quick_actions),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Acción principal: Registrar pago
-            FilledTonalButton(
-                onClick = onRegisterPaymentClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
-                shape = RoundedCornerShape(16.dp)
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.home_register_payment),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    StatCardCompact(
+                        title = stringResource(R.string.home_active_students),
+                        value = stats.activeStudents.toString(),
+                        iconRes = R.drawable.gym_active,
+                        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    StatCardCompact(
+                        title = "Nuevos este mes",
+                        value = stats.newStudentsThisMonth.toString(),
+                        iconRes = R.drawable.gym_new_active,
+                        backgroundColor = Color(0xFFE8F5E9),
+                        contentColor = Color(0xFF2E7D32),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Tarjetas de deudores
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCardCompact(
+                        title = "Pendientes abonar este mes",
+                        value = stats.pendingThisMonth.toString(),
+                        iconRes = R.drawable.gym_pay,
+                        backgroundColor = Color(0xFFFFEBEE),
+                        contentColor = Color(0xFFC62828),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    StatCardCompact(
+                        title = "Pendientes abonar mes pasado",
+                        value = stats.pendingLastMonth.toString(),
+                        iconRes = R.drawable.gym_pay_past_month,
+                        backgroundColor = Color(0xFFFFCDD2),
+                        contentColor = Color(0xFFB71C1C),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF4CAF50)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.payment),
+                                    contentDescription = "Icono de pago",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(20.dp)
+                                )
+
+                                Text(
+                                    text = stringResource(R.string.home_total_collected),
+                                    fontSize = 14.sp,
+                                    color = Cream,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            Text(
+                                text = if (showAmount) formatCurrency(stats.totalCollected) else "••••••",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Cream,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    color = Color.White.copy(alpha = 0.2f),
+                                    shape = CircleShape
+                                )
+                                .clickable { showAmount = !showAmount },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (showAmount) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.eye_on),
+                                    contentDescription = "Icono de ojo",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.eye_off),
+                                    contentDescription = "Icono de ojo cerrado",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Acción principal: Registrar pago
+                FilledTonalButton(
+                    onClick = onRegisterPaymentClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_register_payment),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +38,9 @@ import com.app.wayra.ui.home.HomeViewModel
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.splash.SplashScreen
 import com.app.wayra.ui.students.StudentsViewModel
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
+import com.app.wayra.ui.theme.Orange
 import com.app.wayra.ui.theme.WayraTheme
 
 class MainActivity : ComponentActivity() {
@@ -125,8 +126,8 @@ fun ModernBottomBar(
 ) {
     androidx.compose.material3.Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 8.dp
+        color = Gray,
+        shadowElevation = 4.dp
     ) {
         Row(
             modifier = Modifier
@@ -159,7 +160,7 @@ fun ModernBottomBar(
                             }
                         ),
                         contentDescription = item,
-                        tint = if (isSelected) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (isSelected) Orange else Cream,
                         modifier = Modifier.size(26.dp)
                     )
 
@@ -169,7 +170,7 @@ fun ModernBottomBar(
                         text = item,
                         fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isSelected) Orange else Cream,
                         maxLines = 1
                     )
                 }

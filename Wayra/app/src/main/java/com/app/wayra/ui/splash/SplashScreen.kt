@@ -2,7 +2,6 @@ package com.app.wayra.ui.splash
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -11,11 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.app.wayra.R
+import com.app.wayra.ui.components.WayraBackground
 import kotlinx.coroutines.delay
 
 @Composable
@@ -52,27 +50,19 @@ fun SplashScreen(
     }
 
     // UI del Splash Screen
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF2C2C2C), // Gris oscuro
-                        Color(0xFF1A1A1A), // Negro medio
-                        Color(0xFF000000)  // Negro puro
-                    )
-                )
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_wayra),
-            contentDescription = "Logo Wayra",
-            modifier = Modifier
-                .size(220.dp)
-                .scale(scale)
-                .alpha(alpha)
-        )
+    WayraBackground {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo_wayra),
+                contentDescription = "Logo Wayra",
+                modifier = Modifier
+                    .size(220.dp)
+                    .scale(scale)
+                    .alpha(alpha)
+            )
+        }
     }
 }

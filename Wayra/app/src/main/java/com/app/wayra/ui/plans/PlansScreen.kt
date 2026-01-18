@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
+import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -87,23 +89,31 @@ fun PlansScreen(
                     IconButton(onClick = onNavigateToAddPlan) {
                         Icon(
                             Icons.Default.Add,
-                            contentDescription = stringResource(R.string.plans_add),
-                            tint = WayraOrange
+                            contentDescription = stringResource(R.string.plans_add)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier
     ) { paddingValues ->
-        Column(
+        WayraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 16.dp)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 16.dp, bottom = 16.dp)
+            ) {
             if (plans.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -248,6 +258,7 @@ fun PlansScreen(
                 },
                 shape = RoundedCornerShape(20.dp)
             )
+        }
         }
     }
 }
