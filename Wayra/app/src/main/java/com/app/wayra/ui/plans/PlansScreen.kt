@@ -63,7 +63,8 @@ import java.util.Locale
 @Composable
 fun PlansScreen(
     viewModel: PlansViewModel,
-    onNavigateToAddPlan: () -> Unit
+    onNavigateToAddPlan: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val plans by viewModel.plans.observeAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
@@ -93,7 +94,8 @@ fun PlansScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = modifier
     ) { paddingValues ->
         Column(
             modifier = Modifier
