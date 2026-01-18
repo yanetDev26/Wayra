@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.app.wayra.navigation.HomeNavHost
+import com.app.wayra.navigation.PlansNavHost
 import com.app.wayra.navigation.ReportsNavHost
 import com.app.wayra.navigation.StudentsNavHost
 import com.app.wayra.ui.home.HomeViewModel
-import com.app.wayra.ui.plans.PlansScreen
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.splash.SplashScreen
 import com.app.wayra.ui.students.StudentsViewModel
@@ -100,12 +100,11 @@ fun MainScreen() {
                 )
             }
             2 -> {
-                PlansScreen(
-                    viewModel = plansViewModel,
-                    onNavigateBack = { /* No action needed in tab */ },
-                    onNavigateToAddPlan = {
-                        // TODO: Navegar a agregar plan
-                    }
+                val plansNavController = rememberNavController()
+                PlansNavHost(
+                    navController = plansNavController,
+                    plansViewModel = plansViewModel,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
             3 -> {
@@ -170,7 +169,8 @@ fun ModernBottomBar(
                         text = item,
                         fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isSelected) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
                     )
                 }
             }

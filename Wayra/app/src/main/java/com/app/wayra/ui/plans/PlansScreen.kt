@@ -76,7 +76,12 @@ fun PlansScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.plans_title)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.plans_title),
+                        maxLines = 1
+                    )
+                },
                 actions = {
                     IconButton(onClick = onNavigateToAddPlan) {
                         Icon(
@@ -94,7 +99,8 @@ fun PlansScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
         ) {
             if (plans.isEmpty()) {
                 Box(

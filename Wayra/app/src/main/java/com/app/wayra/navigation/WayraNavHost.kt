@@ -77,7 +77,6 @@ fun WayraNavHost(
             val viewModel: PlansViewModel = viewModel()
             PlansScreen(
                 viewModel = viewModel,
-                onNavigateBack = { navController.popBackStack() },
                 onNavigateToAddPlan = { navController.navigate(Screen.AddPlan.route) }
             )
         }

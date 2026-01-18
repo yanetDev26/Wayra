@@ -76,8 +76,9 @@ class StudentsViewModel : ViewModel() {
                     // Log error
                 }
                 .collect { studentsWithPlan ->
-                    _studentsWithPlan.value = studentsWithPlan
-                    _students.value = studentsWithPlan.map { it.student }
+                    val sortedStudents = studentsWithPlan.sortedBy { it.student.name.lowercase() }
+                    _studentsWithPlan.value = sortedStudents
+                    _students.value = sortedStudents.map { it.student }
                     filterStudents()
                 }
         }
@@ -92,7 +93,7 @@ class StudentsViewModel : ViewModel() {
         val query = _searchQuery.value ?: ""
         val allStudentsWithPlan = _studentsWithPlan.value ?: emptyList()
 
-        _filteredStudents.value = if (query.isBlank()) {
+        val filtered = if (query.isBlank()) {
             allStudentsWithPlan
         } else {
             allStudentsWithPlan.filter {
@@ -104,10 +105,8 @@ class StudentsViewModel : ViewModel() {
                 (it.planName?.contains(query, ignoreCase = true) == true)
             }
         }
-    }
 
-    suspend fun migrateStudentsAddSurname(): Result<Int> {
-        return studentRepository.migrateStudentsAddSurname()
+        _filteredStudents.value = filtered.sortedBy { it.student.name.lowercase() }
     }
 
     suspend fun addStudent(student: Student): Result<String> {

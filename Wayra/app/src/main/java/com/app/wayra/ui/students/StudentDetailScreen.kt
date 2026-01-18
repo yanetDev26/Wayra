@@ -3,11 +3,12 @@ package com.app.wayra.ui.students
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,7 +56,8 @@ import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +121,9 @@ fun StudentDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 90.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Student Info Card
@@ -176,10 +181,6 @@ fun StudentDetailScreen(
                         DetailRow(label = "Plan", value = currentPlan!!.activityName)
                         val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                         DetailRow(label = "Precio", value = formatter.format(currentPlan!!.price))
-                        DetailRow(
-                            label = "Estado",
-                            value = if (activeSubscription!!.active) "Activo" else "Inactivo"
-                        )
                         activeSubscription!!.startDate?.let { startDate ->
                             val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy", Locale.forLanguageTag("es-AR"))
                             DetailRow(label = "Fecha de inicio", value = dateFormat.format(Date(startDate)))
@@ -223,14 +224,15 @@ fun StudentDetailScreen(
             EditStudentDialog(
                 student = student,
                 plans = plans,
+                currentPlan = currentPlan,
                 onDismiss = { showEditDialog = false },
                 onSave = { updatedStudent, selectedPlan ->
                     showEditDialog = false
                     coroutineScope.launch {
                         val result = viewModel.updateStudent(studentId, updatedStudent)
                         if (result.isSuccess) {
-                            // Si se seleccionó un plan diferente, actualizar suscripción
-                            if (selectedPlan != null) {
+                            // Si se seleccionó un plan diferente al actual, actualizar suscripción
+                            if (selectedPlan != null && selectedPlan.id != currentPlan?.id) {
                                 subscriptionViewModel.assignPlan(updatedStudent, selectedPlan)
                                 // Refrescar la suscripción actual
                                 refreshTrigger++
@@ -283,6 +285,7 @@ fun StudentDetailScreen(
 fun EditStudentDialog(
     student: Student,
     plans: List<Plan>,
+    currentPlan: Plan?,
     onDismiss: () -> Unit,
     onSave: (Student, Plan?) -> Unit
 ) {
@@ -291,7 +294,7 @@ fun EditStudentDialog(
     var email by remember { mutableStateOf(student.email) }
     var phone by remember { mutableStateOf(student.phone) }
     var active by remember { mutableStateOf(student.active) }
-    var selectedPlan by remember { mutableStateOf<Plan?>(null) }
+    var selectedPlan by remember { mutableStateOf<Plan?>(currentPlan) }
     var showPlanPicker by remember { mutableStateOf(false) }
 
     AlertDialog(
@@ -303,13 +306,15 @@ fun EditStudentDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Nombre") },
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                 )
                 OutlinedTextField(
                     value = surname,
                     onValueChange = { surname = it },
                     label = { Text("Apellido") },
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                 )
                 OutlinedTextField(
                     value = email,
@@ -340,7 +345,7 @@ fun EditStudentDialog(
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = selectedPlan?.activityName ?: "Sin cambios",
+                                text = selectedPlan?.activityName ?: "Sin plan asignado",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -399,28 +404,9 @@ fun EditStudentDialog(
                     if (plans.isEmpty()) {
                         Text("No hay planes disponibles")
                     } else {
-                        // Opción para no cambiar plan
-                        OutlinedCard(
-                            onClick = {
-                                selectedPlan = null
-                                showPlanPicker = false
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(
-                                    text = "No cambiar plan",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
                         // Lista de planes
                         plans.forEach { plan ->
+                            val isCurrentPlan = plan.id == currentPlan?.id
                             OutlinedCard(
                                 onClick = {
                                     selectedPlan = plan
@@ -431,10 +417,24 @@ fun EditStudentDialog(
                                     .padding(vertical = 4.dp)
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
-                                    Text(
-                                        text = plan.activityName,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = plan.activityName,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        if (isCurrentPlan) {
+                                            Text(
+                                                text = "(Actual)",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
                                     val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                     Text(
                                         text = formatter.format(plan.price),
