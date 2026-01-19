@@ -43,6 +43,7 @@ import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.Gray
+import com.app.wayra.ui.theme.Orange
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -123,8 +124,8 @@ fun HomeContent(
                         title = stringResource(R.string.home_active_students),
                         value = stats.activeStudents.toString(),
                         iconRes = R.drawable.gym_active,
-                        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        backgroundColor = Orange,
+                        contentColor = Color.White,
                         modifier = Modifier.weight(1f)
                     )
 

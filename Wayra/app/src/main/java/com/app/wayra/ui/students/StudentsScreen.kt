@@ -170,10 +170,20 @@ private fun StudentsContent(
                         cursorColor = WayraOrange
                     )
                 )
-            }
 
-            // Students List
-            if (filteredStudents.isEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
+                ) {
+                    items(filteredStudents) { studentWithPlan ->
+                        StudentItemModern(
+                            studentWithPlan = studentWithPlan,
+                            onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
+                        )
+                    }
+                }
+            } else {
+                // Students List
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -205,18 +215,6 @@ private fun StudentsContent(
                             text = "Presiona el botón + para agregar un alumno",
                             color = Gray,
                             style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
-                ) {
-                    items(filteredStudents) { studentWithPlan ->
-                        StudentItemModern(
-                            studentWithPlan = studentWithPlan,
-                            onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
                         )
                     }
                 }
