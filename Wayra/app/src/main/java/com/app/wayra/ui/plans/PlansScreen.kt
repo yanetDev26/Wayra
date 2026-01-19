@@ -29,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,7 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
+import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.components.showErrorSnackbar
+import com.app.wayra.ui.components.showSuccessSnackbar
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -99,7 +102,7 @@ fun PlansScreen(
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         modifier = modifier
     ) { paddingValues ->
         WayraBackground(
@@ -113,131 +116,128 @@ fun PlansScreen(
                     .padding(horizontal = 16.dp)
                     .padding(top = 16.dp, bottom = 16.dp)
             ) {
-            if (plans.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                if (plans.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(48.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = "🏋️",
-                                fontSize = 48.sp
+                            Icon(
+                                painter = painterResource(id = R.drawable.plan),
+                                contentDescription = "Icono de plan",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(40.dp)
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
                             Text(
                                 text = stringResource(R.string.plans_empty),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = Gray,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
                             Text(
                                 text = "Presiona el botón + para agregar tu primer plan",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = Gray,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
-                }
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
-                ) {
-                    items(plans) { plan ->
-                        PlanItemModern(
-                            plan = plan,
-                            onEdit = {
-                                selectedPlan = plan
-                                showEditDialog = true
-                            },
-                            onDelete = {
-                                selectedPlan = plan
-                                showDeleteDialog = true
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        // Diálogo de editar
-        if (showEditDialog && selectedPlan != null) {
-            EditPlanDialog(
-                plan = selectedPlan!!,
-                onDismiss = { showEditDialog = false },
-                onSave = { updatedPlan ->
-                    showEditDialog = false
-                    coroutineScope.launch {
-                        val result = viewModel.updatePlan(selectedPlan!!.id, updatedPlan)
-                        if (result.isSuccess) {
-                            viewModel.refreshData()
-                            snackbarHostState.showSnackbar("Plan actualizado")
-                        } else {
-                            snackbarHostState.showSnackbar("Error al actualizar")
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(plans) { plan ->
+                            PlanItemModern(
+                                plan = plan,
+                                onEdit = {
+                                    selectedPlan = plan
+                                    showEditDialog = true
+                                },
+                                onDelete = {
+                                    selectedPlan = plan
+                                    showDeleteDialog = true
+                                }
+                            )
                         }
                     }
                 }
-            )
-        }
+            }
 
-        // Diálogo de eliminar
-        if (showDeleteDialog && selectedPlan != null) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = {
-                    Text(
-                        "Eliminar Plan",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                text = {
-                    Text("¿Estás seguro de que deseas eliminar ${selectedPlan!!.activityName}?")
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                val result = viewModel.deletePlan(selectedPlan!!.id)
-                                if (result.isSuccess) {
-                                    snackbarHostState.showSnackbar("Plan eliminado")
-                                    showDeleteDialog = false
-                                } else {
-                                    snackbarHostState.showSnackbar("Error al eliminar")
-                                }
+            // Diálogo de editar
+            if (showEditDialog && selectedPlan != null) {
+                EditPlanDialog(
+                    plan = selectedPlan!!,
+                    onDismiss = { showEditDialog = false },
+                    onSave = { updatedPlan ->
+                        showEditDialog = false
+                        coroutineScope.launch {
+                            val result = viewModel.updatePlan(selectedPlan!!.id, updatedPlan)
+                            if (result.isSuccess) {
+                                viewModel.refreshData()
+                                snackbarHostState.showSuccessSnackbar("Plan actualizado")
+                            } else {
+                                snackbarHostState.showErrorSnackbar("Error al actualizar")
                             }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        ),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text("Eliminar")
+                        }
                     }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showDeleteDialog = false },
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text("Cancelar")
-                    }
-                },
-                shape = RoundedCornerShape(20.dp)
-            )
-        }
+                )
+            }
+
+            // Diálogo de eliminar
+            if (showDeleteDialog && selectedPlan != null) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = {
+                        Text(
+                            "Eliminar Plan",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text("¿Estás seguro de que deseas eliminar ${selectedPlan!!.activityName}?")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    val result = viewModel.deletePlan(selectedPlan!!.id)
+                                    if (result.isSuccess) {
+                                        snackbarHostState.showSuccessSnackbar("Plan eliminado")
+                                        showDeleteDialog = false
+                                    } else {
+                                        snackbarHostState.showErrorSnackbar("Error al eliminar")
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            ),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("Eliminar")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showDeleteDialog = false },
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("Cancelar")
+                        }
+                    },
+                    shape = RoundedCornerShape(20.dp)
+                )
+            }
         }
     }
 }

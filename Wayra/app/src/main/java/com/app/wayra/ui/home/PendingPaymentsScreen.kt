@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 import com.app.wayra.R
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
@@ -50,8 +48,12 @@ import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.StudentRepository
+import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.components.showErrorSnackbar
+import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.theme.WayraOrange
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -153,7 +155,7 @@ fun PendingPaymentsScreen(
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         WayraBackground(
             modifier = Modifier.padding(paddingValues)
@@ -235,7 +237,7 @@ fun PendingPaymentsScreen(
                         )
 
                         if (result.isSuccess) {
-                            snackbarHostState.showSnackbar("Pago registrado exitosamente")
+                            snackbarHostState.showSuccessSnackbar("Pago registrado exitosamente")
                             showPaymentDialog = false
                             // Recargar la lista
                             isLoading = true
@@ -279,7 +281,7 @@ fun PendingPaymentsScreen(
                             studentsWithPayments = studentsWithPaymentsList
                             isLoading = false
                         } else {
-                            snackbarHostState.showSnackbar("Error al registrar el pago")
+                            snackbarHostState.showErrorSnackbar("Error al registrar el pago")
                         }
                     }
                 }

@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,6 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.PaymentMethod
+import com.app.wayra.ui.components.CustomSnackbarHost
+import com.app.wayra.ui.components.showErrorSnackbar
+import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.home.PaymentPeriod
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
@@ -81,7 +83,7 @@ fun RegisterPaymentScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -236,26 +238,26 @@ fun RegisterPaymentScreen(
 
                         // Validar datos antes de intentar registrar
                         if (selectedStudent == null) {
-                            snackbarHostState.showSnackbar("Por favor selecciona un estudiante")
+                            snackbarHostState.showErrorSnackbar("Por favor selecciona un estudiante")
                             isLoading = false
                             return@launch
                         }
 
                         if (amount.isBlank()) {
-                            snackbarHostState.showSnackbar("Por favor ingresa un monto")
+                            snackbarHostState.showErrorSnackbar("Por favor ingresa un monto")
                             isLoading = false
                             return@launch
                         }
 
                         val amountValue = amount.toDoubleOrNull()
                         if (amountValue == null) {
-                            snackbarHostState.showSnackbar("El monto debe ser un número válido")
+                            snackbarHostState.showErrorSnackbar("El monto debe ser un número válido")
                             isLoading = false
                             return@launch
                         }
 
                         if (amountValue <= 0) {
-                            snackbarHostState.showSnackbar("El monto debe ser mayor a 0")
+                            snackbarHostState.showErrorSnackbar("El monto debe ser mayor a 0")
                             isLoading = false
                             return@launch
                         }
@@ -265,10 +267,10 @@ fun RegisterPaymentScreen(
                         isLoading = false
 
                         if (success) {
-                            snackbarHostState.showSnackbar("Pago registrado exitosamente")
+                            snackbarHostState.showSuccessSnackbar("Pago registrado exitosamente")
                             onPaymentRegistered()
                         } else {
-                            snackbarHostState.showSnackbar("Error al registrar el pago. Verifica que el estudiante tenga una suscripción activa.")
+                            snackbarHostState.showErrorSnackbar("Error al registrar el pago. Verifica que el estudiante tenga una suscripción activa.")
                         }
                     }
                 },

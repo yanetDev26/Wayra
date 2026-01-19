@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,77 +131,96 @@ private fun StudentsContent(
     onNavigateToStudentDetail: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    WayraBackground(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    WayraBackground(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
+        ) {
 
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { viewModel.searchStudents(it) },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(
-                    stringResource(R.string.students_search),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            // Search Bar
+            if (filteredStudents.isNotEmpty()) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { viewModel.searchStudents(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            stringResource(R.string.students_search),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.TextFieldDefaults.colors(
+                        focusedIndicatorColor = WayraOrange,
+                        unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                        focusedLeadingIconColor = WayraOrange,
+                        cursorColor = WayraOrange
+                    )
                 )
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = stringResource(R.string.search),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = androidx.compose.material3.TextFieldDefaults.colors(
-                focusedIndicatorColor = WayraOrange,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-                focusedLeadingIconColor = WayraOrange,
-                cursorColor = WayraOrange
-            )
-        )
+            }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Students List
-        if (filteredStudents.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(48.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            // Students List
+            if (filteredStudents.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "🏃",
-                        fontSize = 48.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.students_empty),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.gym_ticket),
+                            contentDescription = "Icono de gym",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(40.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = stringResource(R.string.students_empty),
+                            color = Gray,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "Presiona el botón + para agregar un alumno",
+                            color = Gray,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
+                ) {
+                    items(filteredStudents) { studentWithPlan ->
+                        StudentItemModern(
+                            studentWithPlan = studentWithPlan,
+                            onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
+                        )
+                    }
                 }
             }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
-            ) {
-                items(filteredStudents) { studentWithPlan ->
-                    StudentItemModern(
-                        studentWithPlan = studentWithPlan,
-                        onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
-                    )
-                }
-            }
-        }
         }
     }
 }

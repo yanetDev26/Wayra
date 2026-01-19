@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -160,7 +161,7 @@ fun ModernBottomBar(
                             }
                         ),
                         contentDescription = item,
-                        tint = if (isSelected) Orange else Cream,
+                        tint = Color.Unspecified,
                         modifier = Modifier.size(26.dp)
                     )
 

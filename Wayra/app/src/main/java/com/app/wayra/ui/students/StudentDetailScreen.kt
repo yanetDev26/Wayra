@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -55,6 +54,9 @@ import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.model.Subscription
 import com.app.wayra.data.repository.SubscriptionRepository
+import com.app.wayra.ui.components.CustomSnackbarHost
+import com.app.wayra.ui.components.showErrorSnackbar
+import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import com.app.wayra.ui.theme.WayraOrange
@@ -126,7 +128,7 @@ fun StudentDetailScreen(
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -249,9 +251,9 @@ fun StudentDetailScreen(
                                 refreshTrigger++
                             }
                             viewModel.refreshData()
-                            snackbarHostState.showSnackbar("Alumno actualizado")
+                            snackbarHostState.showSuccessSnackbar("Alumno actualizado")
                         } else {
-                            snackbarHostState.showSnackbar("Error al actualizar")
+                            snackbarHostState.showErrorSnackbar("Error al actualizar")
                         }
                     }
                 }
@@ -277,11 +279,11 @@ fun StudentDetailScreen(
                                 isDeleting = false
                                 if (result.isSuccess) {
                                     showDeleteDialog = false
-                                    snackbarHostState.showSnackbar("Alumno eliminado")
+                                    snackbarHostState.showSuccessSnackbar("Alumno eliminado")
                                     onNavigateBack()
                                 } else {
                                     showDeleteDialog = false
-                                    snackbarHostState.showSnackbar("Error al eliminar")
+                                    snackbarHostState.showErrorSnackbar("Error al eliminar")
                                 }
                             }
                         },
