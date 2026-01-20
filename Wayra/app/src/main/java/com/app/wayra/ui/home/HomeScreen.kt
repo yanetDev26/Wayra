@@ -51,8 +51,7 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRegisterPayment: () -> Unit = {},
-    onNavigateToPendingPayments: (String) -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
@@ -65,7 +64,6 @@ fun HomeScreen(
         stats = stats,
         currentDate = currentDate,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
-        onPendingPaymentsClick = onNavigateToPendingPayments,
         modifier = modifier
     )
 }
@@ -75,7 +73,6 @@ fun HomeContent(
     stats: HomeStats,
     currentDate: String,
     onRegisterPaymentClick: () -> Unit,
-    onPendingPaymentsClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAmount by remember { mutableStateOf(false) }
@@ -154,7 +151,6 @@ fun HomeContent(
                         contentColor = Color(0xFFC62828),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onPendingPaymentsClick("this_month") }
                     )
 
                     StatCardCompact(
@@ -165,7 +161,6 @@ fun HomeContent(
                         contentColor = Color(0xFFB71C1C),
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { onPendingPaymentsClick("last_month") }
                     )
                 }
 
@@ -334,7 +329,6 @@ fun HomeScreenPreview() {
             ),
             currentDate = "25 de Diciembre, 2025",
             onRegisterPaymentClick = {},
-            onPendingPaymentsClick = {}
         )
     }
 }

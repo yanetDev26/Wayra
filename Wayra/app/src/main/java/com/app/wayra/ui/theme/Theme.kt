@@ -19,16 +19,16 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = WayraOrange,
     onTertiary = Cream,
 
-    background = Black ,
+    background = Gray,
     onBackground = Cream,
 
-    surface = Black,
+    surface = Gray,
     onSurface = Cream,
-    surfaceVariant = Black,
+    surfaceVariant = Gray,
     onSurfaceVariant = Cream,
 
     error = Color(0xFFCF6679),
-    onError = Black,
+    onError = Gray,
 
     outline = Color(0xFF3A3A3A),
     outlineVariant = Color(0xFF2A2A2A)
