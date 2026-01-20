@@ -32,12 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
-import com.app.wayra.ui.theme.WayraOrange
 import com.app.wayra.data.model.Plan
+import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +83,8 @@ fun AddPlanScreen(
                 onValueChange = { activityName = it },
                 label = { Text(stringResource(R.string.plan_name)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
             )
 
             OutlinedTextField(
@@ -101,7 +103,8 @@ fun AddPlanScreen(
                 label = { Text(stringResource(R.string.plan_description_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
-                maxLines = 5
+                maxLines = 5,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
             )
 
             Spacer(modifier = Modifier.height(24.dp))

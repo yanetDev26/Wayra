@@ -39,9 +39,6 @@ fun HomeNavHost(
                 viewModel = homeViewModel,
                 onNavigateToRegisterPayment = {
                     navController.navigate(HomeScreens.RegisterPayment.route)
-                },
-                onNavigateToPendingPayments = { periodType ->
-                    navController.navigate("pending_payments/$periodType")
                 }
             )
         }

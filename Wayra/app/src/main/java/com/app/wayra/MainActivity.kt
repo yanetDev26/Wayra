@@ -105,8 +105,7 @@ fun MainScreen() {
                 val plansNavController = rememberNavController()
                 PlansNavHost(
                     navController = plansNavController,
-                    plansViewModel = plansViewModel,
-                    modifier = Modifier.padding(innerPadding)
+                    plansViewModel = plansViewModel
                 )
             }
             3 -> {

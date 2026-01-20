@@ -1,7 +1,6 @@
 package com.app.wayra.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,7 +17,6 @@ sealed class PlansScreens(val route: String) {
 @Composable
 fun PlansNavHost(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
     plansViewModel: PlansViewModel = viewModel()
 ) {
     NavHost(
@@ -31,8 +29,7 @@ fun PlansNavHost(
                 viewModel = plansViewModel,
                 onNavigateToAddPlan = {
                     navController.navigate(PlansScreens.AddPlan.route)
-                },
-                modifier = modifier
+                }
             )
         }
 
