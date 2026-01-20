@@ -18,27 +18,6 @@ class PaymentRepository {
     private val firestore: FirebaseFirestore = Firebase.firestore
     private val paymentsCollection = firestore.collection("payments")
 
-    // Obtener todos los pagos en tiempo real
-    fun getPayments(): Flow<List<Payment>> = callbackFlow {
-        val subscription = paymentsCollection
-            .orderBy("dueDate", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    val payments = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Payment::class.java)?.copy(id = doc.id)
-                    }
-                    trySend(payments)
-                }
-            }
-
-        awaitClose { subscription.remove() }
-    }
-
     // Obtener pagos próximos a vencer
     fun getUpcomingPayments(limit: Int = 10): Flow<List<Payment>> = callbackFlow {
         val today = Calendar.getInstance().timeInMillis
@@ -189,17 +168,15 @@ class PaymentRepository {
                 .get()
                 .await()
 
-            // Filtrar por fecha en memoria y contar estudiantes únicos
-            val uniqueStudents = snapshot.documents
+            // Filtrar por fecha en memoria y contar TOTAL de pagos pendientes
+            val pendingPayments = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
                 .filter { payment ->
                     val dueDate = payment.dueDate ?: 0L
                     dueDate in startOfMonth..endOfMonth
                 }
-                .map { it.studentId }
-                .distinct()
 
-            uniqueStudents.size
+            pendingPayments.size
         } catch (_: Exception) {
             0
         }
@@ -234,44 +211,17 @@ class PaymentRepository {
                 .get()
                 .await()
 
-            // Filtrar por fecha en memoria y contar estudiantes únicos
-            val uniqueStudents = snapshot.documents
+            // Filtrar por fecha en memoria y contar TOTAL de pagos pendientes
+            val pendingPayments = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
                 .filter { payment ->
                     val dueDate = payment.dueDate ?: 0L
                     dueDate in startOfLastMonth..endOfLastMonth
                 }
-                .map { it.studentId }
-                .distinct()
 
-            uniqueStudents.size
+            pendingPayments.size
         } catch (_: Exception) {
             0
-        }
-    }
-
-    // Obtener todos los pagos del mes actual
-    suspend fun getMonthlyPayments(): List<Payment> {
-        return try {
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val startOfMonth = calendar.timeInMillis
-
-            val snapshot = paymentsCollection
-                .whereEqualTo("status", PaymentStatus.PAGADO.name)
-                .whereGreaterThanOrEqualTo("paymentDate", startOfMonth)
-                .orderBy("paymentDate", Query.Direction.DESCENDING)
-                .get()
-                .await()
-
-            snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Payment::class.java)?.copy(id = doc.id)
-            }
-        } catch (_: Exception) {
-            emptyList()
         }
     }
 
@@ -348,26 +298,6 @@ class PaymentRepository {
         }
     }
 
-    // Obtener pagos vencidos
-    suspend fun getOverduePayments(): List<Payment> {
-        return try {
-            val today = Calendar.getInstance().timeInMillis
-
-            val snapshot = paymentsCollection
-                .whereEqualTo("status", PaymentStatus.PENDIENTE.name)
-                .whereLessThan("dueDate", today)
-                .orderBy("dueDate", Query.Direction.ASCENDING)
-                .get()
-                .await()
-
-            snapshot.documents.mapNotNull { doc ->
-                doc.toObject(Payment::class.java)?.copy(id = doc.id)
-            }
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
     // Obtener estadísticas de pagos pendientes
     suspend fun getPendingPaymentsStats(): PendingPaymentsStats {
         return try {
@@ -415,6 +345,48 @@ class PaymentRepository {
             )
         } catch (_: Exception) {
             PendingPaymentsStats(0.0, 0.0, 0, 0, 0, 0, emptyList(), emptyList(), emptyList())
+        }
+    }
+
+    // Buscar pago pendiente de un estudiante para un mes específico
+    suspend fun findPendingPaymentForMonth(studentId: String, dueDate: Long): Payment? {
+        return try {
+            // Calcular el rango del mes basado en la fecha de vencimiento proporcionada
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = dueDate
+
+            // Inicio del mes
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            val startOfMonth = calendar.timeInMillis
+
+            // Fin del mes
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            calendar.set(Calendar.HOUR_OF_DAY, 23)
+            calendar.set(Calendar.MINUTE, 59)
+            calendar.set(Calendar.SECOND, 59)
+            val endOfMonth = calendar.timeInMillis
+
+            // Buscar pagos pendientes o vencidos del estudiante en ese mes
+            val snapshot = paymentsCollection
+                .whereEqualTo("studentId", studentId)
+                .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
+                .get()
+                .await()
+
+            // Filtrar por rango de fecha en memoria
+            snapshot.documents
+                .mapNotNull { doc ->
+                    doc.toObject(Payment::class.java)?.copy(id = doc.id)
+                }
+                .firstOrNull { payment ->
+                    val paymentDueDate = payment.dueDate ?: 0L
+                    paymentDueDate in startOfMonth..endOfMonth
+                }
+        } catch (_: Exception) {
+            null
         }
     }
 }

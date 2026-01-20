@@ -9,6 +9,8 @@ import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.StudentRepository
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,6 +39,9 @@ class HomeViewModel : ViewModel() {
     private val _currentDate = MutableLiveData<String>()
     val currentDate: LiveData<String> = _currentDate
 
+    // Mutex para sincronizar las actualizaciones de stats
+    private val statsMutex = Mutex()
+
     init {
         loadCurrentDate()
         loadData()
@@ -55,8 +60,10 @@ class HomeViewModel : ViewModel() {
                     // Log error
                 }
                 .collect { students ->
-                    val currentStats = _stats.value ?: HomeStats()
-                    _stats.value = currentStats.copy(activeStudents = students.size)
+                    statsMutex.withLock {
+                        val currentStats = _stats.value ?: HomeStats()
+                        _stats.value = currentStats.copy(activeStudents = students.size)
+                    }
                 }
         }
 
@@ -78,17 +85,35 @@ class HomeViewModel : ViewModel() {
             val pendingLastMonth = paymentRepository.getStudentsWithPendingPaymentsLastMonth()
             val newStudentsThisMonth = studentRepository.getNewStudentsThisMonth()
 
-            val currentStats = _stats.value ?: HomeStats()
-            _stats.value = currentStats.copy(
-                newStudentsThisMonth = newStudentsThisMonth,
-                totalCollected = totalCollected,
-                pendingThisMonth = pendingThisMonth,
-                pendingLastMonth = pendingLastMonth
-            )
+            statsMutex.withLock {
+                val currentStats = _stats.value ?: HomeStats()
+                _stats.value = currentStats.copy(
+                    newStudentsThisMonth = newStudentsThisMonth,
+                    totalCollected = totalCollected,
+                    pendingThisMonth = pendingThisMonth,
+                    pendingLastMonth = pendingLastMonth
+                )
+            }
         }
     }
 
     fun refreshData() {
-        loadData()
+        // Recargar solo las estadísticas, no relanzar los listeners de Flow
+        viewModelScope.launch {
+            val (_, _, totalCollected) = paymentRepository.getMonthlyStats()
+            val pendingThisMonth = paymentRepository.getStudentsWithPendingPaymentsThisMonth()
+            val pendingLastMonth = paymentRepository.getStudentsWithPendingPaymentsLastMonth()
+            val newStudentsThisMonth = studentRepository.getNewStudentsThisMonth()
+
+            statsMutex.withLock {
+                val currentStats = _stats.value ?: HomeStats()
+                _stats.value = currentStats.copy(
+                    newStudentsThisMonth = newStudentsThisMonth,
+                    totalCollected = totalCollected,
+                    pendingThisMonth = pendingThisMonth,
+                    pendingLastMonth = pendingLastMonth
+                )
+            }
+        }
     }
 }

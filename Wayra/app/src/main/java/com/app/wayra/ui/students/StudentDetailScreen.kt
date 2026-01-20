@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -90,6 +91,10 @@ fun StudentDetailScreen(
     var refreshTrigger by remember { mutableStateOf(0) }
     val subscriptionRepository = remember { SubscriptionRepository() }
 
+    // Estado para historial de pagos
+    var studentPayments by remember { mutableStateOf<List<com.app.wayra.data.model.Payment>>(emptyList()) }
+    val paymentRepository = remember { com.app.wayra.data.repository.PaymentRepository() }
+
     // Cargar suscripción activa cuando cambia el studentId o refreshTrigger
     LaunchedEffect(studentId, refreshTrigger) {
         val subscription = subscriptionRepository.getActiveSubscription(studentId)
@@ -100,6 +105,13 @@ fun StudentDetailScreen(
     LaunchedEffect(activeSubscription, plans) {
         currentPlan = activeSubscription?.let { subscription ->
             plans.find { it.id == subscription.planId }
+        }
+    }
+
+    // Cargar pagos del estudiante
+    LaunchedEffect(studentId, refreshTrigger) {
+        paymentRepository.getPaymentsByStudent(studentId).collect { payments ->
+            studentPayments = payments
         }
     }
 
@@ -223,11 +235,30 @@ fun StudentDetailScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    Text(
-                        text = "No hay pagos registrados",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    if (studentPayments.isEmpty()) {
+                        Text(
+                            text = "No hay pagos registrados",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            studentPayments.take(5).forEach { payment ->
+                                PaymentHistoryItem(payment = payment)
+                            }
+
+                            if (studentPayments.size > 5) {
+                                Text(
+                                    text = "Mostrando últimos 5 de ${studentPayments.size} pagos",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -244,11 +275,19 @@ fun StudentDetailScreen(
                     coroutineScope.launch {
                         val result = viewModel.updateStudent(studentId, updatedStudent)
                         if (result.isSuccess) {
-                            // Si se seleccionó un plan diferente al actual, actualizar suscripción
+                            // Si se seleccionó un plan, actualizar suscripción
                             if (selectedPlan != null && selectedPlan.id != currentPlan?.id) {
-                                subscriptionViewModel.assignPlan(updatedStudent, selectedPlan)
-                                // Refrescar la suscripción actual
-                                refreshTrigger++
+                                // Si ya tiene un plan, usar changePlan(); si no, usar assignPlan()
+                                val subscriptionResult = if (currentPlan != null) {
+                                    subscriptionViewModel.changePlan(studentId, selectedPlan)
+                                } else {
+                                    subscriptionViewModel.assignPlan(updatedStudent, selectedPlan)
+                                }
+
+                                if (subscriptionResult) {
+                                    // Refrescar la suscripción actual
+                                    refreshTrigger++
+                                }
                             }
                             viewModel.refreshData()
                             snackbarHostState.showSuccessSnackbar("Alumno actualizado")
@@ -508,5 +547,102 @@ fun DetailRow(label: String, value: String) {
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
+    }
+}
+
+@Composable
+private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
+    val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val currencyFormat = NumberFormat.getCurrencyInstance(Locale("es", "AR"))
+
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = when (payment.status) {
+                com.app.wayra.data.model.PaymentStatus.PAGADO -> Color(0xFFE8F5E9)
+                com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Color(0xFFFFF3E0)
+                com.app.wayra.data.model.PaymentStatus.VENCIDO -> Color(0xFFFFEBEE)
+            }
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                // Monto
+                Text(
+                    text = currencyFormat.format(payment.amount),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                // Fecha
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = when (payment.status) {
+                            com.app.wayra.data.model.PaymentStatus.PAGADO -> "Pagado:"
+                            else -> "Vence:"
+                        },
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = when (payment.status) {
+                            com.app.wayra.data.model.PaymentStatus.PAGADO ->
+                                payment.paymentDate?.let { dateFormat.format(Date(it)) } ?: "-"
+                            else ->
+                                payment.dueDate?.let { dateFormat.format(Date(it)) } ?: "-"
+                        },
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Método de pago (solo si está pagado)
+                if (payment.status == com.app.wayra.data.model.PaymentStatus.PAGADO && payment.paymentMethod != null) {
+                    Text(
+                        text = when (payment.paymentMethod) {
+                            com.app.wayra.data.model.PaymentMethod.EFECTIVO -> "Efectivo"
+                            com.app.wayra.data.model.PaymentMethod.TRANSFERENCIA -> "Transferencia"
+                        },
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // Badge de estado
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = when (payment.status) {
+                    com.app.wayra.data.model.PaymentStatus.PAGADO -> Color(0xFF4CAF50)
+                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Color(0xFFFF9800)
+                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> Color(0xFFE53935)
+                }
+            ) {
+                Text(
+                    text = when (payment.status) {
+                        com.app.wayra.data.model.PaymentStatus.PAGADO -> "Pagado"
+                        com.app.wayra.data.model.PaymentStatus.PENDIENTE -> "Pendiente"
+                        com.app.wayra.data.model.PaymentStatus.VENCIDO -> "Vencido"
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                )
+            }
+        }
     }
 }

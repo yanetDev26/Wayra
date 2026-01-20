@@ -28,23 +28,30 @@ class SubscriptionViewModel : ViewModel() {
         val result = subscriptionRepository.addSubscription(subscription)
 
         if (result.isSuccess) {
-            // Crear pago pendiente para el mes actual
-            val calendar = Calendar.getInstance()
             // Establecer la fecha de vencimiento al último día del mes actual
+            val calendar = Calendar.getInstance()
             calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
             calendar.set(Calendar.HOUR_OF_DAY, 23)
             calendar.set(Calendar.MINUTE, 59)
             calendar.set(Calendar.SECOND, 59)
+            val dueDate = calendar.timeInMillis
 
-            val payment = Payment(
-                studentId = student.id,
-                amount = plan.price,
-                dueDate = calendar.timeInMillis,
-                status = PaymentStatus.PENDIENTE,
-                notes = "Pago mensual - ${plan.activityName}"
-            )
+            // Verificar si ya existe un pago pendiente para este estudiante en este mes
+            val existingPendingPayment = paymentRepository.findPendingPaymentForMonth(student.id, dueDate)
 
-            paymentRepository.addPayment(payment)
+            if (existingPendingPayment == null) {
+                // Solo crear el pago si no existe uno pendiente
+                val payment = Payment(
+                    studentId = student.id,
+                    amount = plan.price,
+                    dueDate = dueDate,
+                    status = PaymentStatus.PENDIENTE,
+                    notes = "Pago mensual - ${plan.activityName}"
+                )
+
+                paymentRepository.addPayment(payment)
+            }
+            // Si ya existe un pago pendiente, no hacer nada (evitar duplicados)
         }
 
         return result.isSuccess
@@ -61,30 +68,32 @@ class SubscriptionViewModel : ViewModel() {
         val result = subscriptionRepository.addSubscription(subscription)
 
         if (result.isSuccess) {
-            // Crear pago pendiente para el mes actual
-            val calendar = Calendar.getInstance()
             // Establecer la fecha de vencimiento al último día del mes actual
+            val calendar = Calendar.getInstance()
             calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
             calendar.set(Calendar.HOUR_OF_DAY, 23)
             calendar.set(Calendar.MINUTE, 59)
             calendar.set(Calendar.SECOND, 59)
+            val dueDate = calendar.timeInMillis
 
-            val payment = Payment(
-                studentId = studentId,
-                amount = newPlan.price,
-                dueDate = calendar.timeInMillis,
-                status = PaymentStatus.PENDIENTE,
-                notes = "Pago mensual - ${newPlan.activityName}"
-            )
+            // Verificar si ya existe un pago pendiente para este estudiante en este mes
+            val existingPendingPayment = paymentRepository.findPendingPaymentForMonth(studentId, dueDate)
 
-            paymentRepository.addPayment(payment)
+            if (existingPendingPayment == null) {
+                // Solo crear el pago si no existe uno pendiente
+                val payment = Payment(
+                    studentId = studentId,
+                    amount = newPlan.price,
+                    dueDate = dueDate,
+                    status = PaymentStatus.PENDIENTE,
+                    notes = "Pago mensual - ${newPlan.activityName}"
+                )
+
+                paymentRepository.addPayment(payment)
+            }
+            // Si ya existe un pago pendiente, no hacer nada (evitar duplicados)
         }
 
-        return result.isSuccess
-    }
-
-    suspend fun cancelSubscription(subscriptionId: String): Boolean {
-        val result = subscriptionRepository.cancelSubscription(subscriptionId)
         return result.isSuccess
     }
 }

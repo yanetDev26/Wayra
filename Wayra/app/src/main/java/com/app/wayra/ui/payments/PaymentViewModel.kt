@@ -150,18 +150,35 @@ class PaymentViewModel : ViewModel() {
         calendar.set(Calendar.SECOND, 59)
         val dueDate = calendar.timeInMillis
 
-        val payment = Payment(
-            studentId = student.id,
-            subscriptionId = subscription?.id ?: "",
-            amount = amountValue,
-            dueDate = dueDate,
-            paymentDate = System.currentTimeMillis(),
-            paymentMethod = _selectedPaymentMethod.value,
-            status = PaymentStatus.PAGADO,
-            notes = _notes.value ?: ""
-        )
+        // Buscar si existe un pago pendiente para este estudiante en este mes
+        val existingPendingPayment = paymentRepository.findPendingPaymentForMonth(student.id, dueDate)
 
-        val result = paymentRepository.addPayment(payment)
+        val result = if (existingPendingPayment != null) {
+            // Si existe un pago pendiente, actualizarlo a PAGADO
+            val updatedPayment = existingPendingPayment.copy(
+                amount = amountValue,
+                paymentDate = System.currentTimeMillis(),
+                paymentMethod = _selectedPaymentMethod.value,
+                status = PaymentStatus.PAGADO,
+                notes = _notes.value ?: existingPendingPayment.notes
+            )
+            paymentRepository.updatePayment(existingPendingPayment.id, updatedPayment)
+            Result.success(existingPendingPayment.id)
+        } else {
+            // Si no existe, crear un nuevo pago
+            val payment = Payment(
+                studentId = student.id,
+                subscriptionId = subscription?.id ?: "",
+                amount = amountValue,
+                dueDate = dueDate,
+                paymentDate = System.currentTimeMillis(),
+                paymentMethod = _selectedPaymentMethod.value,
+                status = PaymentStatus.PAGADO,
+                notes = _notes.value ?: ""
+            )
+            paymentRepository.addPayment(payment)
+        }
+
         return if (result.isSuccess) {
             clearForm()
             true
