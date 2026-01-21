@@ -60,7 +60,9 @@ import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Date
@@ -97,8 +99,13 @@ fun StudentDetailScreen(
 
     // Cargar suscripción activa cuando cambia el studentId o refreshTrigger
     LaunchedEffect(studentId, refreshTrigger) {
-        val subscription = subscriptionRepository.getActiveSubscription(studentId)
-        activeSubscription = subscription
+        try {
+            val subscription = subscriptionRepository.getActiveSubscription(studentId)
+            activeSubscription = subscription
+        } catch (_: Exception) {
+            // Manejar error sin crashear
+            activeSubscription = null
+        }
     }
 
     // Buscar el plan correspondiente cuando cambia la suscripción o la lista de planes
@@ -110,9 +117,14 @@ fun StudentDetailScreen(
 
     // Cargar pagos del estudiante
     LaunchedEffect(studentId, refreshTrigger) {
-        paymentRepository.getPaymentsByStudent(studentId).collect { payments ->
-            studentPayments = payments
-        }
+        paymentRepository.getPaymentsByStudent(studentId)
+            .catch { e ->
+                // Manejar error sin crashear
+                studentPayments = emptyList()
+            }
+            .collect { payments ->
+                studentPayments = payments
+            }
     }
 
     Scaffold(
@@ -134,9 +146,9 @@ fun StudentDetailScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = WayraOrange,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Cream,
+                    navigationIconContentColor = Cream,
+                    actionIconContentColor = Cream
                 )
             )
         },
@@ -179,7 +191,7 @@ fun StudentDetailScreen(
                                 stringResource(R.string.students_active)
                             else
                                 stringResource(R.string.students_inactive),
-                            color = Color.White,
+                            color = Cream,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
@@ -640,7 +652,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = Cream
                 )
             }
         }

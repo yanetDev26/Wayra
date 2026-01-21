@@ -34,11 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.repository.PlanStats
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.util.Locale
@@ -106,20 +106,20 @@ fun PlanStatisticsReportScreen(
                                 Text(
                                     text = "Resumen General",
                                     fontSize = 16.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "${stats.totalActiveStudents}",
                                     fontSize = 36.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Estudiantes Activos",
                                     fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.9f)
+                                    color = Cream.copy(alpha = 0.9f)
                                 )
                             }
                         }

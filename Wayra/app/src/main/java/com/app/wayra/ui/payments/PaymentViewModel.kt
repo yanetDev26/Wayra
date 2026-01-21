@@ -70,7 +70,8 @@ class PaymentViewModel : ViewModel() {
                     // Log error
                 }
                 .collect { students ->
-                    _students.value = students
+                    // Ordenar alfabéticamente por nombre completo
+                    _students.value = students.sortedBy { it.getFullName().lowercase() }
                 }
         }
     }

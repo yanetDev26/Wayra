@@ -52,6 +52,7 @@ import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
@@ -118,8 +119,8 @@ fun AddStudentScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = WayraOrange,
-                    titleContentColor = androidx.compose.ui.graphics.Color.White,
-                    navigationIconContentColor = androidx.compose.ui.graphics.Color.White
+                    titleContentColor = Cream,
+                    navigationIconContentColor = Cream
                 )
             )
         }
@@ -195,7 +196,6 @@ fun AddStudentScreen(
                         AnnotatedString(prefix + formatted),
                         object : OffsetMapping {
                             override fun originalToTransformed(offset: Int): Int {
-                                // Calcular el offset considerando los espacios agregados
                                 val beforeCursor = text.text.substring(0, minOf(offset, text.text.length))
                                 val formattedBeforeCursor = formatPhone(beforeCursor)
                                 return prefix.length + formattedBeforeCursor.length
@@ -285,7 +285,6 @@ fun AddStudentScreen(
 
                 Button(
                     onClick = {
-                        // Capturar el plan en una variable local para el smart cast
                         val plan = selectedPlan
                         if (name.isNotBlank() && surname.isNotBlank() &&
                             email.isNotBlank() && isValidEmail(email) &&
@@ -294,7 +293,6 @@ fun AddStudentScreen(
                             coroutineScope.launch {
                                 isLoading = true
 
-                                // Agregar prefijo +54 9 al teléfono
                                 val fullPhone = "+549$phone"
 
                                 val student = Student(
@@ -307,10 +305,8 @@ fun AddStudentScreen(
                                 )
                                 val result = viewModel.addStudent(student)
                                 if (result.isSuccess) {
-                                    // Crear la suscripción con el plan seleccionado
                                     val studentId = result.getOrNull()
                                     if (studentId != null) {
-                                        // assignPlan creará automáticamente la suscripción y el pago pendiente
                                         subscriptionViewModel.assignPlan(
                                             student.copy(id = studentId),
                                             plan
@@ -334,7 +330,7 @@ fun AddStudentScreen(
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = Cream,
                             strokeWidth = 2.dp
                         )
                     } else {

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.app.wayra.ui.theme.Cream
 
 enum class SnackbarType {
     SUCCESS,
@@ -39,7 +40,7 @@ fun CustomSnackbarHost(
 
             Snackbar(
                 containerColor = backgroundColor,
-                contentColor = Color.White,
+                contentColor = Cream,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = displayMessage.trim())

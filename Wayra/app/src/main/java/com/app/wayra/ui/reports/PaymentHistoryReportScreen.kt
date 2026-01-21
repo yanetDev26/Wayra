@@ -50,6 +50,7 @@ import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.util.Locale
@@ -142,13 +143,13 @@ fun PaymentHistoryReportScreen(
                             Text(
                                 text = "${filteredPayments.size}",
                                 fontSize = 36.sp,
-                                color = Color.White,
+                                color = Cream,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = if (filteredPayments.size == 1) "Pago encontrado" else "Pagos encontrados",
                                 fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.9f)
+                                color = Cream.copy(alpha = 0.9f)
                             )
                         }
                     }
@@ -580,8 +581,8 @@ fun getStatusName(status: PaymentStatus): String {
 
 fun getStatusColor(status: PaymentStatus): Color {
     return when (status) {
-        PaymentStatus.PAGADO -> Color(0xFF4CAF50) // Verde
-        PaymentStatus.PENDIENTE -> Color(0xFFFFA726) // Naranja
-        PaymentStatus.VENCIDO -> Color(0xFFF44336) // Rojo
+        PaymentStatus.PAGADO -> Color(0xFF4CAF50)
+        PaymentStatus.PENDIENTE -> Color(0xFFFFA726)
+        PaymentStatus.VENCIDO -> Color(0xFFF44336)
     }
 }

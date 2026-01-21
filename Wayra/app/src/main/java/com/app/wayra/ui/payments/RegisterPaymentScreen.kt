@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -47,6 +50,7 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.home.PaymentPeriod
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 
@@ -80,7 +84,12 @@ fun RegisterPaymentScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
-                }
+                },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Cream,
+                    navigationIconContentColor = Cream
+                )
             )
         },
         snackbarHost = { CustomSnackbarHost(snackbarHostState) }
@@ -295,8 +304,12 @@ fun RegisterPaymentScreen(
             onDismissRequest = { showStudentPicker = false },
             title = { Text(stringResource(R.string.payment_select_student)) },
             text = {
-                Column {
-                    students.forEach { student ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                ) {
+                    items(students) { student ->
                         TextButton(
                             onClick = {
                                 viewModel.selectStudent(student)
@@ -383,7 +396,7 @@ fun RegisterPaymentScreen(
                                     },
                                     fontSize = 16.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Color.White else Color.Black
+                                    color = if (isSelected) Cream else Color.Black
                                 )
                                 Text(
                                     text = when (period) {
@@ -392,7 +405,7 @@ fun RegisterPaymentScreen(
                                         PaymentPeriod.NEXT_MONTH -> "Pago adelantado del próximo mes"
                                     },
                                     fontSize = 12.sp,
-                                    color = if (isSelected) Color.White.copy(alpha = 0.8f) else Color.Gray,
+                                    color = if (isSelected) Cream.copy(alpha = 0.8f) else Color.Gray,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                             }

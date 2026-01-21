@@ -35,10 +35,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.wayra.R
 import com.app.wayra.data.repository.MonthProjection
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.util.Locale
@@ -106,7 +109,7 @@ fun IncomeProjectionReportScreen(
                                 Text(
                                     text = "Ingreso Mensual Esperado",
                                     fontSize = 16.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -114,13 +117,13 @@ fun IncomeProjectionReportScreen(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(projection.monthlyExpectedIncome),
                                     fontSize = 36.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Basado en suscripciones activas",
                                     fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.9f)
+                                    color = Cream.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -219,13 +222,15 @@ fun IncomeProjectionReportScreen(
                                     .fillMaxWidth()
                                     .padding(16.dp)
                             ) {
-                                Text(
-                                    text = "ℹ️ Información",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                Icon(
+                                    painter = painterResource(id = R.drawable.info),
+                                    contentDescription = "Icono de info",
+                                    tint = Color.Unspecified,
+                                    modifier = Modifier.size(20.dp)
                                 )
+
                                 Spacer(modifier = Modifier.height(8.dp))
+
                                 Text(
                                     text = "• El ingreso esperado se calcula basándose en las suscripciones activas actuales\n" +
                                             "• Los pagos pendientes son los que tienen vencimiento en cada mes\n" +
@@ -340,7 +345,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                                 text = "${monthProjection.pendingPayments} ${if (monthProjection.pendingPayments == 1) "pago pendiente" else "pagos pendientes"}",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = Color(0xFFE65100) // Naranja oscuro
+                                color = Color(0xFFE65100)
                             )
                             Text(
                                 text = "Vencen en este mes",

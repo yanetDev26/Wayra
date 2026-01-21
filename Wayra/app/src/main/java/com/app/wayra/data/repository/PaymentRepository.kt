@@ -48,7 +48,6 @@ class PaymentRepository {
     fun getPaymentsByStudent(studentId: String): Flow<List<Payment>> = callbackFlow {
         val subscription = paymentsCollection
             .whereEqualTo("studentId", studentId)
-            .orderBy("dueDate", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
@@ -59,7 +58,9 @@ class PaymentRepository {
                     val payments = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(Payment::class.java)?.copy(id = doc.id)
                     }
-                    trySend(payments)
+                    // Ordenar en memoria por dueDate descendente
+                    val sortedPayments = payments.sortedByDescending { it.dueDate ?: 0L }
+                    trySend(sortedPayments)
                 }
             }
 
@@ -152,6 +153,7 @@ class PaymentRepository {
             calendar.set(Calendar.HOUR_OF_DAY, 0)
             calendar.set(Calendar.MINUTE, 0)
             calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
             val startOfMonth = calendar.timeInMillis
 
             // Fin del mes actual
@@ -160,15 +162,16 @@ class PaymentRepository {
             endCalendar.set(Calendar.HOUR_OF_DAY, 23)
             endCalendar.set(Calendar.MINUTE, 59)
             endCalendar.set(Calendar.SECOND, 59)
+            endCalendar.set(Calendar.MILLISECOND, 999)
             val endOfMonth = endCalendar.timeInMillis
 
-            // Obtener todos los pagos pendientes y vencidos
+            // Obtener todos los pagos pendientes y vencidos - forzar desde servidor
             val snapshot = paymentsCollection
                 .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
-                .get()
+                .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
 
-            // Filtrar por fecha en memoria y contar TOTAL de pagos pendientes
+            // Filtrar por fecha en memoria y contar estudiantes únicos
             val pendingPayments = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
                 .filter { payment ->
@@ -176,7 +179,8 @@ class PaymentRepository {
                     dueDate in startOfMonth..endOfMonth
                 }
 
-            pendingPayments.size
+            // Contar estudiantes únicos, no total de pagos
+            pendingPayments.map { it.studentId }.distinct().size
         } catch (_: Exception) {
             0
         }
@@ -194,6 +198,7 @@ class PaymentRepository {
             calendar.set(Calendar.HOUR_OF_DAY, 0)
             calendar.set(Calendar.MINUTE, 0)
             calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
             val startOfLastMonth = calendar.timeInMillis
 
             // Fin del mes pasado
@@ -203,15 +208,16 @@ class PaymentRepository {
             endCalendar.set(Calendar.HOUR_OF_DAY, 23)
             endCalendar.set(Calendar.MINUTE, 59)
             endCalendar.set(Calendar.SECOND, 59)
+            endCalendar.set(Calendar.MILLISECOND, 999)
             val endOfLastMonth = endCalendar.timeInMillis
 
-            // Obtener todos los pagos pendientes y vencidos
+            // Obtener todos los pagos pendientes y vencidos - forzar desde servidor
             val snapshot = paymentsCollection
                 .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
-                .get()
+                .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
 
-            // Filtrar por fecha en memoria y contar TOTAL de pagos pendientes
+            // Filtrar por fecha en memoria y contar estudiantes únicos
             val pendingPayments = snapshot.documents
                 .mapNotNull { doc -> doc.toObject(Payment::class.java) }
                 .filter { payment ->
@@ -219,7 +225,8 @@ class PaymentRepository {
                     dueDate in startOfLastMonth..endOfLastMonth
                 }
 
-            pendingPayments.size
+            // Contar estudiantes únicos, no total de pagos
+            pendingPayments.map { it.studentId }.distinct().size
         } catch (_: Exception) {
             0
         }

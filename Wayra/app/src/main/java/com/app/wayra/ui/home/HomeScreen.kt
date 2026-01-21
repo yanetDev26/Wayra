@@ -122,7 +122,7 @@ fun HomeContent(
                         value = stats.activeStudents.toString(),
                         iconRes = R.drawable.gym_active,
                         backgroundColor = Orange,
-                        contentColor = Color.White,
+                        contentColor = Cream,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -214,7 +214,7 @@ fun HomeContent(
                                 .size(40.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    color = Color.White.copy(alpha = 0.2f),
+                                    color = Cream,
                                     shape = CircleShape
                                 )
                                 .clickable { showAmount = !showAmount },

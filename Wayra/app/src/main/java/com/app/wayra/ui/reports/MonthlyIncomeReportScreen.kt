@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,11 +36,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.wayra.R
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -89,7 +93,7 @@ fun MonthlyIncomeReportScreen(
                         .padding(paddingValues)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     // Header con mes actual
                     item {
@@ -109,7 +113,7 @@ fun MonthlyIncomeReportScreen(
                                 Text(
                                     text = getCurrentMonthName(),
                                     fontSize = 16.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -117,13 +121,13 @@ fun MonthlyIncomeReportScreen(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalIncome),
                                     fontSize = 36.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Total Recaudado",
                                     fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.9f)
+                                    color = Cream.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -267,10 +271,13 @@ fun PaymentMethodCard(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = getPaymentMethodIcon(method),
-                        fontSize = 20.sp
+                    Icon(
+                        painter = painterResource(id = getPaymentMethodIcon(method)),
+                        contentDescription = "Icono de tipo de pago",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(40.dp)
                     )
+
                 }
                 Column {
                     Text(
@@ -350,10 +357,10 @@ fun getPaymentMethodName(method: PaymentMethod): String {
     }
 }
 
-fun getPaymentMethodIcon(method: PaymentMethod): String {
+fun getPaymentMethodIcon(method: PaymentMethod): Int {
     return when (method) {
-        PaymentMethod.EFECTIVO -> "💵"
-        PaymentMethod.TRANSFERENCIA -> "🏦"
+        PaymentMethod.EFECTIVO -> R.drawable.pay
+        PaymentMethod.TRANSFERENCIA -> R.drawable.pay_metod
     }
 }
 

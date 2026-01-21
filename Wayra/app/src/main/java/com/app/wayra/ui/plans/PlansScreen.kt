@@ -57,6 +57,7 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
@@ -97,8 +98,8 @@ fun PlansScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = WayraOrange,
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Cream,
+                    actionIconContentColor = Cream
                 )
             )
         },
@@ -253,7 +254,7 @@ fun PlanItemModern(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Gray
         )
     ) {
         Column(
@@ -336,8 +337,7 @@ fun PlanItemModern(
                     modifier = Modifier.height(40.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = WayraOrange.copy(alpha = 0.15f),
-                        contentColor = WayraOrange
+                        containerColor = Cream,
                     )
                 ) {
                     Icon(
@@ -347,7 +347,9 @@ fun PlanItemModern(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Editar", fontSize = 13.sp)
+                    Text("Editar",
+                        fontSize = 13.sp,
+                        color = Gray)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -357,7 +359,7 @@ fun PlanItemModern(
                     modifier = Modifier.height(40.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
+                        containerColor = Color(0xFFFFCDD2)
                     )
                 ) {
                     Icon(
@@ -367,7 +369,7 @@ fun PlanItemModern(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Eliminar", fontSize = 13.sp)
+                    Text("Eliminar", fontSize = 13.sp, color = Gray)
                 }
             }
         }

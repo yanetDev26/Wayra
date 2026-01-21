@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 
@@ -73,8 +74,8 @@ fun StudentsScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = WayraOrange,
-                        titleContentColor = Color.White,
-                        actionIconContentColor = Color.White
+                        titleContentColor = Cream,
+                        actionIconContentColor = Cream
                     )
                 )
             }
@@ -104,8 +105,8 @@ fun StudentsScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = WayraOrange,
-                        titleContentColor = Color.White,
-                        actionIconContentColor = Color.White
+                        titleContentColor = Cream,
+                        actionIconContentColor = Cream
                     )
                 )
             }
@@ -170,6 +171,8 @@ private fun StudentsContent(
                         cursorColor = WayraOrange
                     )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -236,7 +239,7 @@ fun StudentItemModern(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Gray
         )
     ) {
         Row(

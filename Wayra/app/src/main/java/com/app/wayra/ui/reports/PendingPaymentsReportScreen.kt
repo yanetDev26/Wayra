@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.model.Payment
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -115,7 +116,7 @@ fun PendingPaymentsReportScreen(
                                 Text(
                                     text = "Total Pendiente",
                                     fontSize = 16.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -123,13 +124,13 @@ fun PendingPaymentsReportScreen(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalPending),
                                     fontSize = 36.sp,
-                                    color = Color.White,
+                                    color = Cream,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "${stats.uniqueStudents} estudiantes",
                                     fontSize = 14.sp,
-                                    color = Color.White.copy(alpha = 0.9f)
+                                    color = Cream.copy(alpha = 0.9f)
                                 )
                             }
                         }

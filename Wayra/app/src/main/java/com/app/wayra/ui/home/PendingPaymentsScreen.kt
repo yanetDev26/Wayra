@@ -52,6 +52,7 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -150,8 +151,8 @@ fun PendingPaymentsScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = WayraOrange,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    titleContentColor = Cream,
+                    navigationIconContentColor = Cream
                 )
             )
         },
@@ -303,7 +304,7 @@ fun PendingPaymentCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Cream
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -456,7 +457,7 @@ fun PaymentConfirmationDialog(
                                         .padding(12.dp),
                                     fontSize = 14.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Color.White else Color.Black
+                                    color = if (isSelected) Cream else Color.Black
                                 )
                             }
                         }
@@ -499,7 +500,7 @@ fun PaymentConfirmationDialog(
                                         .padding(12.dp),
                                     fontSize = 14.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Color.White else Color.Black
+                                    color = if (isSelected) Cream else Color.Black
                                 )
                             }
                         }
