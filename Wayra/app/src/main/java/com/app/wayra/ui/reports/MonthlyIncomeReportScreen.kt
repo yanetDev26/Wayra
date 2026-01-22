@@ -25,10 +25,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +44,7 @@ import com.app.wayra.R
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -68,6 +69,10 @@ fun MonthlyIncomeReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Ingresos del Mes") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Cream
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -93,7 +98,7 @@ fun MonthlyIncomeReportScreen(
                         .padding(paddingValues)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                    contentPadding = PaddingValues(bottom = 90.dp)
                 ) {
                     // Header con mes actual
                     item {
@@ -144,7 +149,7 @@ fun MonthlyIncomeReportScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = Cream
                                 )
                             ) {
                                 Column(
@@ -162,7 +167,7 @@ fun MonthlyIncomeReportScreen(
                                     Text(
                                         text = "Pagos",
                                         fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = Gray
                                     )
                                 }
                             }
@@ -172,7 +177,7 @@ fun MonthlyIncomeReportScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = Cream
                                 )
                             ) {
                                 Column(
@@ -194,14 +199,14 @@ fun MonthlyIncomeReportScreen(
                                     Text(
                                         text = "Promedio",
                                         fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = Gray
                                     )
                                 }
                             }
                         }
                     }
 
-                    // Por método de pago
+                    // Por metodo de pago
                     item {
                         Text(
                             text = "Por Método de Pago",
@@ -247,7 +252,7 @@ fun PaymentMethodCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Cream
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -283,12 +288,13 @@ fun PaymentMethodCard(
                     Text(
                         text = getPaymentMethodName(method),
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = Gray
                     )
                     Text(
                         text = "$count ${if (count == 1) "pago" else "pagos"}",
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Gray
                     )
                 }
             }
@@ -309,7 +315,7 @@ fun PaymentDetailCard(payment: Payment) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Cream
         )
     ) {
         Row(
@@ -323,12 +329,13 @@ fun PaymentDetailCard(payment: Payment) {
                 Text(
                     text = formatDate(payment.paymentDate ?: 0L),
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Gray
                 )
                 Text(
                     text = getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Gray
                 )
             }
             Text(

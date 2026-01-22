@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,21 +25,25 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.app.wayra.R
 import com.app.wayra.data.repository.PlanStats
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.util.Locale
@@ -61,6 +66,10 @@ fun PlanStatisticsReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Estadísticas por Plan") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Cream
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -86,7 +95,7 @@ fun PlanStatisticsReportScreen(
                         .padding(paddingValues)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                    contentPadding = PaddingValues(bottom = 90.dp)
                 ) {
                     // Header con totales generales
                     item {
@@ -136,7 +145,7 @@ fun PlanStatisticsReportScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = Cream
                                 )
                             ) {
                                 Column(
@@ -155,7 +164,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = "Mes Actual",
                                         fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = Gray
                                     )
                                 }
                             }
@@ -165,7 +174,7 @@ fun PlanStatisticsReportScreen(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = Cream
                                 )
                             ) {
                                 Column(
@@ -184,7 +193,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = "Total",
                                         fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = Gray
                                     )
                                 }
                             }
@@ -212,7 +221,7 @@ fun PlanStatisticsReportScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    containerColor = Cream
                                 )
                             ) {
                                 Box(
@@ -223,7 +232,7 @@ fun PlanStatisticsReportScreen(
                                 ) {
                                     Text(
                                         text = "No hay planes con estudiantes activos",
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = Gray,
                                         fontSize = 14.sp
                                     )
                                 }
@@ -242,7 +251,7 @@ fun PlanStatCard(planStat: PlanStats) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Cream
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -281,13 +290,14 @@ fun PlanStatCard(planStat: PlanStats) {
                         Text(
                             text = planStat.planName,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                            fontSize = 18.sp,
+                            color = Gray
                         )
                         Text(
                             text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                 .format(planStat.price) + " / mes",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = Gray
                         )
                     }
                 }
@@ -305,7 +315,7 @@ fun PlanStatCard(planStat: PlanStats) {
                     modifier = Modifier.weight(1f),
                     label = "Estudiantes",
                     value = "${planStat.activeStudents}",
-                    icon = "👥"
+                    icon = R.drawable.student
                 )
 
                 // Ingresos del mes
@@ -314,7 +324,7 @@ fun PlanStatCard(planStat: PlanStats) {
                     label = "Mes Actual",
                     value = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                         .format(planStat.monthlyRevenue),
-                    icon = "📅"
+                    icon = R.drawable.calendar
                 )
             }
 
@@ -339,11 +349,18 @@ fun PlanStatCard(planStat: PlanStats) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(text = "💰", fontSize = 16.sp)
+                        Icon(
+                            painter = painterResource(id = R.drawable.money),
+                            contentDescription = "Icono",
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(20.dp)
+                        )
+
                         Text(
                             text = "Ingresos Totales",
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            color = Gray
                         )
                     }
                     Text(
@@ -364,13 +381,13 @@ fun StatItem(
     modifier: Modifier = Modifier,
     label: String,
     value: String,
-    icon: String
+    icon: Int
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Cream
         )
     ) {
         Column(
@@ -379,7 +396,13 @@ fun StatItem(
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = icon, fontSize = 20.sp)
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = "Icono",
+                tint = Color.Unspecified,
+                modifier = Modifier.size(20.dp)
+            )
+
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
@@ -390,7 +413,7 @@ fun StatItem(
             Text(
                 text = label,
                 fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Gray
             )
         }
     }

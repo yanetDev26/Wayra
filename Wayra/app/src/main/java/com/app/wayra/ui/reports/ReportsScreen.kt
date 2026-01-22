@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,47 +57,47 @@ fun ReportsScreen(
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 90.dp)
             ) {
-            item {
-                ReportCard(
-                    title = "Ingresos del Mes",
-                    description = "Total recaudado en el mes actual",
-                    onClick = onNavigateToMonthlyIncome
-                )
-            }
+                item {
+                    ReportCard(
+                        title = "Ingresos del Mes",
+                        description = "Total recaudado en el mes actual",
+                        onClick = onNavigateToMonthlyIncome
+                    )
+                }
 
-            item {
-                ReportCard(
-                    title = "Pagos Pendientes",
-                    description = "Estudiantes con pagos atrasados",
-                    onClick = onNavigateToPendingPayments
-                )
-            }
+                item {
+                    ReportCard(
+                        title = "Pagos Pendientes",
+                        description = "Estudiantes con pagos atrasados",
+                        onClick = onNavigateToPendingPayments
+                    )
+                }
 
-            item {
-                ReportCard(
-                    title = "Estadísticas por Plan",
-                    description = "Distribución de estudiantes por plan",
-                    onClick = onNavigateToPlanStatistics
-                )
-            }
+                item {
+                    ReportCard(
+                        title = "Estadísticas por Plan",
+                        description = "Distribución de estudiantes por plan",
+                        onClick = onNavigateToPlanStatistics
+                    )
+                }
 
-            item {
-                ReportCard(
-                    title = "Historial de Pagos",
-                    description = "Consulta pagos por fecha o estudiante",
-                    onClick = onNavigateToPaymentHistory
-                )
-            }
+                item {
+                    ReportCard(
+                        title = "Historial de Pagos",
+                        description = "Consulta pagos por fecha o estudiante",
+                        onClick = onNavigateToPaymentHistory
+                    )
+                }
 
-            item {
-                ReportCard(
-                    title = "Proyección de Ingresos",
-                    description = "Estimado de ingresos próximos meses",
-                    onClick = onNavigateToIncomeProjection
-                )
-            }
+                item {
+                    ReportCard(
+                        title = "Proyección de Ingresos",
+                        description = "Estimado de ingresos próximos meses",
+                        onClick = onNavigateToIncomeProjection
+                    )
+                }
             }
         }
     }
@@ -110,7 +111,10 @@ private fun ReportCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Gray
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -124,7 +128,7 @@ private fun ReportCard(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Cream
             )
             Spacer(modifier = Modifier.height(12.dp))
             Button(

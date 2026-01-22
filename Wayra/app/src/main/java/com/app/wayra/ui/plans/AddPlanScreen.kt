@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
+import com.app.wayra.ui.theme.Cream
 import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.launch
@@ -65,7 +66,7 @@ fun AddPlanScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = WayraOrange,
                     titleContentColor = Gray,
-                    navigationIconContentColor = Gray
+                    navigationIconContentColor = Cream
                 )
             )
         }

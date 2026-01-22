@@ -27,12 +27,12 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +51,7 @@ import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.util.Locale
@@ -90,6 +91,10 @@ fun PaymentHistoryReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Historial de Pagos") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Cream
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -100,7 +105,7 @@ fun PaymentHistoryReportScreen(
                         Icon(
                             Icons.Default.Search,
                             contentDescription = "Filtros",
-                            tint = if (showFilters) WayraOrange else MaterialTheme.colorScheme.onSurface
+                            tint = Cream
                         )
                     }
                 }
@@ -123,7 +128,7 @@ fun PaymentHistoryReportScreen(
                     .padding(paddingValues)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 90.dp)
             ) {
                 // Resumen
                 item {
@@ -165,7 +170,7 @@ fun PaymentHistoryReportScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = Cream
                             )
                         ) {
                             Column(
@@ -184,7 +189,7 @@ fun PaymentHistoryReportScreen(
                                 Text(
                                     text = "Total",
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = Gray
                                 )
                             }
                         }
@@ -193,7 +198,7 @@ fun PaymentHistoryReportScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = Cream
                             )
                         ) {
                             Column(
@@ -211,7 +216,7 @@ fun PaymentHistoryReportScreen(
                                 Text(
                                     text = "Pagados",
                                     fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = Gray
                                 )
                             }
                         }
@@ -225,7 +230,7 @@ fun PaymentHistoryReportScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
+                                containerColor = Gray
                             ),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
@@ -297,7 +302,7 @@ fun PaymentHistoryReportScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = Cream
                             )
                         ) {
                             Box(
@@ -308,7 +313,7 @@ fun PaymentHistoryReportScreen(
                             ) {
                                 Text(
                                     text = "No se encontraron pagos",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = Gray,
                                     fontSize = 14.sp
                                 )
                             }
@@ -349,7 +354,7 @@ fun StudentDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
         )
 
         ExposedDropdownMenu(
@@ -481,7 +486,7 @@ fun PaymentHistoryCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Cream
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -519,12 +524,13 @@ fun PaymentHistoryCard(
                     Text(
                         text = student?.getFullName() ?: "Estudiante desconocido",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = Gray
                     )
                     Text(
                         text = formatDate(payment.paymentDate ?: payment.dueDate ?: 0L),
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Gray
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -534,7 +540,7 @@ fun PaymentHistoryCard(
                         Text(
                             text = "• ${getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO)}",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = Gray
                         )
                     }
                 }

@@ -30,6 +30,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.model.Payment
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -68,6 +70,10 @@ fun PendingPaymentsReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Pagos Pendientes") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WayraOrange,
+                    titleContentColor = Cream
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -207,7 +213,7 @@ fun PendingPaymentsReportScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(
                             top = 16.dp,
-                            bottom = 80.dp
+                            bottom = 90.dp
                         )
                     ) {
                         items(paymentsToShow) { payment ->
@@ -232,7 +238,7 @@ fun StatCard(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = Cream
         )
     ) {
         Column(
@@ -256,12 +262,12 @@ fun StatCard(
             Text(
                 text = title,
                 fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Gray
             )
             Text(
                 text = subtitle,
                 fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Gray
             )
         }
     }
@@ -279,7 +285,7 @@ fun PendingPaymentCard(payment: Payment) {
             containerColor = if (isOverdue) {
                 Color(0xFFFFEBEE)
             } else {
-                MaterialTheme.colorScheme.surface
+                Cream
             }
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -297,7 +303,7 @@ fun PendingPaymentCard(payment: Payment) {
                 Text(
                     text = "Vence: ${formatPendingDate(payment.dueDate ?: 0L)}",
                     fontSize = 12.sp,
-                    color = if (isOverdue) Color(0xFFD32F2F) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (isOverdue) Color(0xFFD32F2F) else Gray,
                     fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -324,7 +330,7 @@ fun PendingPaymentCard(payment: Payment) {
                     Text(
                         text = payment.notes,
                         fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Gray
                     )
                 }
             }
