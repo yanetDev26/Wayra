@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -90,7 +91,7 @@ fun StudentDetailScreen(
     // Estado para la suscripción activa y plan actual
     var activeSubscription by remember { mutableStateOf<Subscription?>(null) }
     var currentPlan by remember { mutableStateOf<Plan?>(null) }
-    var refreshTrigger by remember { mutableStateOf(0) }
+    var refreshTrigger by remember { mutableIntStateOf(0) }
     val subscriptionRepository = remember { SubscriptionRepository() }
 
     // Estado para historial de pagos
@@ -160,7 +161,7 @@ fun StudentDetailScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 90.dp),
+                .padding(top = 16.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Student Info Card

@@ -17,11 +17,13 @@ sealed class PlansScreens(val route: String) {
 @Composable
 fun PlansNavHost(
     navController: NavHostController,
-    plansViewModel: PlansViewModel = viewModel()
+    plansViewModel: PlansViewModel = viewModel(),
+    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = PlansScreens.Plans.route
+        startDestination = PlansScreens.Plans.route,
+        modifier = modifier
     ) {
         // Pantalla principal: Lista de planes
         composable(PlansScreens.Plans.route) {

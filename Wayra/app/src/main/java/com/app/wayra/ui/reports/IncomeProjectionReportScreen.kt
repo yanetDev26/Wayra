@@ -94,7 +94,7 @@ fun IncomeProjectionReportScreen(
                         .padding(paddingValues)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 90.dp)
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
                 ) {
                     // Header con ingreso mensual esperado
                     item {

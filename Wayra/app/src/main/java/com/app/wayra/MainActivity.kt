@@ -3,16 +3,20 @@ package com.app.wayra
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         setContent {
             WayraTheme {
@@ -98,20 +103,23 @@ fun MainScreen() {
                 StudentsNavHost(
                     navController = studentsNavController,
                     studentsViewModel = studentsViewModel,
-                    homeViewModel = homeViewModel
+                    homeViewModel = homeViewModel,
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
             }
             2 -> {
                 val plansNavController = rememberNavController()
                 PlansNavHost(
                     navController = plansNavController,
-                    plansViewModel = plansViewModel
+                    plansViewModel = plansViewModel,
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
             }
             3 -> {
                 val reportsNavController = rememberNavController()
                 ReportsNavHost(
-                    navController = reportsNavController
+                    navController = reportsNavController,
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
             }
         }
@@ -125,7 +133,9 @@ fun ModernBottomBar(
     onItemSelected: (Int) -> Unit
 ) {
     androidx.compose.material3.Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars),
         color = Gray,
         shadowElevation = 4.dp
     ) {
@@ -168,7 +178,7 @@ fun ModernBottomBar(
 
                     Text(
                         text = item,
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                         color = if (isSelected) Orange else Cream,
                         maxLines = 1

@@ -185,7 +185,7 @@ fun PendingPaymentsScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp)
-                            .padding(top = 16.dp, bottom = 90.dp),
+                            .padding(top = 16.dp, bottom = 100.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(studentsWithPayments) { item ->

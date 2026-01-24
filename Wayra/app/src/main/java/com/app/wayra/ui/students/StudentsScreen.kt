@@ -176,7 +176,7 @@ private fun StudentsContent(
 
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 80.dp)
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
                 ) {
                     items(filteredStudents) { studentWithPlan ->
                         StudentItemModern(
