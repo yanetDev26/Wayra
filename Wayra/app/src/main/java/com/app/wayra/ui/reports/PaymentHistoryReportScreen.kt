@@ -346,10 +346,10 @@ fun StudentDropdown(
         onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
-            value = selectedStudent?.getFullName() ?: "Todos los estudiantes",
+            value = selectedStudent?.getFullName() ?: "Todos los alumnos",
             onValueChange = {},
             readOnly = true,
-            label = { Text("Estudiante") },
+            label = { Text("Alumno") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -362,7 +362,7 @@ fun StudentDropdown(
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Todos los estudiantes") },
+                text = { Text("Todos los alumnos") },
                 onClick = {
                     onStudentSelected(null)
                     expanded = false
@@ -522,7 +522,7 @@ fun PaymentHistoryCard(
                 // Información
                 Column {
                     Text(
-                        text = student?.getFullName() ?: "Estudiante desconocido",
+                        text = student?.getFullName() ?: "Alumno desconocido",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = Gray

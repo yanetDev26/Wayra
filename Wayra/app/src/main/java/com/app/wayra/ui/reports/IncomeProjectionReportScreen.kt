@@ -161,7 +161,7 @@ fun IncomeProjectionReportScreen(
                                         color = WayraOrange
                                     )
                                     Text(
-                                        text = "Estudiantes",
+                                        text = "Alumnos",
                                         fontSize = 12.sp,
                                         color = Gray
                                     )

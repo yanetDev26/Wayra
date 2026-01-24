@@ -440,7 +440,12 @@ fun EditStudentDialog(
         onDismissRequest = onDismiss,
         title = { Text("Editar Alumno") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -461,11 +466,43 @@ fun EditStudentDialog(
                     label = { Text("Email") },
                     singleLine = true
                 )
+
                 OutlinedTextField(
                     value = phone,
-                    onValueChange = { phone = it },
+                    onValueChange = { newValue ->
+                        // Solo permitir números y limitar a 10 dígitos
+                        val filtered = newValue.filter { it.isDigit() }.take(10)
+                        phone = filtered
+                        phoneError = phone.isNotBlank() && !isValidPhone(phone)
+                    },
                     label = { Text("Teléfono") },
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    visualTransformation = { text ->
+                        val prefix = "+54 9 "
+                        val formatted = formatPhone(text.text)
+                        TransformedText(
+                            AnnotatedString(prefix + formatted),
+                            object : OffsetMapping {
+                                override fun originalToTransformed(offset: Int): Int {
+                                    val beforeCursor = text.text.substring(0, minOf(offset, text.text.length))
+                                    val formattedBeforeCursor = formatPhone(beforeCursor)
+                                    return prefix.length + formattedBeforeCursor.length
+                                }
+                                override fun transformedToOriginal(offset: Int): Int {
+                                    if (offset <= prefix.length) return 0
+                                    val textPart = (offset - prefix.length).coerceAtLeast(0)
+                                    return text.text.take(textPart).count { it.isDigit() }
+                                }
+                            }
+                        )
+                    },
+                    isError = phoneError,
+                    supportingText = if (phoneError) {
+                        { Text("Debe tener 10 dígitos (ej: 3492 566468)") }
+                    } else null
                 )
 
                 OutlinedTextField(
@@ -478,9 +515,40 @@ fun EditStudentDialog(
 
                 OutlinedTextField(
                     value = emergencyPhone,
-                    onValueChange = { emergencyPhone = it },
+                    onValueChange = { newValue ->
+                        // Solo permitir números y limitar a 10 dígitos
+                        val filtered = newValue.filter { it.isDigit() }.take(10)
+                        emergencyPhone = filtered
+                        emergencyPhoneError = emergencyPhone.isNotBlank() && !isValidPhone(emergencyPhone)
+                    },
                     label = { Text("Teléfono de Emergencia") },
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    visualTransformation = { text ->
+                        val prefix = "+54 9 "
+                        val formatted = formatPhone(text.text)
+                        TransformedText(
+                            AnnotatedString(prefix + formatted),
+                            object : OffsetMapping {
+                                override fun originalToTransformed(offset: Int): Int {
+                                    val beforeCursor = text.text.substring(0, minOf(offset, text.text.length))
+                                    val formattedBeforeCursor = formatPhone(beforeCursor)
+                                    return prefix.length + formattedBeforeCursor.length
+                                }
+                                override fun transformedToOriginal(offset: Int): Int {
+                                    if (offset <= prefix.length) return 0
+                                    val textPart = (offset - prefix.length).coerceAtLeast(0)
+                                    return text.text.take(textPart).count { it.isDigit() }
+                                }
+                            }
+                        )
+                    },
+                    isError = emergencyPhoneError,
+                    supportingText = if (emergencyPhoneError) {
+                        { Text("Debe tener 10 dígitos (ej: 3492 566468)") }
+                    } else null
                 )
 
                 // Selector de Plan
@@ -526,19 +594,23 @@ fun EditStudentDialog(
         confirmButton = {
             TextButton(
                 onClick = {
+                    val fullPhone = if (phone.isNotBlank()) "+549$phone" else ""
+                    val fullEmergencyPhone = if (emergencyPhone.isNotBlank()) "+549$emergencyPhone" else ""
+
                     onSave(
                         student.copy(
                             name = name,
                             surname = surname,
                             email = email,
-                            phone = phone,
+                            phone = fullPhone,
                             emergencyContact = emergencyContact,
-                            emergencyPhone = emergencyPhone,
+                            emergencyPhone = fullEmergencyPhone,
                             active = active
                         ),
                         selectedPlan
                     )
-                }
+                },
+                enabled = phone.isBlank() || (!phoneError && isValidPhone(phone))
             ) {
                 Text("Guardar")
             }
@@ -556,7 +628,11 @@ fun EditStudentDialog(
             onDismissRequest = { showPlanPicker = false },
             title = { Text("Cambiar Plan") },
             text = {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
                     if (plans.isEmpty()) {
                         Text("No hay planes disponibles")
                     } else {

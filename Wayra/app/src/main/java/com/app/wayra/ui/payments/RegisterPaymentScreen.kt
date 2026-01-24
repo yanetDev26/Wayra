@@ -157,9 +157,9 @@ fun RegisterPaymentScreen(
                     } else {
                         Text(
                             text = if (selectedStudent != null) {
-                                "El estudiante no tiene un plan asignado"
+                                "El alumno no tiene un plan asignado"
                             } else {
-                                "Selecciona un estudiante para ver el plan"
+                                "Selecciona un alumno para ver el plan"
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -247,7 +247,7 @@ fun RegisterPaymentScreen(
 
                         // Validar datos antes de intentar registrar
                         if (selectedStudent == null) {
-                            snackbarHostState.showErrorSnackbar("Por favor selecciona un estudiante")
+                            snackbarHostState.showErrorSnackbar("Por favor selecciona un alumno")
                             isLoading = false
                             return@launch
                         }
@@ -279,7 +279,7 @@ fun RegisterPaymentScreen(
                             snackbarHostState.showSuccessSnackbar("Pago registrado exitosamente")
                             onPaymentRegistered()
                         } else {
-                            snackbarHostState.showErrorSnackbar("Error al registrar el pago. Verifica que el estudiante tenga una suscripción activa.")
+                            snackbarHostState.showErrorSnackbar("Error al registrar el pago. Verifica que el alumno tenga una suscripción activa.")
                         }
                     }
                 },

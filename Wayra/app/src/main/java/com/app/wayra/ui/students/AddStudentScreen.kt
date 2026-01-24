@@ -412,7 +412,11 @@ fun AddStudentScreen(
                 onDismissRequest = { showPlanPicker = false },
                 title = { Text("Seleccionar Plan") },
                 text = {
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
                         if (plans.isEmpty()) {
                             Text("No hay planes disponibles")
                         } else {
@@ -432,7 +436,7 @@ fun AddStudentScreen(
                                         style = MaterialTheme.typography.bodyLarge
                                     )
                                     Text(
-                                        text = "No asignar plan al estudiante",
+                                        text = "No asignar plan al alumno",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

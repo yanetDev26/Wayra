@@ -125,7 +125,7 @@ fun PlanStatisticsReportScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "Estudiantes Activos",
+                                    text = "Alumnos Activos",
                                     fontSize = 14.sp,
                                     color = Cream.copy(alpha = 0.9f)
                                 )
@@ -230,7 +230,7 @@ fun PlanStatisticsReportScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "No hay planes con estudiantes activos",
+                                        text = "No hay planes con alumnos activos",
                                         color = Gray,
                                         fontSize = 14.sp
                                     )
@@ -312,7 +312,7 @@ fun PlanStatCard(planStat: PlanStats) {
                 // Estudiantes activos
                 StatItem(
                     modifier = Modifier.weight(1f),
-                    label = "Estudiantes",
+                    label = "Alumnos",
                     value = "${planStat.activeStudents}",
                     icon = R.drawable.student
                 )

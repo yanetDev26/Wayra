@@ -134,7 +134,7 @@ fun PendingPaymentsReportScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "${stats.uniqueStudents} estudiantes",
+                                    text = "${stats.uniqueStudents} alumnos",
                                     fontSize = 14.sp,
                                     color = Cream.copy(alpha = 0.9f)
                                 )
