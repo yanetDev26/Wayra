@@ -45,7 +45,8 @@ fun ReportsScreen(
                     titleContentColor = Cream
                 )
             )
-        }
+        },
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         WayraBackground(
             modifier = Modifier
@@ -70,7 +71,7 @@ fun ReportsScreen(
                 item {
                     ReportCard(
                         title = "Pagos Pendientes",
-                        description = "Estudiantes con pagos atrasados",
+                        description = "Alumnos con pagos atrasados",
                         onClick = onNavigateToPendingPayments
                     )
                 }
@@ -78,7 +79,7 @@ fun ReportsScreen(
                 item {
                     ReportCard(
                         title = "Estadísticas por Plan",
-                        description = "Distribución de estudiantes por plan",
+                        description = "Distribución de alumnos por plan",
                         onClick = onNavigateToPlanStatistics
                     )
                 }
@@ -86,7 +87,7 @@ fun ReportsScreen(
                 item {
                     ReportCard(
                         title = "Historial de Pagos",
-                        description = "Consulta pagos por fecha o estudiante",
+                        description = "Consulta pagos por fecha o alumno",
                         onClick = onNavigateToPaymentHistory
                     )
                 }

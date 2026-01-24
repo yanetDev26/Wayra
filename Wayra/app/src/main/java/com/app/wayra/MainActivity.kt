@@ -95,7 +95,7 @@ fun MainScreen() {
                 HomeNavHost(
                     navController = homeNavController,
                     homeViewModel = homeViewModel,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
                 )
             }
             1 -> {
@@ -142,7 +142,7 @@ fun ModernBottomBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 8.dp),
+                .padding(vertical = 8.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -171,10 +171,10 @@ fun ModernBottomBar(
                         ),
                         contentDescription = item,
                         tint = Color.Unspecified,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(24.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = item,

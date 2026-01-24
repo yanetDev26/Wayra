@@ -11,6 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -62,6 +66,7 @@ import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
 import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.Gray
 import com.app.wayra.ui.theme.WayraOrange
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
@@ -182,6 +187,22 @@ fun StudentDetailScreen(
                     DetailRow(label = "Nombre", value = student?.getFullName() ?: "Cargando...")
                     DetailRow(label = "Email", value = student?.email ?: "-")
                     DetailRow(label = "Teléfono", value = student?.phone ?: "-")
+
+                    if (!student?.emergencyContact.isNullOrBlank() || !student?.emergencyPhone.isNullOrBlank()) {
+                        Text(
+                            text = "Contacto de Emergencia",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                        if (student.emergencyContact.isNotBlank()) {
+                            DetailRow(label = "Nombre", value = student.emergencyContact)
+                        }
+                        if (student.emergencyPhone.isNotBlank()) {
+                            DetailRow(label = "Teléfono", value = student.emergencyPhone)
+                        }
+                    }
 
                     Surface(
                         color = if (student?.active == true) Color(0xFF4CAF50) else Color(0xFFFF5722),
@@ -379,13 +400,41 @@ fun EditStudentDialog(
     onDismiss: () -> Unit,
     onSave: (Student, Plan?) -> Unit
 ) {
+    // Remover el prefijo +549 de los teléfonos para mostrar solo los 10 dígitos
+    val initialPhone = student.phone.removePrefix("+549")
+    val initialEmergencyPhone = student.emergencyPhone.removePrefix("+549")
+
     var name by remember { mutableStateOf(student.name) }
     var surname by remember { mutableStateOf(student.surname) }
     var email by remember { mutableStateOf(student.email) }
-    var phone by remember { mutableStateOf(student.phone) }
+    var phone by remember { mutableStateOf(initialPhone) }
+    var emergencyContact by remember { mutableStateOf(student.emergencyContact) }
+    var emergencyPhone by remember { mutableStateOf(initialEmergencyPhone) }
     var active by remember { mutableStateOf(student.active) }
     var selectedPlan by remember { mutableStateOf(currentPlan) }
     var showPlanPicker by remember { mutableStateOf(false) }
+    var phoneError by remember { mutableStateOf(false) }
+    var emergencyPhoneError by remember { mutableStateOf(false) }
+
+    // Función para validar número de celular argentino
+    fun isValidPhone(phone: String): Boolean {
+        val digits = phone.replace(Regex("[^0-9]"), "").length
+        return digits == 10
+    }
+
+    // Función para formatear el número con espacios
+    fun formatPhone(phone: String): String {
+        return when {
+            phone.isEmpty() -> ""
+            phone.length <= 4 -> phone
+            phone.length <= 10 -> {
+                val part1 = phone.substring(0, minOf(4, phone.length))
+                val part2 = phone.substring(4)
+                "$part1${if (part2.isNotEmpty()) " $part2" else ""}"
+            }
+            else -> phone
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -416,6 +465,21 @@ fun EditStudentDialog(
                     value = phone,
                     onValueChange = { phone = it },
                     label = { Text("Teléfono") },
+                    singleLine = true
+                )
+
+                OutlinedTextField(
+                    value = emergencyContact,
+                    onValueChange = { emergencyContact = it },
+                    label = { Text("Contacto de Emergencia") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                )
+
+                OutlinedTextField(
+                    value = emergencyPhone,
+                    onValueChange = { emergencyPhone = it },
+                    label = { Text("Teléfono de Emergencia") },
                     singleLine = true
                 )
 
@@ -468,6 +532,8 @@ fun EditStudentDialog(
                             surname = surname,
                             email = email,
                             phone = phone,
+                            emergencyContact = emergencyContact,
+                            emergencyPhone = emergencyPhone,
                             active = active
                         ),
                         selectedPlan
@@ -594,7 +660,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                     text = currencyFormat.format(payment.amount),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Gray
                 )
 
                 // Fecha
@@ -608,7 +674,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             else -> "Vence:"
                         },
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Gray
                     )
                     Text(
                         text = when (payment.status) {
@@ -618,7 +684,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                                 payment.dueDate?.let { dateFormat.format(Date(it)) } ?: "-"
                         },
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Gray
                     )
                 }
 

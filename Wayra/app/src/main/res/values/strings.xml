@@ -4,7 +4,7 @@
     <string name="title_home">Inicio</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notificaciones</string>
-    <string name="title_students">Estudiantes</string>
+    <string name="title_students">Alumnos</string>
     <string name="title_payments">Pagos</string>
     <string name="title_reports">Reportes</string>
 
@@ -52,8 +52,8 @@
 
     <!-- Payments -->
     <string name="register_payment_title">Registrar Pago</string>
-    <string name="payment_student">Estudiante</string>
-    <string name="payment_select_student">Seleccionar estudiante</string>
+    <string name="payment_student">Alumno</string>
+    <string name="payment_select_student">Seleccionar alumno</string>
     <string name="payment_amount">Monto</string>
     <string name="payment_plan_and_amount">Plan y Monto</string>
     <string name="payment_method">Método de pago</string>

@@ -44,9 +44,10 @@ class StudentsViewModel : ViewModel() {
 
     init {
         loadStudents()
-        // Ejecutar migración automática para agregar campo surname
+        // Ejecutar migraciones automáticas para agregar campos nuevos
         viewModelScope.launch {
             studentRepository.migrateStudentsAddSurname()
+            studentRepository.migrateStudentsAddEmergencyFields()
         }
     }
 

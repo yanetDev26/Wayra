@@ -72,11 +72,14 @@ fun AddStudentScreen(
     var surname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
+    var emergencyContact by remember { mutableStateOf("") }
+    var emergencyPhone by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(true) }
     var selectedPlan by remember { mutableStateOf<Plan?>(null) }
     var showPlanPicker by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
+    var emergencyPhoneError by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
     val plans by plansViewModel.plans.observeAsState(emptyList())
@@ -221,6 +224,63 @@ fun AddStudentScreen(
                 }
             )
 
+            OutlinedTextField(
+                value = emergencyContact,
+                onValueChange = { emergencyContact = it },
+                label = { Text("Contacto de Emergencia") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words
+                )
+            )
+
+            OutlinedTextField(
+                value = emergencyPhone,
+                onValueChange = { newValue ->
+                    // Solo permitir números y limitar a 10 dígitos
+                    val filtered = newValue.filter { it.isDigit() }.take(10)
+                    emergencyPhone = filtered
+                    emergencyPhoneError = emergencyPhone.isNotBlank() && !isValidPhone(emergencyPhone)
+                },
+                label = { Text("Teléfono de Emergencia") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                visualTransformation = { text ->
+                    val prefix = "+54 9 "
+                    val formatted = formatPhone(text.text)
+                    TransformedText(
+                        AnnotatedString(prefix + formatted),
+                        object : OffsetMapping {
+                            override fun originalToTransformed(offset: Int): Int {
+                                val beforeCursor = text.text.substring(0, minOf(offset, text.text.length))
+                                val formattedBeforeCursor = formatPhone(beforeCursor)
+                                return prefix.length + formattedBeforeCursor.length
+                            }
+                            override fun transformedToOriginal(offset: Int): Int {
+                                if (offset <= prefix.length) return 0
+                                val textPart = (offset - prefix.length).coerceAtLeast(0)
+                                return text.text.take(textPart).count { it.isDigit() }
+                            }
+                        }
+                    )
+                },
+                isError = emergencyPhoneError,
+                supportingText = {
+                    if (emergencyPhoneError) {
+                        Text("Debe tener 10 dígitos (ej: 3492 566468)")
+                    } else {
+                        Text(
+                            "Código de área + número (10 dígitos)",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            )
+
             // Selector de Plan
             OutlinedCard(
                 onClick = { showPlanPicker = true },
@@ -270,7 +330,7 @@ fun AddStudentScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -294,12 +354,15 @@ fun AddStudentScreen(
                                 isLoading = true
 
                                 val fullPhone = "+549$phone"
+                                val fullEmergencyPhone = if (emergencyPhone.isNotBlank()) "+549$emergencyPhone" else ""
 
                                 val student = Student(
                                     name = name,
                                     surname = surname,
                                     email = email,
                                     phone = fullPhone,
+                                    emergencyContact = emergencyContact,
+                                    emergencyPhone = fullEmergencyPhone,
                                     registrationDate = Timestamp.now(),
                                     active = isActive
                                 )
@@ -325,6 +388,7 @@ fun AddStudentScreen(
                             surname.isNotBlank() &&
                             email.isNotBlank() && !emailError && isValidEmail(email) &&
                             phone.isNotBlank() && !phoneError && isValidPhone(phone) &&
+                            (emergencyPhone.isBlank() || (!emergencyPhoneError && isValidPhone(emergencyPhone))) &&
                             selectedPlan != null
                 ) {
                     if (isLoading) {

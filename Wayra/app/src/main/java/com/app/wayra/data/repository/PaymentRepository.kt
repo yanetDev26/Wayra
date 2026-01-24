@@ -3,10 +3,10 @@ package com.app.wayra.data.repository
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

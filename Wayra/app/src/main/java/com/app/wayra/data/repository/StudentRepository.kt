@@ -1,9 +1,9 @@
 package com.app.wayra.data.repository
 
 import com.app.wayra.data.model.Student
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -129,6 +129,39 @@ class StudentRepository {
                 if (data != null && !data.containsKey("surname")) {
                     doc.reference.update("surname", "").await()
                     count++
+                }
+            }
+
+            Result.success(count)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Migración: Agregar campos de contacto de emergencia a todos los estudiantes existentes
+    suspend fun migrateStudentsAddEmergencyFields(): Result<Int> {
+        return try {
+            val snapshot = studentsCollection.get().await()
+            var count = 0
+
+            snapshot.documents.forEach { doc ->
+                val data = doc.data
+                val updates = mutableMapOf<String, Any>()
+
+                // Solo actualizar campos que no existan
+                if (data != null) {
+                    if (!data.containsKey("emergencyContact")) {
+                        updates["emergencyContact"] = ""
+                    }
+                    if (!data.containsKey("emergencyPhone")) {
+                        updates["emergencyPhone"] = ""
+                    }
+
+                    // Solo hacer update si hay campos para actualizar
+                    if (updates.isNotEmpty()) {
+                        doc.reference.update(updates).await()
+                        count++
+                    }
                 }
             }
 
