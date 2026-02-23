@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -52,7 +50,6 @@ import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.ui.components.CustomSnackbarHost
-import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.theme.Cream
@@ -120,7 +117,7 @@ fun PendingPaymentsScreen(
             val allPayments = paymentRepository.getAllPayments()
 
             android.util.Log.d("PendingPayments", "Total payments: ${allPayments.size}")
-            android.util.Log.d("PendingPayments", "Period: $periodType, Start: ${java.util.Date(startOfMonth)}, End: ${java.util.Date(endOfMonth)}")
+            android.util.Log.d("PendingPayments", "Period: $periodType, Start: ${Date(startOfMonth)}, End: ${Date(endOfMonth)}")
 
             val filteredPayments = allPayments.filter { payment ->
                 // Solo incluir pagos pendientes o vencidos
@@ -131,7 +128,7 @@ fun PendingPaymentsScreen(
                 val dueDate = payment.dueDate ?: 0L
                 val isInRange = dueDate > 0L && dueDate >= startOfMonth && dueDate <= endOfMonth
 
-                android.util.Log.d("PendingPayments", "Payment ${payment.id}: status=${payment.status}, dueDate=${if (dueDate > 0) java.util.Date(dueDate) else "null"}, inRange=$isInRange, pending=$isPendingOrOverdue")
+                android.util.Log.d("PendingPayments", "Payment ${payment.id}: status=${payment.status}, dueDate=${if (dueDate > 0) Date(dueDate) else "null"}, inRange=$isInRange, pending=$isPendingOrOverdue")
 
                 isPendingOrOverdue && isInRange
             }
