@@ -51,7 +51,11 @@ import java.util.Locale
 fun HomeScreen(
     viewModel: HomeViewModel,
     modifier: Modifier = Modifier,
-    onNavigateToRegisterPayment: () -> Unit = {}
+    onNavigateToRegisterPayment: () -> Unit = {},
+    onNavigateToActiveStudents: () -> Unit = {},
+    onNavigateToNewStudents: () -> Unit = {},
+    onNavigateToPendingThisMonth: () -> Unit = {},
+    onNavigateToPendingLastMonth: () -> Unit = {}
 ) {
     val stats by viewModel.stats.observeAsState(HomeStats())
     val currentDate by viewModel.currentDate.observeAsState("")
@@ -64,6 +68,10 @@ fun HomeScreen(
         stats = stats,
         currentDate = currentDate,
         onRegisterPaymentClick = onNavigateToRegisterPayment,
+        onActiveStudentsClick = onNavigateToActiveStudents,
+        onNewStudentsClick = onNavigateToNewStudents,
+        onPendingThisMonthClick = onNavigateToPendingThisMonth,
+        onPendingLastMonthClick = onNavigateToPendingLastMonth,
         modifier = modifier
     )
 }
@@ -73,6 +81,10 @@ fun HomeContent(
     stats: HomeStats,
     currentDate: String,
     onRegisterPaymentClick: () -> Unit,
+    onActiveStudentsClick: () -> Unit = {},
+    onNewStudentsClick: () -> Unit = {},
+    onPendingThisMonthClick: () -> Unit = {},
+    onPendingLastMonthClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showAmount by remember { mutableStateOf(false) }
@@ -123,7 +135,8 @@ fun HomeContent(
                         iconRes = R.drawable.gym_active,
                         backgroundColor = Orange,
                         contentColor = Cream,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onActiveStudentsClick
                     )
 
                     StatCardCompact(
@@ -132,7 +145,8 @@ fun HomeContent(
                         iconRes = R.drawable.gym_new_active,
                         backgroundColor = Color(0xFFE8F5E9),
                         contentColor = Color(0xFF2E7D32),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNewStudentsClick
                     )
                 }
 
@@ -149,8 +163,8 @@ fun HomeContent(
                         iconRes = R.drawable.gym_pay,
                         backgroundColor = Color(0xFFFFEBEE),
                         contentColor = Color(0xFFC62828),
-                        modifier = Modifier
-                            .weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onPendingThisMonthClick
                     )
 
                     StatCardCompact(
@@ -159,8 +173,8 @@ fun HomeContent(
                         iconRes = R.drawable.gym_pay_past_month,
                         backgroundColor = Color(0xFFFFCDD2),
                         contentColor = Color(0xFFB71C1C),
-                        modifier = Modifier
-                            .weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onPendingLastMonthClick
                     )
                 }
 
@@ -267,10 +281,14 @@ fun StatCardCompact(
     iconRes: Int? = null,
     backgroundColor: Color,
     contentColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.then(
+            if (onClick != null) Modifier.clickable(onClick = onClick)
+            else Modifier
+        ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor

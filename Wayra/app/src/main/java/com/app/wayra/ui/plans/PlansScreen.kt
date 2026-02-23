@@ -105,6 +105,7 @@ fun PlansScreen(
                 )
             )
         },
+        containerColor = Cream,
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         modifier = modifier

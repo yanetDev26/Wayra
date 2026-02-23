@@ -78,7 +78,9 @@ fun StudentsScreen(
                         actionIconContentColor = Cream
                     )
                 )
-            }
+            },
+            containerColor = Cream,
+            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
             StudentsContent(
                 filteredStudents = filteredStudents,
@@ -110,6 +112,7 @@ fun StudentsScreen(
                     )
                 )
             },
+            containerColor = Cream,
             contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
             StudentsContent(

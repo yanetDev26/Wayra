@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -85,53 +88,76 @@ fun PendingPaymentsScreen(
     LaunchedEffect(periodType) {
         isLoading = true
 
-        // Obtener rango de fechas según el período
-        val calendar = Calendar.getInstance()
+        try {
+            // Obtener rango de fechas según el período
+            val calendar = Calendar.getInstance()
 
-        if (periodType == "last_month") {
-            calendar.add(Calendar.MONTH, -1)
-        }
-
-        // Inicio del mes
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        val startOfMonth = calendar.timeInMillis
-
-        // Fin del mes
-        val endCalendar = Calendar.getInstance()
-        if (periodType == "last_month") {
-            endCalendar.add(Calendar.MONTH, -1)
-        }
-        endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-        endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-        endCalendar.set(Calendar.MINUTE, 59)
-        endCalendar.set(Calendar.SECOND, 59)
-        val endOfMonth = endCalendar.timeInMillis
-
-        // Obtener todos los pagos pendientes y filtrar por fecha
-        val allPayments = paymentRepository.getPendingPayments()
-        val filteredPayments = allPayments.filter { payment ->
-            val dueDate = payment.dueDate ?: 0L
-            dueDate in startOfMonth..endOfMonth
-        }
-
-        // Obtener todos los estudiantes
-        val allStudents = studentRepository.getAllStudents()
-
-        // Combinar estudiantes con sus pagos pendientes
-        val studentsWithPaymentsList = filteredPayments.mapNotNull { payment ->
-            val student = allStudents.find { it.id == payment.studentId }
-            if (student != null) {
-                StudentWithPayment(student, payment)
-            } else {
-                null
+            if (periodType == "last_month") {
+                calendar.add(Calendar.MONTH, -1)
             }
-        }.sortedBy { it.student.name }
 
-        studentsWithPayments = studentsWithPaymentsList
-        isLoading = false
+            // Inicio del mes
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val startOfMonth = calendar.timeInMillis
+
+            // Fin del mes
+            val endCalendar = Calendar.getInstance()
+            if (periodType == "last_month") {
+                endCalendar.add(Calendar.MONTH, -1)
+            }
+            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
+            endCalendar.set(Calendar.MINUTE, 59)
+            endCalendar.set(Calendar.SECOND, 59)
+            endCalendar.set(Calendar.MILLISECOND, 999)
+            val endOfMonth = endCalendar.timeInMillis
+
+            // Obtener todos los pagos (de todos los estados) y luego filtrar por pendientes/vencidos y fecha
+            val allPayments = paymentRepository.getAllPayments()
+
+            android.util.Log.d("PendingPayments", "Total payments: ${allPayments.size}")
+            android.util.Log.d("PendingPayments", "Period: $periodType, Start: ${java.util.Date(startOfMonth)}, End: ${java.util.Date(endOfMonth)}")
+
+            val filteredPayments = allPayments.filter { payment ->
+                // Solo incluir pagos pendientes o vencidos
+                val isPendingOrOverdue = payment.status == PaymentStatus.PENDIENTE ||
+                                         payment.status == PaymentStatus.VENCIDO
+
+                // Verificar que la fecha de vencimiento esté en el rango del mes
+                val dueDate = payment.dueDate ?: 0L
+                val isInRange = dueDate > 0L && dueDate >= startOfMonth && dueDate <= endOfMonth
+
+                android.util.Log.d("PendingPayments", "Payment ${payment.id}: status=${payment.status}, dueDate=${if (dueDate > 0) java.util.Date(dueDate) else "null"}, inRange=$isInRange, pending=$isPendingOrOverdue")
+
+                isPendingOrOverdue && isInRange
+            }
+
+            android.util.Log.d("PendingPayments", "Filtered payments: ${filteredPayments.size}")
+
+            // Obtener todos los estudiantes
+            val allStudents = studentRepository.getAllStudents()
+
+            // Combinar estudiantes con sus pagos pendientes
+            val studentsWithPaymentsList = filteredPayments.mapNotNull { payment ->
+                val student = allStudents.find { it.id == payment.studentId }
+                if (student != null) {
+                    StudentWithPayment(student, payment)
+                } else {
+                    null
+                }
+            }.sortedBy { it.student.name }
+
+            studentsWithPayments = studentsWithPaymentsList
+        } catch (e: Exception) {
+            android.util.Log.e("PendingPayments", "Error loading payments", e)
+            studentsWithPayments = emptyList()
+        } finally {
+            isLoading = false
+        }
     }
 
     val title = if (periodType == "this_month") {
@@ -156,10 +182,14 @@ fun PendingPaymentsScreen(
                 )
             )
         },
-        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+        containerColor = Cream,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        WayraBackground(
-            modifier = Modifier.padding(paddingValues)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (isLoading) {
                 Box(
@@ -182,10 +212,13 @@ fun PendingPaymentsScreen(
                     }
                 } else {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
-                            .padding(top = 16.dp, bottom = 100.dp),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 100.dp
+                        ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(studentsWithPayments) { item ->
@@ -263,10 +296,13 @@ fun PendingPaymentsScreen(
                             endCalendar.set(Calendar.SECOND, 59)
                             val endOfMonth = endCalendar.timeInMillis
 
-                            val allPayments = paymentRepository.getPendingPayments()
+                            val allPayments = paymentRepository.getAllPayments()
                             val filteredPayments = allPayments.filter { payment ->
+                                val isPendingOrOverdue = payment.status == PaymentStatus.PENDIENTE ||
+                                                         payment.status == PaymentStatus.VENCIDO
                                 val dueDate = payment.dueDate ?: 0L
-                                dueDate in startOfMonth..endOfMonth
+                                val isInRange = dueDate in startOfMonth..endOfMonth
+                                isPendingOrOverdue && isInRange
                             }
 
                             val allStudents = studentRepository.getAllStudents()

@@ -8,8 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.app.wayra.ui.home.ActiveStudentsScreen
 import com.app.wayra.ui.home.HomeScreen
 import com.app.wayra.ui.home.HomeViewModel
+import com.app.wayra.ui.home.NewStudentsScreen
 import com.app.wayra.ui.home.PendingPaymentsScreen
 import com.app.wayra.ui.payments.PaymentDetailScreen
 import com.app.wayra.ui.payments.PaymentViewModel
@@ -20,6 +22,8 @@ sealed class HomeScreens(val route: String) {
     object RegisterPayment : HomeScreens("register_payment")
     object PaymentDetail : HomeScreens("payment_detail/{paymentId}")
     object PendingPayments : HomeScreens("pending_payments/{periodType}")
+    object ActiveStudents : HomeScreens("active_students")
+    object NewStudents : HomeScreens("new_students")
 }
 
 @Composable
@@ -39,6 +43,18 @@ fun HomeNavHost(
                 viewModel = homeViewModel,
                 onNavigateToRegisterPayment = {
                     navController.navigate(HomeScreens.RegisterPayment.route)
+                },
+                onNavigateToActiveStudents = {
+                    navController.navigate(HomeScreens.ActiveStudents.route)
+                },
+                onNavigateToNewStudents = {
+                    navController.navigate(HomeScreens.NewStudents.route)
+                },
+                onNavigateToPendingThisMonth = {
+                    navController.navigate("pending_payments/this_month")
+                },
+                onNavigateToPendingLastMonth = {
+                    navController.navigate("pending_payments/last_month")
                 }
             )
         }
@@ -82,6 +98,24 @@ fun HomeNavHost(
             val periodType = backStackEntry.arguments?.getString("periodType") ?: "this_month"
             PendingPaymentsScreen(
                 periodType = periodType,
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Pantalla: Estudiantes activos
+        composable(HomeScreens.ActiveStudents.route) {
+            ActiveStudentsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Pantalla: Estudiantes nuevos
+        composable(HomeScreens.NewStudents.route) {
+            NewStudentsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

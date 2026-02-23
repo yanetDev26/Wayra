@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -75,6 +78,7 @@ fun RegisterPaymentScreen(
     var showPaymentPeriodPicker by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -92,15 +96,22 @@ fun RegisterPaymentScreen(
                 )
             )
         },
-        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) },
+        containerColor = Cream,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Column(
+        androidx.compose.foundation.layout.Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             // Student Selector
             OutlinedCard(
                 onClick = { showStudentPicker = true },
@@ -237,7 +248,7 @@ fun RegisterPaymentScreen(
                 maxLines = 5
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Register Button
             Button(
@@ -294,6 +305,7 @@ fun RegisterPaymentScreen(
                 } else {
                     Text(stringResource(R.string.payment_register))
                 }
+            }
             }
         }
     }

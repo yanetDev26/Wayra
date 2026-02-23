@@ -1,8 +1,10 @@
 package com.app.wayra.ui.students
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -158,17 +160,22 @@ fun StudentDetailScreen(
                 )
             )
         },
+        containerColor = Cream,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             // Student Info Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -295,6 +302,7 @@ fun StudentDetailScreen(
                     }
                 }
             }
+        }
         }
 
         // Diálogo de editar

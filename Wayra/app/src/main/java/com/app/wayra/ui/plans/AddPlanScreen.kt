@@ -1,9 +1,11 @@
 package com.app.wayra.ui.plans
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -69,16 +71,22 @@ fun AddPlanScreen(
                     navigationIconContentColor = Cream
                 )
             )
-        }
+        },
+        containerColor = Cream,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             OutlinedTextField(
                 value = activityName,
                 onValueChange = { activityName = it },
@@ -143,8 +151,7 @@ fun AddPlanScreen(
                     Text(stringResource(R.string.save))
                 }
             }
-
-            Spacer(modifier = Modifier.height(100.dp))
+        }
         }
     }
 }

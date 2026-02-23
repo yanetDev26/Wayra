@@ -1,9 +1,12 @@
 package com.app.wayra.ui.subscriptions
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,6 +40,7 @@ import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.students.StudentsViewModel
+import com.app.wayra.ui.theme.Cream
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -70,15 +74,21 @@ fun AssignPlanScreen(
                     }
                 }
             )
-        }
+        },
+        containerColor = Cream,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             // Student Selector
             OutlinedCard(
                 onClick = { showStudentPicker = true },
@@ -143,19 +153,20 @@ fun AssignPlanScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Assign Button
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        if (subscriptionViewModel.assignPlan(selectedStudent, selectedPlan)) {
-                            onPlanAssigned()
+                // Assign Button
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            if (subscriptionViewModel.assignPlan(selectedStudent, selectedPlan)) {
+                                onPlanAssigned()
+                            }
                         }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = selectedStudent != null && selectedPlan != null
-            ) {
-                Text(stringResource(R.string.subscription_assign_plan))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = selectedStudent != null && selectedPlan != null
+                ) {
+                    Text(stringResource(R.string.subscription_assign_plan))
+                }
             }
         }
     }
