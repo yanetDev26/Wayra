@@ -2,12 +2,12 @@
 <resources>
     <!-- Theme para Android 12+ (API 31) - Desactiva el splash nativo -->
     <style name="Theme.Wayra" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/ic_logo_background</item>
-        <item name="android:navigationBarColor">@color/ic_logo_background</item>
-        <item name="android:windowBackground">@color/ic_logo_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/wayra_window_background</item>
         <item name="android:windowIsTranslucent">false</item>
         <!-- Desactiva completamente el splash screen del sistema -->
-        <item name="android:windowSplashScreenBackground">@color/ic_logo_background</item>
+        <item name="android:windowSplashScreenBackground">@color/wayra_window_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon_transparent</item>
         <item name="android:windowSplashScreenAnimationDuration">1</item>
     </style>

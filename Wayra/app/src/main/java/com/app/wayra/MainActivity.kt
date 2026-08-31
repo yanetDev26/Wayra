@@ -3,6 +3,7 @@ package com.app.wayra
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,7 +18,9 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,16 +46,25 @@ import com.app.wayra.ui.home.HomeViewModel
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.splash.SplashScreen
 import com.app.wayra.ui.students.StudentsViewModel
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.Orange
-import com.app.wayra.ui.theme.WayraTheme
+import com.app.wayra.ui.theme.*
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Toda la app se dibuja sobre fondo claro, así que los iconos de la
+        // barra de estado deben ser oscuros. La barra de navegación acompaña a
+        // la barra inferior, que es oscura.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
 
         setContent {
             WayraTheme {
@@ -133,56 +145,60 @@ fun ModernBottomBar(
     onItemSelected: (Int) -> Unit
 ) {
     androidx.compose.material3.Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .windowInsetsPadding(WindowInsets.navigationBars),
-        color = Gray,
-        shadowElevation = 4.dp
+        modifier = Modifier.fillMaxWidth(),
+        color = SurfaceCard
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)
         ) {
-            items.forEachIndexed { index, item ->
-                val isSelected = selectedItem == index
+            // Una línea de 1 dp separa la barra del contenido; sobre fondo claro
+            // define mejor que una sombra.
+            HorizontalDivider(thickness = 1.dp, color = BorderSoft)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp, horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items.forEachIndexed { index, item ->
+                    val isSelected = selectedItem == index
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(
-                            onClick = { onItemSelected(index) },
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            id = when (index) {
-                                0 -> R.drawable.home
-                                1 -> R.drawable.runner
-                                2 -> R.drawable.plan
-                                else -> R.drawable.report
-                            }
-                        ),
-                        contentDescription = item,
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable(
+                                onClick = { onItemSelected(index) },
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = when (index) {
+                                    0 -> R.drawable.home
+                                    1 -> R.drawable.runner
+                                    2 -> R.drawable.plan
+                                    else -> R.drawable.report
+                                }
+                            ),
+                            contentDescription = item,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(24.dp)
+                        )
 
-                    Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
-                    Text(
-                        text = item,
-                        fontSize = 13.sp,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) Orange else Cream,
-                        maxLines = 1
-                    )
+                        Text(
+                            text = item,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                            color = if (isSelected) WayraOrangeDark else InkMuted,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }

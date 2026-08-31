@@ -53,8 +53,7 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.home.PaymentPeriod
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,15 +88,11 @@ fun RegisterPaymentScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         androidx.compose.foundation.layout.Box(
@@ -389,7 +384,7 @@ fun RegisterPaymentScreen(
                                     showPaymentPeriodPicker = false
                                 },
                             colors = CardDefaults.cardColors(
-                                containerColor = if (isSelected) WayraOrange else Color.LightGray
+                                containerColor = if (isSelected) WayraOrange else SurfaceAlt
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = if (isSelected) 4.dp else 1.dp
@@ -408,7 +403,7 @@ fun RegisterPaymentScreen(
                                     },
                                     fontSize = 16.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Cream else Color.Black
+                                    color = if (isSelected) Paper else Ink
                                 )
                                 Text(
                                     text = when (period) {
@@ -417,7 +412,7 @@ fun RegisterPaymentScreen(
                                         PaymentPeriod.NEXT_MONTH -> "Pago adelantado del próximo mes"
                                     },
                                     fontSize = 12.sp,
-                                    color = if (isSelected) Cream.copy(alpha = 0.8f) else Color.Gray,
+                                    color = if (isSelected) OnDark.copy(alpha = 0.8f) else InkMuted,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                             }

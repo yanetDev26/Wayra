@@ -1,6 +1,7 @@
 package com.app.wayra.ui.reports
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,9 +53,7 @@ import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -93,10 +92,7 @@ fun PaymentHistoryReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Historial de Pagos") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream
-                ),
+                colors = wayraTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -107,13 +103,13 @@ fun PaymentHistoryReportScreen(
                         Icon(
                             Icons.Default.Search,
                             contentDescription = "Filtros",
-                            tint = Cream
+                            tint = OnDark
                         )
                     }
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -151,14 +147,15 @@ fun PaymentHistoryReportScreen(
                         ) {
                             Text(
                                 text = "${filteredPayments.size}",
-                                fontSize = 36.sp,
-                                color = Cream,
+                                fontFamily = AgenorNeue,
+                                fontSize = 32.sp,
+                                color = OnDark,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = if (filteredPayments.size == 1) "Pago encontrado" else "Pagos encontrados",
                                 fontSize = 14.sp,
-                                color = Cream.copy(alpha = 0.9f)
+                                color = OnDark.copy(alpha = 0.9f)
                             )
                         }
                     }
@@ -173,8 +170,9 @@ fun PaymentHistoryReportScreen(
                         Card(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderSoft),
                             colors = CardDefaults.cardColors(
-                                containerColor = Cream
+                                containerColor = SurfaceCard
                             )
                         ) {
                             Column(
@@ -186,6 +184,7 @@ fun PaymentHistoryReportScreen(
                                 Text(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(filteredPayments.sumOf { it.amount }),
+                                    fontFamily = AgenorNeue,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = WayraOrange
@@ -193,7 +192,7 @@ fun PaymentHistoryReportScreen(
                                 Text(
                                     text = "Total",
                                     fontSize = 12.sp,
-                                    color = Gray
+                                    color = Ink
                                 )
                             }
                         }
@@ -201,8 +200,9 @@ fun PaymentHistoryReportScreen(
                         Card(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderSoft),
                             colors = CardDefaults.cardColors(
-                                containerColor = Cream
+                                containerColor = SurfaceCard
                             )
                         ) {
                             Column(
@@ -213,6 +213,7 @@ fun PaymentHistoryReportScreen(
                             ) {
                                 Text(
                                     text = "${filteredPayments.count { it.status == PaymentStatus.PAGADO }}",
+                                    fontFamily = AgenorNeue,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = WayraOrange
@@ -220,7 +221,7 @@ fun PaymentHistoryReportScreen(
                                 Text(
                                     text = "Pagados",
                                     fontSize = 12.sp,
-                                    color = Gray
+                                    color = Ink
                                 )
                             }
                         }
@@ -233,10 +234,11 @@ fun PaymentHistoryReportScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderSoft),
                             colors = CardDefaults.cardColors(
-                                containerColor = Gray
+                                containerColor = SurfaceCard
                             ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -305,8 +307,9 @@ fun PaymentHistoryReportScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderSoft),
                             colors = CardDefaults.cardColors(
-                                containerColor = Cream
+                                containerColor = SurfaceCard
                             )
                         ) {
                             Box(
@@ -317,7 +320,7 @@ fun PaymentHistoryReportScreen(
                             ) {
                                 Text(
                                     text = "No se encontraron pagos",
-                                    color = Gray,
+                                    color = Ink,
                                     fontSize = 14.sp
                                 )
                             }
@@ -490,10 +493,11 @@ fun PaymentHistoryCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
@@ -518,6 +522,7 @@ fun PaymentHistoryCard(
                 ) {
                     Text(
                         text = student?.name?.firstOrNull()?.toString()?.uppercase() ?: "?",
+                        fontFamily = AgenorNeue,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = getStatusColor(payment.status)
@@ -530,12 +535,12 @@ fun PaymentHistoryCard(
                         text = student?.getFullName() ?: "Alumno desconocido",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = Gray
+                        color = Ink
                     )
                     Text(
                         text = formatDate(payment.paymentDate ?: payment.dueDate ?: 0L),
                         fontSize = 12.sp,
-                        color = Gray
+                        color = Ink
                     )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -544,8 +549,8 @@ fun PaymentHistoryCard(
                         StatusChip(status = payment.status)
                         Text(
                             text = "• ${getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO)}",
-                            fontSize = 11.sp,
-                            color = Gray
+                            fontSize = 12.sp,
+                            color = Ink
                         )
                     }
                 }
@@ -575,7 +580,7 @@ fun StatusChip(status: PaymentStatus) {
     ) {
         Text(
             text = getStatusName(status),
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = getStatusColor(status)
         )
@@ -592,8 +597,8 @@ fun getStatusName(status: PaymentStatus): String {
 
 fun getStatusColor(status: PaymentStatus): Color {
     return when (status) {
-        PaymentStatus.PAGADO -> Color(0xFF4CAF50)
-        PaymentStatus.PENDIENTE -> Color(0xFFFFA726)
-        PaymentStatus.VENCIDO -> Color(0xFFF44336)
+        PaymentStatus.PAGADO -> Success
+        PaymentStatus.PENDIENTE -> Warning
+        PaymentStatus.VENCIDO -> Danger
     }
 }

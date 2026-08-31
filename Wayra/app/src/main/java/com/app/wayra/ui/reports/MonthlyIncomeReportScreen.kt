@@ -1,6 +1,7 @@
 package com.app.wayra.ui.reports
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,9 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -70,10 +69,7 @@ fun MonthlyIncomeReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Ingresos del Mes") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream
-                ),
+                colors = wayraTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -81,7 +77,7 @@ fun MonthlyIncomeReportScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -121,21 +117,22 @@ fun MonthlyIncomeReportScreen(
                                 Text(
                                     text = getCurrentMonthName(),
                                     fontSize = 16.sp,
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalIncome),
-                                    fontSize = 36.sp,
-                                    color = Cream,
+                                    fontFamily = AgenorNeue,
+                                    fontSize = 32.sp,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Total Recaudado",
                                     fontSize = 14.sp,
-                                    color = Cream.copy(alpha = 0.9f)
+                                    color = OnDark.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -151,8 +148,9 @@ fun MonthlyIncomeReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -163,6 +161,7 @@ fun MonthlyIncomeReportScreen(
                                 ) {
                                     Text(
                                         text = "${stats.totalPayments}",
+                                        fontFamily = AgenorNeue,
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -170,7 +169,7 @@ fun MonthlyIncomeReportScreen(
                                     Text(
                                         text = "Pagos",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -179,8 +178,9 @@ fun MonthlyIncomeReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -195,6 +195,7 @@ fun MonthlyIncomeReportScreen(
                                         } else {
                                             "$ 0"
                                         },
+                                        fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -202,7 +203,7 @@ fun MonthlyIncomeReportScreen(
                                     Text(
                                         text = "Promedio",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -255,10 +256,11 @@ fun PaymentMethodCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
@@ -293,12 +295,12 @@ fun PaymentMethodCard(
                         text = getPaymentMethodName(method),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp,
-                        color = Gray
+                        color = Ink
                     )
                     Text(
                         text = "$count ${if (count == 1) "pago" else "pagos"}",
                         fontSize = 12.sp,
-                        color = Gray
+                        color = Ink
                     )
                 }
             }
@@ -318,8 +320,9 @@ fun PaymentDetailCard(payment: Payment) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         )
     ) {
         Row(
@@ -333,13 +336,13 @@ fun PaymentDetailCard(payment: Payment) {
                 Text(
                     text = formatDate(payment.paymentDate ?: 0L),
                     fontSize = 12.sp,
-                    color = Gray
+                    color = Ink
                 )
                 Text(
                     text = getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Gray
+                    color = Ink
                 )
             }
             Text(

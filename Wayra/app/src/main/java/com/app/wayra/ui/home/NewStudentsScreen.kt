@@ -1,5 +1,6 @@
 package com.app.wayra.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,8 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.StudentRepository
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -86,14 +86,10 @@ fun NewStudentsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -147,10 +143,11 @@ fun NewStudentCard(student: Student) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -167,7 +164,7 @@ fun NewStudentCard(student: Student) {
                     text = student.getFullName(),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Ink
                 )
 
                 student.registrationDate?.let { timestamp ->
@@ -188,12 +185,12 @@ fun NewStudentCard(student: Student) {
                     Text(
                         text = "Email:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = student.email,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                 }
             }
@@ -206,12 +203,12 @@ fun NewStudentCard(student: Student) {
                     Text(
                         text = "Teléfono:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = student.phone,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                 }
             }

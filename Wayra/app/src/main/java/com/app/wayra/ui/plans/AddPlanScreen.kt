@@ -39,9 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.R
 import com.app.wayra.data.model.Plan
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,14 +63,10 @@ fun AddPlanScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Gray,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(

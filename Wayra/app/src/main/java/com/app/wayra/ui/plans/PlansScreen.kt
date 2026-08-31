@@ -1,5 +1,6 @@
 package com.app.wayra.ui.plans
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,9 +60,7 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -98,14 +97,10 @@ fun PlansScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    actionIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         modifier = modifier
@@ -142,7 +137,7 @@ fun PlansScreen(
 
                             Text(
                                 text = stringResource(R.string.plans_empty),
-                                color = Gray,
+                                color = Ink,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
@@ -151,7 +146,7 @@ fun PlansScreen(
 
                             Text(
                                 text = "Presiona el botón + para agregar tu primer plan",
-                                color = Gray,
+                                color = Ink,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -256,9 +251,10 @@ fun PlanItemModern(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Gray
+            containerColor = SurfaceCard
         )
     ) {
         Column(
@@ -287,7 +283,7 @@ fun PlanItemModern(
                         if (plan.description.isNotBlank()) {
                             Text(
                                 text = plan.description,
-                                fontSize = 13.sp,
+                                fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
@@ -297,7 +293,7 @@ fun PlanItemModern(
 
                         // Precio destacado
                         Surface(
-                            color = Color(0xFF4CAF50).copy(alpha = 0.15f),
+                            color = Success.copy(alpha = 0.15f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Row(
@@ -319,7 +315,7 @@ fun PlanItemModern(
                                         text = formatCurrency(plan.price),
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF2E7D32)
+                                        color = Success
                                     )
                                 }
                             }
@@ -341,7 +337,7 @@ fun PlanItemModern(
                     modifier = Modifier.height(40.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = Cream,
+                        containerColor = SurfaceAlt,
                     )
                 ) {
                     Icon(
@@ -351,9 +347,11 @@ fun PlanItemModern(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Editar",
-                        fontSize = 13.sp,
-                        color = Gray)
+                    Text(
+                        "Editar",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Ink
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -363,7 +361,7 @@ fun PlanItemModern(
                     modifier = Modifier.height(40.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFFFCDD2)
+                        containerColor = DangerSoft
                     )
                 ) {
                     Icon(
@@ -373,7 +371,11 @@ fun PlanItemModern(
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Eliminar", fontSize = 13.sp, color = Gray)
+                    Text(
+                        "Eliminar",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Danger
+                    )
                 }
             }
         }

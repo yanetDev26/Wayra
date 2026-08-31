@@ -2,9 +2,9 @@
 <resources>
     <!-- Theme Wayra -->
     <style name="Theme.Wayra" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/ic_logo_background</item>
-        <item name="android:navigationBarColor">@color/ic_logo_background</item>
-        <item name="android:windowBackground">@color/ic_logo_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/wayra_window_background</item>
         <item name="android:windowIsTranslucent">false</item>
     </style>
 </resources>

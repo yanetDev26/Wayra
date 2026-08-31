@@ -1,5 +1,6 @@
 package com.app.wayra.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,8 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.StudentRepository
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,14 +67,10 @@ fun ActiveStudentsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -134,10 +130,11 @@ fun StudentCard(
                 if (onClick != null) Modifier.clickable(onClick = onClick)
                 else Modifier
             ),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -149,7 +146,7 @@ fun StudentCard(
                 text = student.getFullName(),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Ink
             )
 
             if (student.email.isNotBlank()) {
@@ -160,12 +157,12 @@ fun StudentCard(
                     Text(
                         text = "Email:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = student.email,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                 }
             }
@@ -178,12 +175,12 @@ fun StudentCard(
                     Text(
                         text = "Teléfono:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = student.phone,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                 }
             }

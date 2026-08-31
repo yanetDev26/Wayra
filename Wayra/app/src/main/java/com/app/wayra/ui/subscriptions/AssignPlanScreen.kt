@@ -39,7 +39,7 @@ import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.students.StudentsViewModel
-import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -74,7 +74,7 @@ fun AssignPlanScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(

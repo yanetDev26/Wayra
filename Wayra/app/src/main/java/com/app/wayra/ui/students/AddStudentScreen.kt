@@ -54,8 +54,7 @@ import com.app.wayra.data.model.Plan
 import com.app.wayra.data.model.Student
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -122,14 +121,10 @@ fun AddStudentScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -402,7 +397,7 @@ fun AddStudentScreen(
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = Cream,
+                            color = OnDark,
                             strokeWidth = 2.dp
                         )
                     } else {

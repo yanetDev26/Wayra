@@ -1,5 +1,6 @@
 package com.app.wayra.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,8 +53,7 @@ import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -172,15 +172,11 @@ fun PendingPaymentsScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -336,10 +332,11 @@ fun PendingPaymentCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -357,14 +354,14 @@ fun PendingPaymentCard(
                         text = studentWithPayment.student.getFullName(),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Ink
                     )
 
                     if (studentWithPayment.payment.notes.isNotBlank()) {
                         Text(
                             text = studentWithPayment.payment.notes,
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = InkMuted
                         )
                     }
                 }
@@ -384,7 +381,7 @@ fun PendingPaymentCard(
                 Text(
                     text = "Vencimiento:",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = InkMuted
                 )
 
                 studentWithPayment.payment.dueDate?.let { dueDate ->
@@ -392,7 +389,7 @@ fun PendingPaymentCard(
                     Text(
                         text = dateFormat.format(Date(dueDate)),
                         fontSize = 12.sp,
-                        color = if (isOverdue) Color.Red else Color.Gray,
+                        color = if (isOverdue) Danger else InkMuted,
                         fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal
                     )
                 }
@@ -430,7 +427,7 @@ fun PaymentConfirmationDialog(
                     Text(
                         text = "Alumno:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = studentWithPayment.student.getFullName(),
@@ -443,10 +440,11 @@ fun PaymentConfirmationDialog(
                     Text(
                         text = "Monto:",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = InkMuted
                     )
                     Text(
                         text = formatter.format(studentWithPayment.payment.amount),
+                        fontFamily = AgenorNeue,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = WayraOrange
@@ -458,7 +456,7 @@ fun PaymentConfirmationDialog(
                     Text(
                         text = "Corresponde al mes:",
                         fontSize = 12.sp,
-                        color = Color.Gray,
+                        color = InkMuted,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -473,7 +471,7 @@ fun PaymentConfirmationDialog(
                                     .weight(1f)
                                     .clickable { selectedPeriod = period },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) WayraOrange else Color.LightGray
+                                    containerColor = if (isSelected) WayraOrange else SurfaceAlt
                                 ),
                                 elevation = CardDefaults.cardElevation(
                                     defaultElevation = if (isSelected) 4.dp else 1.dp
@@ -490,7 +488,7 @@ fun PaymentConfirmationDialog(
                                         .padding(12.dp),
                                     fontSize = 14.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Cream else Color.Black
+                                    color = if (isSelected) Paper else Ink
                                 )
                             }
                         }
@@ -502,7 +500,7 @@ fun PaymentConfirmationDialog(
                     Text(
                         text = "Método de pago:",
                         fontSize = 12.sp,
-                        color = Color.Gray,
+                        color = InkMuted,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -517,7 +515,7 @@ fun PaymentConfirmationDialog(
                                     .weight(1f)
                                     .clickable { selectedPaymentMethod = method },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) WayraOrange else Color.LightGray
+                                    containerColor = if (isSelected) WayraOrange else SurfaceAlt
                                 ),
                                 elevation = CardDefaults.cardElevation(
                                     defaultElevation = if (isSelected) 4.dp else 1.dp
@@ -533,7 +531,7 @@ fun PaymentConfirmationDialog(
                                         .padding(12.dp),
                                     fontSize = 14.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Cream else Color.Black
+                                    color = if (isSelected) Paper else Ink
                                 )
                             }
                         }

@@ -1,6 +1,7 @@
 package com.app.wayra.ui.reports
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,9 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.repository.MonthProjection
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -67,10 +66,7 @@ fun IncomeProjectionReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Proyección de Ingresos") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream
-                ),
+                colors = wayraTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -78,7 +74,7 @@ fun IncomeProjectionReportScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -118,21 +114,22 @@ fun IncomeProjectionReportScreen(
                                 Text(
                                     text = "Ingreso Mensual Esperado",
                                     fontSize = 16.sp,
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(projection.monthlyExpectedIncome),
-                                    fontSize = 36.sp,
-                                    color = Cream,
+                                    fontFamily = AgenorNeue,
+                                    fontSize = 32.sp,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Basado en suscripciones activas",
                                     fontSize = 14.sp,
-                                    color = Cream.copy(alpha = 0.9f)
+                                    color = OnDark.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -148,8 +145,9 @@ fun IncomeProjectionReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -160,6 +158,7 @@ fun IncomeProjectionReportScreen(
                                 ) {
                                     Text(
                                         text = "${projection.totalActiveSubscriptions}",
+                                        fontFamily = AgenorNeue,
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -167,7 +166,7 @@ fun IncomeProjectionReportScreen(
                                     Text(
                                         text = "Alumnos",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -176,8 +175,9 @@ fun IncomeProjectionReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -189,6 +189,7 @@ fun IncomeProjectionReportScreen(
                                     Text(
                                         text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(projection.averageRevenuePerStudent),
+                                        fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -196,7 +197,7 @@ fun IncomeProjectionReportScreen(
                                     Text(
                                         text = "Promedio",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -222,8 +223,9 @@ fun IncomeProjectionReportScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderSoft),
                             colors = CardDefaults.cardColors(
-                                containerColor = Cream
+                                containerColor = SurfaceCard
                             )
                         ) {
                             Column(
@@ -245,7 +247,7 @@ fun IncomeProjectionReportScreen(
                                             "• Los pagos pendientes son los que tienen vencimiento en cada mes\n" +
                                             "• Esta proyección asume que no habrá cambios en las suscripciones",
                                     fontSize = 12.sp,
-                                    color = Gray,
+                                    color = Ink,
                                     lineHeight = 18.sp
                                 )
                             }
@@ -263,10 +265,11 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -304,12 +307,12 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                             text = monthProjection.monthName,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            color = Gray
+                            color = Ink
                         )
                         Text(
                             text = "${monthProjection.year}",
                             fontSize = 12.sp,
-                            color = Gray
+                            color = Ink
                         )
                     }
                 }
@@ -321,14 +324,15 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                     Text(
                         text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                             .format(monthProjection.expectedIncome),
+                        fontFamily = AgenorNeue,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = WayraOrange
                     )
                     Text(
                         text = "Esperado",
-                        fontSize = 11.sp,
-                        color = Gray
+                        fontSize = 12.sp,
+                        color = Ink
                     )
                 }
             }
@@ -341,7 +345,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFFF3E0) // Naranja claro
+                        containerColor = WarningSoft // Naranja claro
                     )
                 ) {
                     Row(
@@ -354,14 +358,14 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                         Column {
                             Text(
                                 text = "${monthProjection.pendingPayments} ${if (monthProjection.pendingPayments == 1) "pago pendiente" else "pagos pendientes"}",
-                                fontSize = 13.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = Color(0xFFE65100)
+                                color = Warning
                             )
                             Text(
                                 text = "Vencen en este mes",
-                                fontSize = 11.sp,
-                                color = Color(0xFFE65100).copy(alpha = 0.7f)
+                                fontSize = 12.sp,
+                                color = Warning.copy(alpha = 0.7f)
                             )
                         }
                         Text(
@@ -369,7 +373,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                                 .format(monthProjection.pendingAmount),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFE65100)
+                            color = Warning
                         )
                     }
                 }
@@ -377,8 +381,9 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, BorderSoft),
                     colors = CardDefaults.cardColors(
-                        containerColor = Cream
+                        containerColor = SurfaceCard
                     )
                 ) {
                     Box(
@@ -390,7 +395,7 @@ fun MonthProjectionCard(monthProjection: MonthProjection) {
                         Text(
                             text = "Sin pagos pendientes registrados",
                             fontSize = 12.sp,
-                            color = Gray
+                            color = Ink
                         )
                     }
                 }

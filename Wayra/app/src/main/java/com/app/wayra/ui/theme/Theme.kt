@@ -1,37 +1,65 @@
 package com.app.wayra.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
+/**
+ * La app se dibuja siempre sobre fondo claro, por lo que el esquema es claro.
+ * Antes se usaba [androidx.compose.material3.darkColorScheme], lo que invertía
+ * los roles `on*` y dejaba textos ilegibles en los componentes que confían en
+ * `MaterialTheme.colorScheme`.
+ */
+private val WayraColorScheme = lightColorScheme(
     primary = WayraOrange,
-    onPrimary = Cream,
-    primaryContainer = WayraOrange,
-    onPrimaryContainer = Cream,
+    onPrimary = OnDark,
+    primaryContainer = WayraOrangeSoft,
+    onPrimaryContainer = WayraOrangeDark,
 
-    secondary = WayraOrange,
-    onSecondary = Cream,
-    secondaryContainer = WayraOrange,
-    onSecondaryContainer = Cream,
+    secondary = WayraOrangeDark,
+    onSecondary = OnDark,
+    secondaryContainer = SurfaceAlt,
+    onSecondaryContainer = Ink,
 
-    tertiary = WayraOrange,
-    onTertiary = Cream,
+    tertiary = Info,
+    onTertiary = OnDark,
+    tertiaryContainer = InfoSoft,
+    onTertiaryContainer = Info,
 
-    background = Gray,
-    onBackground = Cream,
+    background = Paper,
+    onBackground = Ink,
 
-    surface = Gray,
-    onSurface = Cream,
-    surfaceVariant = Gray,
-    onSurfaceVariant = Cream,
+    surface = SurfaceCard,
+    onSurface = Ink,
+    surfaceVariant = SurfaceAlt,
+    onSurfaceVariant = InkMuted,
 
-    error = Color(0xFFCF6679),
-    onError = Gray,
+    // Roles de contenedor: los usan TextField, Menu, AlertDialog y NavigationBar.
+    // Sin definirlos, Material recurre a sus grises azulados por defecto.
+    surfaceContainerLowest = SurfaceCard,
+    surfaceContainerLow = Paper,
+    surfaceContainer = SurfaceAlt,
+    surfaceContainerHigh = SurfaceAlt,
+    surfaceContainerHighest = SurfaceAlt,
+    surfaceBright = SurfaceCard,
+    surfaceDim = SurfaceAlt,
 
-    outline = Color(0xFF3A3A3A),
-    outlineVariant = Color(0xFF2A2A2A)
+    // Sin tinte de elevación: las tarjetas se mantienen blancas y limpias.
+    surfaceTint = Color.Transparent,
+
+    inverseSurface = SurfaceDark,
+    inverseOnSurface = OnDark,
+
+    error = Danger,
+    onError = OnDark,
+    errorContainer = DangerSoft,
+    onErrorContainer = Danger,
+
+    outline = BorderSoft,
+    outlineVariant = SurfaceAlt,
+
+    scrim = Ink
 )
 
 @Composable
@@ -39,8 +67,9 @@ fun WayraTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = WayraColorScheme,
         typography = Typography,
+        shapes = WayraShapes,
         content = content
     )
 }

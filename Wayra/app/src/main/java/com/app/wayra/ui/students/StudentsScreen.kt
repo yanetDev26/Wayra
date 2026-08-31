@@ -1,5 +1,6 @@
 package com.app.wayra.ui.students
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,9 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,14 +71,10 @@ fun StudentsScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = WayraOrange,
-                        titleContentColor = Cream,
-                        actionIconContentColor = Cream
-                    )
+                    colors = wayraTopAppBarColors()
                 )
             },
-            containerColor = Cream,
+            containerColor = Paper,
             contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
             StudentsContent(
@@ -105,14 +100,10 @@ fun StudentsScreen(
                             )
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = WayraOrange,
-                        titleContentColor = Cream,
-                        actionIconContentColor = Cream
-                    )
+                    colors = wayraTopAppBarColors()
                 )
             },
-            containerColor = Cream,
+            containerColor = Paper,
             contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
             StudentsContent(
@@ -211,7 +202,7 @@ private fun StudentsContent(
 
                         Text(
                             text = stringResource(R.string.students_empty),
-                            color = Gray,
+                            color = Ink,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
@@ -220,7 +211,7 @@ private fun StudentsContent(
 
                         Text(
                             text = "Presiona el botón + para agregar un alumno",
-                            color = Gray,
+                            color = Ink,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -241,9 +232,10 @@ fun StudentItemModern(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Gray
+            containerColor = SurfaceCard
         )
     ) {
         Row(
@@ -268,6 +260,7 @@ fun StudentItemModern(
             ) {
                 Text(
                     text = student.name.take(1).uppercase(),
+                    fontFamily = AgenorNeue,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (student.active) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant
@@ -294,7 +287,7 @@ fun StudentItemModern(
                         modifier = Modifier
                             .size(8.dp)
                             .background(
-                                color = if (student.active) Color(0xFF4CAF50) else Color(0xFF9E9E9E),
+                                color = if (student.active) Success else Neutral,
                                 shape = CircleShape
                             )
                     )
@@ -315,7 +308,7 @@ fun StudentItemModern(
 
                     Text(
                         text = student.email,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -332,7 +325,7 @@ fun StudentItemModern(
                     )
                     Text(
                         text = student.phone,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 2.dp)
                     )

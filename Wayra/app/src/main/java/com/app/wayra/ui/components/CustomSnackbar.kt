@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.*
 
 enum class SnackbarType {
     SUCCESS,
@@ -34,13 +34,13 @@ fun CustomSnackbarHost(
             }
 
             val backgroundColor = when (type) {
-                SnackbarType.SUCCESS -> Color(0xFF4CAF50) // Verde
-                SnackbarType.ERROR -> Color(0xFFD32F2F)   // Rojo
+                SnackbarType.SUCCESS -> Success // Verde
+                SnackbarType.ERROR -> Danger   // Rojo
             }
 
             Snackbar(
                 containerColor = backgroundColor,
-                contentColor = Cream,
+                contentColor = OnDark,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = displayMessage.trim())

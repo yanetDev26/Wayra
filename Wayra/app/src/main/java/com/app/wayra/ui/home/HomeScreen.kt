@@ -41,9 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.Orange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -117,7 +115,7 @@ fun HomeContent(
                     Text(
                         text = currentDate,
                         fontSize = 14.sp,
-                        color = Gray
+                        color = Ink
                     )
                 }
             }
@@ -127,14 +125,14 @@ fun HomeContent(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     StatCardCompact(
                         title = stringResource(R.string.home_active_students),
                         value = stats.activeStudents.toString(),
                         iconRes = R.drawable.gym_active,
-                        backgroundColor = Orange,
-                        contentColor = Cream,
+                        backgroundColor = WayraOrangeSoft,
+                        contentColor = WayraOrangeDark,
                         modifier = Modifier.weight(1f),
                         onClick = onActiveStudentsClick
                     )
@@ -143,8 +141,8 @@ fun HomeContent(
                         title = "Nuevos este mes",
                         value = stats.newStudentsThisMonth.toString(),
                         iconRes = R.drawable.gym_new_active,
-                        backgroundColor = Color(0xFFE8F5E9),
-                        contentColor = Color(0xFF2E7D32),
+                        backgroundColor = SuccessSoft,
+                        contentColor = Success,
                         modifier = Modifier.weight(1f),
                         onClick = onNewStudentsClick
                     )
@@ -161,8 +159,8 @@ fun HomeContent(
                         title = "Pendientes abonar este mes",
                         value = stats.pendingThisMonth.toString(),
                         iconRes = R.drawable.gym_pay,
-                        backgroundColor = Color(0xFFFFEBEE),
-                        contentColor = Color(0xFFC62828),
+                        backgroundColor = WarningSoft,
+                        contentColor = Warning,
                         modifier = Modifier.weight(1f),
                         onClick = onPendingThisMonthClick
                     )
@@ -171,8 +169,8 @@ fun HomeContent(
                         title = "Pendientes abonar mes pasado",
                         value = stats.pendingLastMonth.toString(),
                         iconRes = R.drawable.gym_pay_past_month,
-                        backgroundColor = Color(0xFFFFCDD2),
-                        contentColor = Color(0xFFB71C1C),
+                        backgroundColor = DangerSoft,
+                        contentColor = Danger,
                         modifier = Modifier.weight(1f),
                         onClick = onPendingLastMonthClick
                     )
@@ -184,9 +182,9 @@ fun HomeContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4CAF50)
+                        containerColor = SurfaceDark
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -210,15 +208,16 @@ fun HomeContent(
                                 Text(
                                     text = stringResource(R.string.home_total_collected),
                                     fontSize = 14.sp,
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
                             Text(
                                 text = if (showAmount) formatCurrency(stats.totalCollected) else "••••••",
+                                fontFamily = AgenorNeue,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Cream,
+                                color = OnDark,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         }
@@ -228,7 +227,7 @@ fun HomeContent(
                                 .size(40.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    color = Cream,
+                                    color = OnDark.copy(alpha = 0.12f),
                                     shape = CircleShape
                                 )
                                 .clickable { showAmount = !showAmount },
@@ -293,7 +292,7 @@ fun StatCardCompact(
         colors = CardDefaults.cardColors(
             containerColor = backgroundColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -313,7 +312,8 @@ fun StatCardCompact(
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = value,
-                fontSize = 26.sp,
+                fontFamily = AgenorNeue,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = contentColor
             )

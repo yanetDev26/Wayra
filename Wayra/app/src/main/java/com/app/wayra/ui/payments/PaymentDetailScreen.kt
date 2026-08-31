@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
-import com.app.wayra.ui.theme.Cream
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -126,7 +126,7 @@ fun PaymentDetailScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -154,6 +154,7 @@ fun PaymentDetailScreen(
                     ) {
                         Text(
                             text = "Información del Pago",
+                            fontFamily = AgenorNeue,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -176,16 +177,16 @@ fun PaymentDetailScreen(
                             )
                             Surface(
                                 color = when (payment.status) {
-                                    PaymentStatus.PAGADO -> Color(0xFF4CAF50)
-                                    PaymentStatus.PENDIENTE -> Color(0xFFFFC107)
-                                    PaymentStatus.VENCIDO -> Color(0xFFF44336)
+                                    PaymentStatus.PAGADO -> Success
+                                    PaymentStatus.PENDIENTE -> Warning
+                                    PaymentStatus.VENCIDO -> Danger
                                 },
                                 shape = MaterialTheme.shapes.small
                             ) {
                                 Text(
                                     text = payment.status.name,
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -212,7 +213,7 @@ fun PaymentDetailScreen(
                                         },
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF4CAF50)
+                                            containerColor = Success
                                         )
                                     ) {
                                         Text("Marcar como Pagado")
@@ -376,7 +377,7 @@ fun PaymentDetailScreen(
                         }
                     }
                 ) {
-                    Text("Eliminar", color = Color.Red)
+                    Text("Eliminar", color = Danger)
                 }
             },
             dismissButton = {

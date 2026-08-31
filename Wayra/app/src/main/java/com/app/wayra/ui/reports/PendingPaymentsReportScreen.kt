@@ -1,6 +1,7 @@
 package com.app.wayra.ui.reports
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,9 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.model.Payment
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -72,10 +71,7 @@ fun PendingPaymentsReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Pagos Pendientes") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream
-                ),
+                colors = wayraTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -83,7 +79,7 @@ fun PendingPaymentsReportScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -114,7 +110,7 @@ fun PendingPaymentsReportScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFFF6B6B)
+                                containerColor = Danger
                             ),
                             shape = RoundedCornerShape(16.dp)
                         ) {
@@ -127,21 +123,22 @@ fun PendingPaymentsReportScreen(
                                 Text(
                                     text = "Total Pendiente",
                                     fontSize = 16.sp,
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                         .format(stats.totalPending),
-                                    fontSize = 36.sp,
-                                    color = Cream,
+                                    fontFamily = AgenorNeue,
+                                    fontSize = 32.sp,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "${stats.uniqueStudents} alumnos",
                                     fontSize = 14.sp,
-                                    color = Cream.copy(alpha = 0.9f)
+                                    color = OnDark.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -157,7 +154,7 @@ fun PendingPaymentsReportScreen(
                                 value = "${stats.overdueCount}",
                                 subtitle = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                     .format(stats.totalOverdue),
-                                color = Color(0xFFFF6B6B),
+                                color = Danger,
                                 modifier = Modifier.weight(1f)
                             )
 
@@ -243,8 +240,9 @@ fun StatCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         )
     ) {
         Column(
@@ -261,19 +259,20 @@ fun StatCard(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = value,
+                fontFamily = AgenorNeue,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = color
             )
             Text(
                 text = title,
-                fontSize = 11.sp,
-                color = Gray
+                fontSize = 12.sp,
+                color = Ink
             )
             Text(
                 text = subtitle,
-                fontSize = 10.sp,
-                color = Gray
+                fontSize = 12.sp,
+                color = Ink
             )
         }
     }
@@ -289,12 +288,12 @@ fun PendingPaymentCard(payment: Payment) {
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isOverdue) {
-                Color(0xFFFFEBEE)
+                DangerSoft
             } else {
-                Cream
+                Paper
             }
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
@@ -309,7 +308,7 @@ fun PendingPaymentCard(payment: Payment) {
                 Text(
                     text = "Vence: ${formatPendingDate(payment.dueDate ?: 0L)}",
                     fontSize = 12.sp,
-                    color = if (isOverdue) Color(0xFFD32F2F) else Gray,
+                    color = if (isOverdue) Danger else Ink,
                     fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -317,8 +316,8 @@ fun PendingPaymentCard(payment: Payment) {
                     val daysOverdue = ((System.currentTimeMillis() - (payment.dueDate ?: 0L)) / (1000 * 60 * 60 * 24)).toInt()
                     Text(
                         text = "Vencido hace $daysOverdue ${if (daysOverdue == 1) "día" else "días"}",
-                        fontSize = 11.sp,
-                        color = Color(0xFFD32F2F),
+                        fontSize = 12.sp,
+                        color = Danger,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -330,13 +329,13 @@ fun PendingPaymentCard(payment: Payment) {
                     text = "$ ${String.format("%.2f", payment.amount)}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isOverdue) Color(0xFFD32F2F) else WayraOrange
+                    color = if (isOverdue) Danger else WayraOrange
                 )
                 if (payment.notes.isNotEmpty()) {
                     Text(
                         text = payment.notes,
-                        fontSize = 11.sp,
-                        color = Gray
+                        fontSize = 12.sp,
+                        color = Ink
                     )
                 }
             }

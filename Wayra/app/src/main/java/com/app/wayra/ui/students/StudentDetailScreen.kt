@@ -67,9 +67,7 @@ import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.plans.PlansViewModel
 import com.app.wayra.ui.subscriptions.SubscriptionViewModel
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
@@ -152,15 +150,10 @@ fun StudentDetailScreen(
                         Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream,
-                    navigationIconContentColor = Cream,
-                    actionIconContentColor = Cream
-                )
+                colors = wayraTopAppBarColors()
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
@@ -179,7 +172,7 @@ fun StudentDetailScreen(
             // Student Info Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -212,7 +205,7 @@ fun StudentDetailScreen(
                     }
 
                     Surface(
-                        color = if (student?.active == true) Color(0xFF4CAF50) else Color(0xFFFF5722),
+                        color = if (student?.active == true) Success else Neutral,
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
@@ -220,7 +213,7 @@ fun StudentDetailScreen(
                                 stringResource(R.string.students_active)
                             else
                                 stringResource(R.string.students_inactive),
-                            color = Cream,
+                            color = OnDark,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
@@ -231,7 +224,7 @@ fun StudentDetailScreen(
             // Subscription Info
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -264,7 +257,7 @@ fun StudentDetailScreen(
             // Payment History
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -377,13 +370,13 @@ fun StudentDetailScreen(
                             ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(16.dp),
-                                    color = Color.Red,
+                                    color = Danger,
                                     strokeWidth = 2.dp
                                 )
-                                Text("Eliminando...", color = Color.Red)
+                                Text("Eliminando...", color = Danger)
                             }
                         } else {
-                            Text("Eliminar", color = Color.Red)
+                            Text("Eliminar", color = Danger)
                         }
                     }
                 },
@@ -722,9 +715,9 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(
             containerColor = when (payment.status) {
-                com.app.wayra.data.model.PaymentStatus.PAGADO -> Color(0xFFE8F5E9)
-                com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Color(0xFFFFF3E0)
-                com.app.wayra.data.model.PaymentStatus.VENCIDO -> Color(0xFFFFEBEE)
+                com.app.wayra.data.model.PaymentStatus.PAGADO -> SuccessSoft
+                com.app.wayra.data.model.PaymentStatus.PENDIENTE -> WarningSoft
+                com.app.wayra.data.model.PaymentStatus.VENCIDO -> DangerSoft
             }
         )
     ) {
@@ -744,7 +737,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                     text = currencyFormat.format(payment.amount),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Gray
+                    color = Ink
                 )
 
                 // Fecha
@@ -758,7 +751,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             else -> "Vence:"
                         },
                         fontSize = 12.sp,
-                        color = Gray
+                        color = Ink
                     )
                     Text(
                         text = when (payment.status) {
@@ -768,7 +761,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                                 payment.dueDate?.let { dateFormat.format(Date(it)) } ?: "-"
                         },
                         fontSize = 12.sp,
-                        color = Gray
+                        color = Ink
                     )
                 }
 
@@ -779,7 +772,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             com.app.wayra.data.model.PaymentMethod.EFECTIVO -> "Efectivo"
                             com.app.wayra.data.model.PaymentMethod.TRANSFERENCIA -> "Transferencia"
                         },
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -789,9 +782,9 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = when (payment.status) {
-                    com.app.wayra.data.model.PaymentStatus.PAGADO -> Color(0xFF4CAF50)
-                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Color(0xFFFF9800)
-                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> Color(0xFFE53935)
+                    com.app.wayra.data.model.PaymentStatus.PAGADO -> Success
+                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Warning
+                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> Danger
                 }
             ) {
                 Text(
@@ -803,7 +796,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Cream
+                    color = OnDark
                 )
             }
         }

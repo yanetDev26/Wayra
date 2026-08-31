@@ -1,6 +1,7 @@
 package com.app.wayra.ui.reports
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,9 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.repository.PlanStats
-import com.app.wayra.ui.theme.Cream
-import com.app.wayra.ui.theme.Gray
-import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -67,10 +66,7 @@ fun PlanStatisticsReportScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Estadísticas por Plan") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WayraOrange,
-                    titleContentColor = Cream
-                ),
+                colors = wayraTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -78,7 +74,7 @@ fun PlanStatisticsReportScreen(
                 }
             )
         },
-        containerColor = Cream,
+        containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Box(
@@ -118,20 +114,21 @@ fun PlanStatisticsReportScreen(
                                 Text(
                                     text = "Resumen General",
                                     fontSize = 16.sp,
-                                    color = Cream,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "${stats.totalActiveStudents}",
-                                    fontSize = 36.sp,
-                                    color = Cream,
+                                    fontFamily = AgenorNeue,
+                                    fontSize = 32.sp,
+                                    color = OnDark,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Alumnos Activos",
                                     fontSize = 14.sp,
-                                    color = Cream.copy(alpha = 0.9f)
+                                    color = OnDark.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -147,8 +144,9 @@ fun PlanStatisticsReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -160,6 +158,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(stats.totalMonthlyRevenue),
+                                        fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -167,7 +166,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = "Mes Actual",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -176,8 +175,9 @@ fun PlanStatisticsReportScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Column(
@@ -189,6 +189,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                             .format(stats.totalRevenue),
+                                        fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = WayraOrange
@@ -196,7 +197,7 @@ fun PlanStatisticsReportScreen(
                                     Text(
                                         text = "Total",
                                         fontSize = 12.sp,
-                                        color = Gray
+                                        color = Ink
                                     )
                                 }
                             }
@@ -223,8 +224,9 @@ fun PlanStatisticsReportScreen(
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, BorderSoft),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Cream
+                                    containerColor = SurfaceCard
                                 )
                             ) {
                                 Box(
@@ -235,7 +237,7 @@ fun PlanStatisticsReportScreen(
                                 ) {
                                     Text(
                                         text = "No hay planes con alumnos activos",
-                                        color = Gray,
+                                        color = Ink,
                                         fontSize = 14.sp
                                     )
                                 }
@@ -254,10 +256,11 @@ fun PlanStatCard(planStat: PlanStats) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier
@@ -285,6 +288,7 @@ fun PlanStatCard(planStat: PlanStats) {
                     ) {
                         Text(
                             text = planStat.planName.firstOrNull()?.toString()?.uppercase() ?: "P",
+                            fontFamily = AgenorNeue,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = WayraOrange
@@ -295,13 +299,13 @@ fun PlanStatCard(planStat: PlanStats) {
                             text = planStat.planName,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp,
-                            color = Gray
+                            color = Ink
                         )
                         Text(
                             text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                                 .format(planStat.price) + " / mes",
                             fontSize = 12.sp,
-                            color = Gray
+                            color = Ink
                         )
                     }
                 }
@@ -364,7 +368,7 @@ fun PlanStatCard(planStat: PlanStats) {
                             text = "Ingresos Totales",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Gray
+                            color = Ink
                         )
                     }
                     Text(
@@ -390,8 +394,9 @@ fun StatItem(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
-            containerColor = Cream
+            containerColor = SurfaceCard
         )
     ) {
         Column(
@@ -416,8 +421,8 @@ fun StatItem(
             )
             Text(
                 text = label,
-                fontSize = 11.sp,
-                color = Gray
+                fontSize = 12.sp,
+                color = Ink
             )
         }
     }

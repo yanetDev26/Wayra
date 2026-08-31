@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de ventana y splash. Debe coincidir con `Paper` de Color.kt
+         para que no haya un destello oscuro al abrir la app. -->
+    <color name="wayra_window_background">#FAF6F0</color>
+</resources>
