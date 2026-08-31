@@ -53,19 +53,12 @@ import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
-import com.app.wayra.ui.theme.AgenorNeue
-import com.app.wayra.ui.theme.BorderSoft
-import com.app.wayra.ui.theme.Danger
-import com.app.wayra.ui.theme.Ink
-import com.app.wayra.ui.theme.OnBrand
-import com.app.wayra.ui.theme.Paper
-import com.app.wayra.ui.theme.Success
-import com.app.wayra.ui.theme.SurfaceCard
-import com.app.wayra.ui.theme.Warning
-import com.app.wayra.ui.theme.WayraOrange
-import com.app.wayra.ui.theme.wayraTopAppBarColors
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,216 +128,120 @@ fun PaymentHistoryReportScreen(
                     CircularProgressIndicator(color = WayraOrange)
                 }
             } else {
+                val currency = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                val activeFilters = listOfNotNull(selectedStudent, selectedStatus, selectedMethod).size
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp)
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
                 ) {
-                // Resumen
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = WayraOrange
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "${filteredPayments.size}",
-                                fontFamily = AgenorNeue,
-                                fontSize = 32.sp,
-                                color = OnBrand,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = if (filteredPayments.size == 1) "Pago encontrado" else "Pagos encontrados",
-                                fontSize = 14.sp,
-                                color = OnBrand.copy(alpha = 0.9f)
-                            )
-                        }
-                    }
-                }
-
-                // Total
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Card(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, BorderSoft),
-                            colors = CardDefaults.cardColors(
-                                containerColor = SurfaceCard
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                        .format(filteredPayments.sumOf { it.amount }),
-                                    fontFamily = AgenorNeue,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Ink
-                                )
-                                Text(
-                                    text = "Total",
-                                    fontSize = 12.sp,
-                                    color = Ink
-                                )
-                            }
-                        }
-
-                        Card(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, BorderSoft),
-                            colors = CardDefaults.cardColors(
-                                containerColor = SurfaceCard
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "${filteredPayments.count { it.status == PaymentStatus.PAGADO }}",
-                                    fontFamily = AgenorNeue,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Ink
-                                )
-                                Text(
-                                    text = "Pagados",
-                                    fontSize = 12.sp,
-                                    color = Ink
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Filtros
-                if (showFilters) {
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, BorderSoft),
-                            colors = CardDefaults.cardColors(
-                                containerColor = SurfaceCard
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                        // La cifra que importa es cuanto suma lo filtrado; el
+                        // recuento pasa a la tira de metricas.
+                        ReportHero(
+                            caption = "Total filtrado",
+                            value = currency.format(filteredPayments.sumOf { it.amount }),
+                            note = if (activeFilters > 0)
+                                "$activeFilters ${if (activeFilters == 1) "filtro activo" else "filtros activos"}"
+                            else "Sin filtros"
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        ReportStatStrip(
+                            stats = listOf(
+                                ReportStat(
+                                    if (filteredPayments.size == 1) "Pago" else "Pagos",
+                                    "${filteredPayments.size}"
+                                ),
+                                ReportStat(
+                                    "Pagados",
+                                    "${filteredPayments.count { it.status == PaymentStatus.PAGADO }}",
+                                    Tone.Success
+                                )
+                            )
+                        )
+                    }
+
+                    if (showFilters) {
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "Filtros",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                // Filtro por estudiante
-                                StudentDropdown(
-                                    students = allStudents,
-                                    selectedStudent = selectedStudent,
-                                    onStudentSelected = { selectedStudent = it }
-                                )
-
-                                // Filtro por estado
-                                StatusDropdown(
-                                    selectedStatus = selectedStatus,
-                                    onStatusSelected = { selectedStatus = it }
-                                )
-
-                                // Filtro por método de pago
-                                PaymentMethodDropdown(
-                                    selectedMethod = selectedMethod,
-                                    onMethodSelected = { selectedMethod = it }
-                                )
-
-                                // Botón para limpiar filtros
-                                if (selectedStudent != null || selectedStatus != null || selectedMethod != null) {
+                                SectionLabel(text = "Filtros")
+                                if (activeFilters > 0) {
                                     Text(
-                                        text = "Limpiar filtros",
+                                        text = "Limpiar",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = WayraOrangeDark,
                                         modifier = Modifier
-                                            .fillMaxWidth()
                                             .clickable {
                                                 selectedStudent = null
                                                 selectedStatus = null
                                                 selectedMethod = null
                                             }
-                                            .padding(vertical = 8.dp),
-                                        color = Ink,
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 14.sp
+                                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            WayraPanel(modifier = Modifier.fillMaxWidth()) {
+                                Column(
+                                    modifier = Modifier.padding(14.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    StudentDropdown(
+                                        students = allStudents,
+                                        selectedStudent = selectedStudent,
+                                        onStudentSelected = { selectedStudent = it }
+                                    )
+                                    StatusDropdown(
+                                        selectedStatus = selectedStatus,
+                                        onStatusSelected = { selectedStatus = it }
+                                    )
+                                    PaymentMethodDropdown(
+                                        selectedMethod = selectedMethod,
+                                        onMethodSelected = { selectedMethod = it }
                                     )
                                 }
                             }
                         }
                     }
-                }
 
-                // Lista de pagos
-                item {
-                    Text(
-                        text = "Resultados",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                if (filteredPayments.isEmpty()) {
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, BorderSoft),
-                            colors = CardDefaults.cardColors(
-                                containerColor = SurfaceCard
+                        Spacer(modifier = Modifier.height(24.dp))
+                        SectionLabel(text = "Resultados")
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    if (filteredPayments.isEmpty()) {
+                        item {
+                            ReportEmpty(
+                                text = if (activeFilters > 0)
+                                    "Ningún pago coincide con los filtros."
+                                else "Todavía no hay pagos registrados."
                             )
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "No se encontraron pagos",
-                                    color = Ink,
-                                    fontSize = 14.sp
-                                )
-                            }
+                        }
+                    } else {
+                        itemsIndexed(filteredPayments) { index, payment ->
+                            val student = allStudents.find { it.id == payment.studentId }
+                            ReportRowItem(
+                                title = student?.getFullName() ?: "Alumno no encontrado",
+                                subtitle = formatDate(payment.paymentDate ?: payment.dueDate ?: 0L),
+                                amount = currency.format(payment.amount),
+                                badgeText = getStatusName(payment.status),
+                                badgeTone = when (payment.status) {
+                                    PaymentStatus.PAGADO -> Tone.Success
+                                    PaymentStatus.PENDIENTE -> Tone.Warning
+                                    PaymentStatus.VENCIDO -> Tone.Danger
+                                },
+                                isFirst = index == 0,
+                                isLast = index == filteredPayments.lastIndex
+                            )
                         }
                     }
-                } else {
-                    items(filteredPayments) { payment ->
-                        PaymentHistoryCard(
-                            payment = payment,
-                            student = allStudents.find { it.id == payment.studentId }
-                        )
-                    }
                 }
-            }
         }
         }
     }
@@ -492,108 +389,6 @@ fun PaymentMethodDropdown(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun PaymentHistoryCard(
-    payment: Payment,
-    student: Student?
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Lado izquierdo: Info del estudiante y pago
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Avatar del estudiante
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            color = getStatusColor(payment.status).copy(alpha = 0.2f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = student?.name?.firstOrNull()?.toString()?.uppercase() ?: "?",
-                        fontFamily = AgenorNeue,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = getStatusColor(payment.status)
-                    )
-                }
-
-                // Información
-                Column {
-                    Text(
-                        text = student?.getFullName() ?: "Alumno desconocido",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Ink
-                    )
-                    Text(
-                        text = formatDate(payment.paymentDate ?: payment.dueDate ?: 0L),
-                        fontSize = 12.sp,
-                        color = Ink
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        StatusChip(status = payment.status)
-                        Text(
-                            text = "• ${getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO)}",
-                            fontSize = 12.sp,
-                            color = Ink
-                        )
-                    }
-                }
-            }
-
-            // Lado derecho: Monto
-            Text(
-                text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                    .format(payment.amount),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Ink
-            )
-        }
-    }
-}
-
-@Composable
-fun StatusChip(status: PaymentStatus) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = getStatusColor(status).copy(alpha = 0.2f),
-                shape = RoundedCornerShape(6.dp)
-            )
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    ) {
-        Text(
-            text = getStatusName(status),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = getStatusColor(status)
-        )
     }
 }
 

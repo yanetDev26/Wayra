@@ -30,24 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
-import com.app.wayra.ui.theme.Danger
-import com.app.wayra.ui.theme.DangerSoft
-import com.app.wayra.ui.theme.Ink
-import com.app.wayra.ui.theme.InkMuted
-import com.app.wayra.ui.theme.InkSubtle
-import com.app.wayra.ui.theme.PanelDivider
-import com.app.wayra.ui.theme.Paper
-import com.app.wayra.ui.theme.SectionLabel
-import com.app.wayra.ui.theme.Success
-import com.app.wayra.ui.theme.SuccessSoft
-import com.app.wayra.ui.theme.SurfaceAlt
-import com.app.wayra.ui.theme.Tone
-import com.app.wayra.ui.theme.Warning
-import com.app.wayra.ui.theme.WarningSoft
-import com.app.wayra.ui.theme.WayraOrangeDark
-import com.app.wayra.ui.theme.WayraOrangeSoft
-import com.app.wayra.ui.theme.WayraPanel
-import com.app.wayra.ui.theme.wayraTopAppBarColors
+import com.app.wayra.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

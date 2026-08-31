@@ -42,19 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.repository.MonthProjection
-import com.app.wayra.ui.theme.AgenorNeue
-import com.app.wayra.ui.theme.BorderSoft
-import com.app.wayra.ui.theme.Ink
-import com.app.wayra.ui.theme.OnBrand
-import com.app.wayra.ui.theme.Paper
-import com.app.wayra.ui.theme.SurfaceCard
-import com.app.wayra.ui.theme.Warning
-import com.app.wayra.ui.theme.WarningSoft
-import com.app.wayra.ui.theme.WayraOrange
-import com.app.wayra.ui.theme.WayraOrangeSoft
-import com.app.wayra.ui.theme.wayraTopAppBarColors
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,323 +83,86 @@ fun IncomeProjectionReportScreen(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = WayraOrange)
-                }
+                ReportLoading()
             } else {
                 incomeProjection?.let { projection ->
+                    val currency = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                    val months = projection.projections
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp)
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
                     ) {
-                    // Header con ingreso mensual esperado
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = WayraOrange
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Ingreso Mensual Esperado",
-                                    fontSize = 16.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                        .format(projection.monthlyExpectedIncome),
-                                    fontFamily = AgenorNeue,
-                                    fontSize = 32.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "Basado en suscripciones activas",
-                                    fontSize = 14.sp,
-                                    color = OnBrand.copy(alpha = 0.9f)
-                                )
-                            }
-                        }
-                    }
-
-                    // Estadísticas generales
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            // Estudiantes activos
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, BorderSoft),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = SurfaceCard
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "${projection.totalActiveSubscriptions}",
-                                        fontFamily = AgenorNeue,
-                                        fontSize = 28.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Ink
-                                    )
-                                    Text(
-                                        text = "Alumnos",
-                                        fontSize = 12.sp,
-                                        color = Ink
-                                    )
-                                }
-                            }
-
-                            // Promedio por estudiante
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, BorderSoft),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = SurfaceCard
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                            .format(projection.averageRevenuePerStudent),
-                                        fontFamily = AgenorNeue,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Ink
-                                    )
-                                    Text(
-                                        text = "Promedio",
-                                        fontSize = 12.sp,
-                                        color = Ink
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Título de proyecciones
-                    item {
-                        Text(
-                            text = "Próximos ${projection.projections.size} meses",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    // Lista de proyecciones mensuales
-                    items(projection.projections) { monthProjection ->
-                        MonthProjectionCard(monthProjection = monthProjection)
-                    }
-
-                    // Información adicional
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, BorderSoft),
-                            colors = CardDefaults.cardColors(
-                                containerColor = SurfaceCard
+                        item {
+                            ReportHero(
+                                caption = "Ingreso mensual esperado",
+                                value = currency.format(projection.monthlyExpectedIncome),
+                                note = "Según las suscripciones activas de hoy"
                             )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_info),
-                                    contentDescription = null,
-                                    tint = Warning,
-                                    modifier = Modifier.size(20.dp)
+                            Spacer(modifier = Modifier.height(10.dp))
+                            ReportStatStrip(
+                                stats = listOf(
+                                    ReportStat("Suscripciones", "${projection.totalActiveSubscriptions}"),
+                                    ReportStat(
+                                        "Por alumno",
+                                        currency.format(projection.averageRevenuePerStudent)
+                                    )
                                 )
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            SectionLabel(text = "Próximos ${months.size} meses")
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
 
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Text(
-                                    text = "• El ingreso esperado se calcula basándose en las suscripciones activas actuales\n" +
-                                            "• Los pagos pendientes son los que tienen vencimiento en cada mes\n" +
-                                            "• Esta proyección asume que no habrá cambios en las suscripciones",
-                                    fontSize = 12.sp,
-                                    color = Ink,
-                                    lineHeight = 18.sp
+                        if (months.isEmpty()) {
+                            item { ReportEmpty(text = "No hay meses para proyectar todavía.") }
+                        } else {
+                            itemsIndexed(months) { index, month ->
+                                ReportRowItem(
+                                    title = "${month.monthName} ${month.year}",
+                                    subtitle = if (month.pendingPayments > 0)
+                                        "${month.pendingPayments} " +
+                                        (if (month.pendingPayments == 1) "pago vence" else "pagos vencen") +
+                                        " · ${currency.format(month.pendingAmount)}"
+                                    else "Sin vencimientos",
+                                    iconRes = R.drawable.ic_calendar,
+                                    iconTone = if (month.pendingPayments > 0) Tone.Warning else Tone.Neutral,
+                                    amount = currency.format(month.expectedIncome),
+                                    isFirst = index == 0,
+                                    isLast = index == months.lastIndex
                                 )
                             }
                         }
+
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            // Nota metodologica: una proyeccion sin sus
+                            // supuestos a la vista invita a leerla como certeza.
+                            WayraPanel(modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    modifier = Modifier.padding(14.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_info),
+                                        contentDescription = null,
+                                        tint = InkSubtle,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = "El estimado toma las suscripciones activas de hoy y asume " +
+                                                "que no cambian. Los vencimientos son los pagos con fecha " +
+                                                "en cada mes.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = InkMuted
+                                    )
+                                }
+                            }
+                        }
                     }
-                }
                 }
             }
         }
     }
 }
 
-@Composable
-fun MonthProjectionCard(monthProjection: MonthProjection) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            // Header del mes
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(
-                                color = WayraOrangeSoft,
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = monthProjection.monthName.take(3),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Ink
-                        )
-                    }
-                    Column {
-                        Text(
-                            text = monthProjection.monthName,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Ink
-                        )
-                        Text(
-                            text = "${monthProjection.year}",
-                            fontSize = 12.sp,
-                            color = Ink
-                        )
-                    }
-                }
-
-                // Ingreso esperado
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                            .format(monthProjection.expectedIncome),
-                        fontFamily = AgenorNeue,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Ink
-                    )
-                    Text(
-                        text = "Esperado",
-                        fontSize = 12.sp,
-                        color = Ink
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Información de pagos pendientes
-            if (monthProjection.pendingPayments > 0) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(6.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = WarningSoft // Naranja claro
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = "${monthProjection.pendingPayments} ${if (monthProjection.pendingPayments == 1) "pago pendiente" else "pagos pendientes"}",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Warning
-                            )
-                            Text(
-                                text = "Vencen en este mes",
-                                fontSize = 12.sp,
-                                color = Warning.copy(alpha = 0.7f)
-                            )
-                        }
-                        Text(
-                            text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                .format(monthProjection.pendingAmount),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Warning
-                        )
-                    }
-                }
-            } else {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(6.dp),
-                    border = BorderStroke(1.dp, BorderSoft),
-                    colors = CardDefaults.cardColors(
-                        containerColor = SurfaceCard
-                    )
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Sin pagos pendientes registrados",
-                            fontSize = 12.sp,
-                            color = Ink
-                        )
-                    }
-                }
-            }
-        }
-    }
-}

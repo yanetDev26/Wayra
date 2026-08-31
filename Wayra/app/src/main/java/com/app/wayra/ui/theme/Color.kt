@@ -48,6 +48,9 @@ data class WayraColors(
     val info: Color,
     val infoSoft: Color,
     val neutral: Color,
+    /** Color de dato cuantitativo. Ver nota en [PistaColors]. */
+    val dataAccent: Color,
+    val dataTrack: Color,
     val isDark: Boolean
 )
 
@@ -78,6 +81,13 @@ val PistaColors = WayraColors(
     info = Color(0xFF2C6E8F),
     infoSoft = Color(0xFFE9F1F5),
     neutral = Color(0xFF93A0AB),
+
+    // Hue propio para magnitudes (barras de proporcion). No es el naranja,
+    // que esta reservado para la accion, ni un color de estado, que leeria
+    // como "bueno/malo". Validado en ambas superficies: banda de luminosidad,
+    // piso de croma y contraste >= 3:1.
+    dataAccent = Color(0xFF2790C0),
+    dataTrack = Color(0xFFE8ECEF),
     isDark = false
 )
 
@@ -108,6 +118,8 @@ val NocturnaColors = WayraColors(
     info = Color(0xFF6BA8C6),
     infoSoft = Color(0xFF14212A),
     neutral = Color(0xFF64717C),
+    dataAccent = Color(0xFF2790C0),
+    dataTrack = Color(0xFF232C34),
     isDark = true
 )
 
@@ -167,3 +179,10 @@ val InfoSoft: Color
     @Composable @ReadOnlyComposable get() = LocalWayraColors.current.infoSoft
 val Neutral: Color
     @Composable @ReadOnlyComposable get() = LocalWayraColors.current.neutral
+
+/** Relleno de las barras de proporción. */
+val DataAccent: Color
+    @Composable @ReadOnlyComposable get() = LocalWayraColors.current.dataAccent
+/** Riel de las barras de proporción. */
+val DataTrack: Color
+    @Composable @ReadOnlyComposable get() = LocalWayraColors.current.dataTrack

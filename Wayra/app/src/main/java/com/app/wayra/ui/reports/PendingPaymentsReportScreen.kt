@@ -47,19 +47,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.model.Payment
-import com.app.wayra.ui.theme.AgenorNeue
-import com.app.wayra.ui.theme.BorderSoft
-import com.app.wayra.ui.theme.Danger
-import com.app.wayra.ui.theme.DangerSoft
-import com.app.wayra.ui.theme.Ink
-import com.app.wayra.ui.theme.OnBrand
-import com.app.wayra.ui.theme.Paper
-import com.app.wayra.ui.theme.SurfaceCard
-import com.app.wayra.ui.theme.WayraOrange
-import com.app.wayra.ui.theme.wayraTopAppBarColors
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.foundation.lazy.itemsIndexed
+import com.app.wayra.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,121 +89,11 @@ fun PendingPaymentsReportScreen(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = WayraOrange)
-                }
+                ReportLoading()
             } else {
                 pendingStats?.let { stats ->
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                    // Header con estadísticas principales
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        // Card principal con total pendiente
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Danger
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Total Pendiente",
-                                    fontSize = 16.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                        .format(stats.totalPending),
-                                    fontFamily = AgenorNeue,
-                                    fontSize = 32.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = "${stats.uniqueStudents} alumnos",
-                                    fontSize = 14.sp,
-                                    color = OnBrand.copy(alpha = 0.9f)
-                                )
-                            }
-                        }
-
-                        // Tarjetas de resumen
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            // Vencidos
-                            StatCard(
-                                title = "Vencidos",
-                                value = "${stats.overdueCount}",
-                                subtitle = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                    .format(stats.totalOverdue),
-                                color = Danger,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // Próximos 7 días
-                            StatCard(
-                                title = "Próximos",
-                                value = "${stats.upcomingSoonCount}",
-                                subtitle = "7 días",
-                                color = Ink,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // Total pendientes
-                            StatCard(
-                                title = "Total",
-                                value = "${stats.pendingCount}",
-                                subtitle = "pendientes",
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
-
-                    // Tabs para filtrar
-                    TabRow(
-                        selectedTabIndex = selectedTab,
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ) {
-                        Tab(
-                            selected = selectedTab == 0,
-                            onClick = { selectedTab = 0 },
-                            text = { Text("Todos (${stats.pendingCount})") }
-                        )
-                        Tab(
-                            selected = selectedTab == 1,
-                            onClick = { selectedTab = 1 },
-                            text = { Text("Vencidos (${stats.overdueCount})") }
-                        )
-                        Tab(
-                            selected = selectedTab == 2,
-                            onClick = { selectedTab = 2 },
-                            text = { Text("Próximos (${stats.upcomingSoonCount})") }
-                        )
-                    }
-
-                    // Lista de pagos
+                    val currency = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                     val paymentsToShow = when (selectedTab) {
-                        0 -> stats.allPendingPayments
                         1 -> stats.overduePayments
                         2 -> stats.upcomingPayments
                         else -> stats.allPendingPayments
@@ -218,133 +101,73 @@ fun PendingPaymentsReportScreen(
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 16.dp,
-                            bottom = 100.dp
-                        )
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
                     ) {
-                        items(paymentsToShow) { payment ->
-                            PendingPaymentCard(payment = payment)
+                        item {
+                            // El bloque de cabecera va en slate, no en rojo a
+                            // sangre: la severidad la llevan las metricas y las
+                            // filas, donde ademas distingue vencido de proximo.
+                            ReportHero(
+                                caption = "Total pendiente",
+                                value = currency.format(stats.totalPending),
+                                note = "${stats.uniqueStudents} ${if (stats.uniqueStudents == 1) "alumno" else "alumnos"}"
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            ReportStatStrip(
+                                stats = listOf(
+                                    ReportStat("Vencidos", "${stats.overdueCount}", Tone.Danger),
+                                    ReportStat("Próximos 7 días", "${stats.upcomingSoonCount}", Tone.Warning),
+                                    ReportStat("Total", "${stats.pendingCount}", Tone.Neutral)
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            ReportSegmented(
+                                options = listOf(
+                                    "Todos (${stats.pendingCount})",
+                                    "Vencidos (${stats.overdueCount})",
+                                    "Próximos (${stats.upcomingSoonCount})"
+                                ),
+                                selectedIndex = selectedTab,
+                                onSelect = { selectedTab = it }
+                            )
+                            Spacer(modifier = Modifier.height(14.dp))
+                        }
+
+                        if (paymentsToShow.isEmpty()) {
+                            item {
+                                ReportEmpty(
+                                    text = when (selectedTab) {
+                                        1 -> "No hay pagos vencidos. Al día."
+                                        2 -> "Nada vence en los próximos 7 días."
+                                        else -> "No hay pagos pendientes."
+                                    },
+                                    iconRes = R.drawable.ic_check
+                                )
+                            }
+                        } else {
+                            itemsIndexed(paymentsToShow) { index, payment ->
+                                val due = payment.dueDate ?: Long.MAX_VALUE
+                                val isOverdue = due < System.currentTimeMillis()
+                                val days = ((System.currentTimeMillis() - (payment.dueDate ?: 0L)) /
+                                        (1000 * 60 * 60 * 24)).toInt()
+                                ReportRowItem(
+                                    title = if (payment.notes.isNotEmpty()) payment.notes
+                                            else "Vence ${formatPendingDate(payment.dueDate ?: 0L)}",
+                                    subtitle = if (payment.notes.isNotEmpty())
+                                        "Vence ${formatPendingDate(payment.dueDate ?: 0L)}" else null,
+                                    iconRes = if (isOverdue) R.drawable.ic_overdue else R.drawable.ic_clock,
+                                    iconTone = if (isOverdue) Tone.Danger else Tone.Warning,
+                                    amount = currency.format(payment.amount),
+                                    amountTone = if (isOverdue) Tone.Danger else Tone.Neutral,
+                                    badgeText = if (isOverdue)
+                                        "$days ${if (days == 1) "día" else "días"}" else null,
+                                    badgeTone = Tone.Danger,
+                                    isFirst = index == 0,
+                                    isLast = index == paymentsToShow.lastIndex
+                                )
+                            }
                         }
                     }
-                }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun StatCard(
-    title: String,
-    value: String,
-    subtitle: String,
-    color: Color,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(color = color, shape = CircleShape)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = value,
-                fontFamily = AgenorNeue,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = color
-            )
-            Text(
-                text = title,
-                fontSize = 12.sp,
-                color = Ink
-            )
-            Text(
-                text = subtitle,
-                fontSize = 12.sp,
-                color = Ink
-            )
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-fun PendingPaymentCard(payment: Payment) {
-    val isOverdue = (payment.dueDate ?: Long.MAX_VALUE) < System.currentTimeMillis()
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isOverdue) {
-                DangerSoft
-            } else {
-                Paper
-            }
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "Vence: ${formatPendingDate(payment.dueDate ?: 0L)}",
-                    fontSize = 12.sp,
-                    color = if (isOverdue) Danger else Ink,
-                    fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                if (isOverdue) {
-                    val daysOverdue = ((System.currentTimeMillis() - (payment.dueDate ?: 0L)) / (1000 * 60 * 60 * 24)).toInt()
-                    Text(
-                        text = "Vencido hace $daysOverdue ${if (daysOverdue == 1) "día" else "días"}",
-                        fontSize = 12.sp,
-                        color = Danger,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = "$ ${String.format("%.2f", payment.amount)}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isOverdue) Danger else WayraOrange
-                )
-                if (payment.notes.isNotEmpty()) {
-                    Text(
-                        text = payment.notes,
-                        fontSize = 12.sp,
-                        color = Ink
-                    )
                 }
             }
         }

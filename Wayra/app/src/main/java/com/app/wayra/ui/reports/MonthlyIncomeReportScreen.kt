@@ -43,20 +43,12 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
-import com.app.wayra.ui.theme.AgenorNeue
-import com.app.wayra.ui.theme.BorderSoft
-import com.app.wayra.ui.theme.Ink
-import com.app.wayra.ui.theme.OnBrand
-import com.app.wayra.ui.theme.Paper
-import com.app.wayra.ui.theme.SurfaceCard
-import com.app.wayra.ui.theme.WayraOrange
-import com.app.wayra.ui.theme.WayraOrangeDark
-import com.app.wayra.ui.theme.WayraOrangeSoft
-import com.app.wayra.ui.theme.wayraTopAppBarColors
+import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import androidx.compose.foundation.lazy.itemsIndexed
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,271 +85,87 @@ fun MonthlyIncomeReportScreen(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = WayraOrange)
-                }
+                ReportLoading()
             } else {
                 monthlyStats?.let { stats ->
+                    val currency = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
+                    val methods = stats.paymentsByMethod.entries.toList()
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp)
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
                     ) {
-                    // Header con mes actual
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = WayraOrange
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = getCurrentMonthName(),
-                                    fontSize = 16.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Medium
+                        item {
+                            ReportHero(
+                                caption = getCurrentMonthName(),
+                                value = currency.format(stats.totalIncome),
+                                note = "Total recaudado en el mes"
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            ReportStatStrip(
+                                stats = listOf(
+                                    ReportStat(
+                                        label = if (stats.totalPayments == 1) "Pago" else "Pagos",
+                                        value = "${stats.totalPayments}"
+                                    ),
+                                    ReportStat(
+                                        label = "Promedio",
+                                        value = if (stats.totalPayments > 0)
+                                            currency.format(stats.totalIncome / stats.totalPayments)
+                                        else currency.format(0)
+                                    )
                                 )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
-                                        .format(stats.totalIncome),
-                                    fontFamily = AgenorNeue,
-                                    fontSize = 32.sp,
-                                    color = OnBrand,
-                                    fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            SectionLabel(text = "Por método de pago")
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        if (methods.isEmpty()) {
+                            item { ReportEmpty(text = "Todavía no hay pagos registrados este mes.") }
+                        } else {
+                            itemsIndexed(methods) { index, entry ->
+                                val (method, data) = entry
+                                ReportRowItem(
+                                    title = getPaymentMethodName(method),
+                                    subtitle = "${data.first} ${if (data.first == 1) "pago" else "pagos"}",
+                                    iconRes = getPaymentMethodIcon(method),
+                                    iconTone = Tone.Brand,
+                                    amount = currency.format(data.second),
+                                    isFirst = index == 0,
+                                    isLast = index == methods.lastIndex
                                 )
-                                Text(
-                                    text = "Total Recaudado",
-                                    fontSize = 14.sp,
-                                    color = OnBrand.copy(alpha = 0.9f)
+                            }
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            SectionLabel(text = "Detalle de pagos")
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        if (stats.payments.isEmpty()) {
+                            item { ReportEmpty(text = "Sin movimientos en el período.") }
+                        } else {
+                            itemsIndexed(stats.payments) { index, payment ->
+                                ReportRowItem(
+                                    title = getPaymentMethodName(
+                                        payment.paymentMethod ?: PaymentMethod.EFECTIVO
+                                    ),
+                                    subtitle = formatDate(payment.paymentDate ?: 0L),
+                                    amount = currency.format(payment.amount),
+                                    amountTone = Tone.Success,
+                                    isFirst = index == 0,
+                                    isLast = index == stats.payments.lastIndex
                                 )
                             }
                         }
                     }
-
-                    // Resumen
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            // Total de pagos
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, BorderSoft),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = SurfaceCard
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "${stats.totalPayments}",
-                                        fontFamily = AgenorNeue,
-                                        fontSize = 28.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Ink
-                                    )
-                                    Text(
-                                        text = "Pagos",
-                                        fontSize = 12.sp,
-                                        color = Ink
-                                    )
-                                }
-                            }
-
-                            // Promedio
-                            Card(
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, BorderSoft),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = SurfaceCard
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = if (stats.totalPayments > 0) {
-                                            "$ ${String.format("%.0f", stats.totalIncome / stats.totalPayments)}"
-                                        } else {
-                                            "$ 0"
-                                        },
-                                        fontFamily = AgenorNeue,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Ink
-                                    )
-                                    Text(
-                                        text = "Promedio",
-                                        fontSize = 12.sp,
-                                        color = Ink
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Por metodo de pago
-                    item {
-                        Text(
-                            text = "Por Método de Pago",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    items(stats.paymentsByMethod.entries.toList()) { (method, data) ->
-                        PaymentMethodCard(
-                            method = method,
-                            count = data.first,
-                            total = data.second
-                        )
-                    }
-
-                    // Detalle de pagos
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Detalle de Pagos",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    items(stats.payments) { payment ->
-                        PaymentDetailCard(payment = payment)
-                    }
-                }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun PaymentMethodCard(
-    method: PaymentMethod,
-    count: Int,
-    total: Double
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = WayraOrangeSoft,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = getPaymentMethodIcon(method)),
-                        contentDescription = null,
-                        tint = WayraOrangeDark,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                }
-                Column {
-                    Text(
-                        text = getPaymentMethodName(method),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
-                        color = Ink
-                    )
-                    Text(
-                        text = "$count ${if (count == 1) "pago" else "pagos"}",
-                        fontSize = 12.sp,
-                        color = Ink
-                    )
-                }
-            }
-            Text(
-                text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR")).format(total),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Ink
-            )
-        }
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-fun PaymentDetailCard(payment: Payment) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = formatDate(payment.paymentDate ?: 0L),
-                    fontSize = 12.sp,
-                    color = Ink
-                )
-                Text(
-                    text = getPaymentMethodName(payment.paymentMethod ?: PaymentMethod.EFECTIVO),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Ink
-                )
-            }
-            Text(
-                text = "$ ${String.format("%.2f", payment.amount)}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Ink
-            )
         }
     }
 }
