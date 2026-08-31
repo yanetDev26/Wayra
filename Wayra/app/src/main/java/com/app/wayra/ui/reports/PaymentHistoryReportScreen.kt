@@ -35,10 +35,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +53,17 @@ import com.app.wayra.data.model.Payment
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
 import com.app.wayra.data.model.Student
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.AgenorNeue
+import com.app.wayra.ui.theme.BorderSoft
+import com.app.wayra.ui.theme.Danger
+import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.OnBrand
+import com.app.wayra.ui.theme.Paper
+import com.app.wayra.ui.theme.Success
+import com.app.wayra.ui.theme.SurfaceCard
+import com.app.wayra.ui.theme.Warning
+import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.wayraTopAppBarColors
 import java.text.NumberFormat
 import java.util.Locale
 

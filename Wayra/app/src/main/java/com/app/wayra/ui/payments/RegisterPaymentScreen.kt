@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,7 +52,13 @@ import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
 import com.app.wayra.ui.home.PaymentPeriod
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.InkMuted
+import com.app.wayra.ui.theme.OnBrand
+import com.app.wayra.ui.theme.Paper
+import com.app.wayra.ui.theme.SurfaceAlt
+import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.wayraTopAppBarColors
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

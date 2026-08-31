@@ -33,7 +33,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,7 +47,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.data.model.Payment
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.AgenorNeue
+import com.app.wayra.ui.theme.BorderSoft
+import com.app.wayra.ui.theme.Danger
+import com.app.wayra.ui.theme.DangerSoft
+import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.OnBrand
+import com.app.wayra.ui.theme.Paper
+import com.app.wayra.ui.theme.SurfaceCard
+import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.wayraTopAppBarColors
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
