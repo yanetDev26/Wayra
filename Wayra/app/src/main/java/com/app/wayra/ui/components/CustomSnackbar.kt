@@ -7,9 +7,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.Danger
+import com.app.wayra.ui.theme.OnBrand
+import com.app.wayra.ui.theme.Success
 
 enum class SnackbarType {
     SUCCESS,

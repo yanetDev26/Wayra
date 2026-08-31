@@ -1,7 +1,6 @@
 package com.app.wayra.ui.reports
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,13 +21,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.app.wayra.ui.components.WayraBackground
+import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import com.app.wayra.R
 import com.app.wayra.ui.theme.*
+import androidx.compose.foundation.layout.Row
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,107 +49,170 @@ fun ReportsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Reportes Financieros") },
+                // "Reportes Financieros" repetia la pestaña que ya dice
+                // "Reportes"; el titulo solo tiene que ubicar, no describir.
+                title = { Text("Reportes") },
                 colors = wayraTopAppBarColors()
             )
         },
         containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Box(
+        WayraBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            WayraBackground(
-                modifier = Modifier.fillMaxSize()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp)
-                ) {
+                // Los reportes se agrupan por el periodo que miran. El orden
+                // no es decorativo: primero lo que se puede accionar hoy.
                 item {
-                    ReportCard(
-                        title = "Ingresos del Mes",
-                        description = "Total recaudado en el mes actual",
-                        onClick = onNavigateToMonthlyIncome
+                    SectionLabel(text = "Este mes")
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                item {
+                    ReportGroup(
+                        items = listOf(
+                            ReportEntry(
+                                title = "Ingresos del mes",
+                                description = "Total recaudado y desglose por medio de pago",
+                                iconRes = R.drawable.ic_wallet,
+                                tone = Tone.Brand,
+                                onClick = onNavigateToMonthlyIncome
+                            ),
+                            ReportEntry(
+                                title = "Pagos pendientes",
+                                description = "Quién debe y desde cuándo",
+                                iconRes = R.drawable.ic_clock,
+                                tone = Tone.Warning,
+                                onClick = onNavigateToPendingPayments
+                            ),
+                            ReportEntry(
+                                title = "Estadísticas por plan",
+                                description = "Cómo se reparten los alumnos entre planes",
+                                iconRes = R.drawable.ic_pie,
+                                tone = Tone.Neutral,
+                                onClick = onNavigateToPlanStatistics
+                            )
+                        )
                     )
                 }
 
                 item {
-                    ReportCard(
-                        title = "Pagos Pendientes",
-                        description = "Alumnos con pagos atrasados",
-                        onClick = onNavigateToPendingPayments
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SectionLabel(text = "Histórico y proyección")
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
-
                 item {
-                    ReportCard(
-                        title = "Estadísticas por Plan",
-                        description = "Distribución de alumnos por plan",
-                        onClick = onNavigateToPlanStatistics
-                    )
-                }
-
-                item {
-                    ReportCard(
-                        title = "Historial de Pagos",
-                        description = "Consulta pagos por fecha o alumno",
-                        onClick = onNavigateToPaymentHistory
-                    )
-                }
-
-                item {
-                    ReportCard(
-                        title = "Proyección de Ingresos",
-                        description = "Estimado de ingresos próximos meses",
-                        onClick = onNavigateToIncomeProjection
+                    ReportGroup(
+                        items = listOf(
+                            ReportEntry(
+                                title = "Historial de pagos",
+                                description = "Consulta por fecha, alumno o estado",
+                                iconRes = R.drawable.ic_calendar,
+                                tone = Tone.Neutral,
+                                onClick = onNavigateToPaymentHistory
+                            ),
+                            ReportEntry(
+                                title = "Proyección de ingresos",
+                                description = "Estimado de los próximos meses",
+                                iconRes = R.drawable.ic_report,
+                                tone = Tone.Success,
+                                onClick = onNavigateToIncomeProjection
+                            )
+                        )
                     )
                 }
             }
         }
+    }
+}
+
+private data class ReportEntry(
+    val title: String,
+    val description: String,
+    val iconRes: Int,
+    val tone: Tone,
+    val onClick: () -> Unit
+)
+
+/** Grupo de reportes: un panel, filas separadas por linea sangrada. */
+@Composable
+private fun ReportGroup(items: List<ReportEntry>) {
+    WayraPanel(modifier = Modifier.fillMaxWidth()) {
+        Column {
+            items.forEachIndexed { index, entry ->
+                if (index > 0) PanelDivider(startIndent = 58)
+                ReportRow(entry)
+            }
         }
     }
 }
 
 @Composable
-private fun ReportCard(
-    title: String,
-    description: String,
-    onClick: () -> Unit = {}
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        )
+private fun ReportRow(entry: ReportEntry) {
+    val accent = when (entry.tone) {
+        Tone.Success -> Success
+        Tone.Warning -> Warning
+        Tone.Danger -> Danger
+        Tone.Brand -> WayraOrangeDark
+        Tone.Neutral -> InkMuted
+    }
+    val accentBg = when (entry.tone) {
+        Tone.Success -> SuccessSoft
+        Tone.Warning -> WarningSoft
+        Tone.Danger -> DangerSoft
+        Tone.Brand -> WayraOrangeSoft
+        Tone.Neutral -> SurfaceAlt
+    }
+    // La fila entera es el area tactil. El boton "Ver Reporte" repetido cinco
+    // veces era un ancho completo de naranja por tarjeta, sin agregar nada.
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = entry.onClick)
+            .padding(horizontal = 14.dp, vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(accentBg, RoundedCornerShape(10.dp)),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+            Icon(
+                painter = painterResource(id = entry.iconRes),
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.size(17.dp)
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = InkMuted
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(
-                onClick = onClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Ver Reporte")
-            }
         }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = entry.title,
+                style = MaterialTheme.typography.titleSmall,
+                fontSize = 15.sp,
+                color = Ink
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = entry.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = InkMuted,
+                maxLines = 2
+            )
+        }
+
+        Icon(
+            painter = painterResource(id = R.drawable.ic_chevron),
+            contentDescription = null,
+            tint = InkSubtle,
+            modifier = Modifier.size(15.dp)
+        )
     }
 }

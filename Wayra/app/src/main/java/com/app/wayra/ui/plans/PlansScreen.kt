@@ -64,6 +64,14 @@ import com.app.wayra.ui.theme.*
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,43 +130,66 @@ fun PlansScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_plan),
                                 contentDescription = null,
                                 tint = InkSubtle,
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(36.dp)
                             )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
+                            Spacer(modifier = Modifier.height(14.dp))
                             Text(
                                 text = stringResource(R.string.plans_empty),
-                                color = Ink,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Ink
                             )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = "Presiona el botón + para agregar tu primer plan",
-                                color = Ink,
-                                style = MaterialTheme.typography.bodyMedium
+                                text = "Un plan define la actividad y el precio que se le cobra al alumno.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = InkMuted,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
                             )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            // Una accion, en vez de explicar donde esta el boton
+                            Button(
+                                onClick = onNavigateToAddPlan,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = WayraOrange,
+                                    contentColor = OnBrand
+                                )
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_plus),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(17.dp)
+                                )
+                                Spacer(modifier = Modifier.width(7.dp))
+                                Text(
+                                    text = stringResource(R.string.plans_add),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                            }
                         }
                     }
                 } else {
+                    SectionLabel(
+                        text = if (plans.size == 1) "1 plan" else "${plans.size} planes"
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
                     ) {
-                        items(plans) { plan ->
-                            PlanItemModern(
+                        itemsIndexed(plans) { index, plan ->
+                            PlanRow(
                                 plan = plan,
+                                isFirst = index == 0,
+                                isLast = index == plans.lastIndex,
                                 onEdit = {
                                     selectedPlan = plan
                                     showEditDialog = true
@@ -243,138 +274,126 @@ fun PlansScreen(
 }
 
 @Composable
-fun PlanItemModern(
+fun PlanRow(
     plan: Plan,
+    isFirst: Boolean,
+    isLast: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        )
+    var menuOpen by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(
+        topStart = if (isFirst) 12.dp else 0.dp,
+        topEnd = if (isFirst) 12.dp else 0.dp,
+        bottomStart = if (isLast) 12.dp else 0.dp,
+        bottomEnd = if (isLast) 12.dp else 0.dp
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(SurfaceCard)
     ) {
-        Column(
+        if (!isFirst) {
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 16.dp),
+                thickness = 1.dp,
+                color = BorderSoft
+            )
+        }
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(start = 16.dp, end = 6.dp, top = 13.dp, bottom = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                // Contenido principal
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = plan.activityName,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        if (plan.description.isNotBlank()) {
-                            Text(
-                                text = plan.description,
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Precio destacado
-                        Surface(
-                            color = Success.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(6.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_money),
-                                        contentDescription = null,
-                                        tint = Success,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Text(
-                                        text = formatCurrency(plan.price),
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Success
-                                    )
-                                }
-                            }
-                        }
-                    }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = plan.activityName,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontSize = 15.sp,
+                    color = Ink,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (plan.description.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = plan.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = InkMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
-            // Botones de acción
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FilledTonalButton(
-                    onClick = onEdit,
-                    modifier = Modifier.height(40.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = SurfaceAlt,
-                    )
+            // El precio es un dato, no un estado: va en tinta y con cifras
+            // tabulares para que la columna alinee. El verde queda reservado
+            // para "pagado".
+            Text(
+                text = formatCurrency(plan.price),
+                style = WayraType.amount,
+                color = Ink
+            )
+
+            // Editar y eliminar salen de la fila: dos botones por plan
+            // multiplicaban el ruido y le daban a "eliminar" el mismo peso
+            // que a todo lo demas.
+            Box {
+                IconButton(
+                    onClick = { menuOpen = true },
+                    modifier = Modifier.size(36.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_edit),
-                        contentDescription = null,
-                        tint = Ink,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        "Editar",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Ink
+                        painter = painterResource(id = R.drawable.ic_more),
+                        contentDescription = "Acciones del plan",
+                        tint = InkSubtle,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                OutlinedButton(
-                    onClick = onDelete,
-                    modifier = Modifier.height(40.dp),
+                DropdownMenu(
+                    expanded = menuOpen,
+                    onDismissRequest = { menuOpen = false },
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = DangerSoft
-                    )
+                    containerColor = SurfaceCard
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_trash),
-                        contentDescription = null,
-                        tint = Danger,
-                        modifier = Modifier.size(20.dp)
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                "Editar",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Ink
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_edit),
+                                contentDescription = null,
+                                tint = InkMuted,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        onClick = { menuOpen = false; onEdit() }
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        "Eliminar",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Danger
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                "Eliminar",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Danger
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_trash),
+                                contentDescription = null,
+                                tint = Danger,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        onClick = { menuOpen = false; onDelete() }
                     )
                 }
             }

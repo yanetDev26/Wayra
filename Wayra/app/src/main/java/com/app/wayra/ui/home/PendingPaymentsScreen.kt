@@ -28,7 +28,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,7 +51,16 @@ import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.AgenorNeue
+import com.app.wayra.ui.theme.BorderSoft
+import com.app.wayra.ui.theme.Danger
+import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.InkMuted
+import com.app.wayra.ui.theme.Paper
+import com.app.wayra.ui.theme.SurfaceAlt
+import com.app.wayra.ui.theme.SurfaceCard
+import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.wayraTopAppBarColors
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat

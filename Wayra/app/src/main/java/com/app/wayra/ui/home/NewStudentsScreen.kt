@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,7 +38,12 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.StudentRepository
-import com.app.wayra.ui.theme.*
+import com.app.wayra.ui.theme.BorderSoft
+import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.InkMuted
+import com.app.wayra.ui.theme.Paper
+import com.app.wayra.ui.theme.SurfaceCard
+import com.app.wayra.ui.theme.wayraTopAppBarColors
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
