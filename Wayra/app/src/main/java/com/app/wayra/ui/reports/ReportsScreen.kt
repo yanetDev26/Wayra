@@ -149,20 +149,11 @@ private fun ReportGroup(items: List<ReportEntry>) {
 
 @Composable
 private fun ReportRow(entry: ReportEntry) {
-    val accent = when (entry.tone) {
-        Tone.Success -> Success
-        Tone.Warning -> Warning
-        Tone.Danger -> Danger
-        Tone.Brand -> WayraOrangeDark
-        Tone.Neutral -> InkMuted
-    }
-    val accentBg = when (entry.tone) {
-        Tone.Success -> SuccessSoft
-        Tone.Warning -> WarningSoft
-        Tone.Danger -> DangerSoft
-        Tone.Brand -> WayraOrangeSoft
-        Tone.Neutral -> SurfaceAlt
-    }
+    // accent()/soft() viven en ReportComponents: un solo lugar decide como se
+    // pinta cada tono.
+    val accent = entry.tone.accent()
+    val accentBg = entry.tone.soft()
+
     // La fila entera es el area tactil. El boton "Ver Reporte" repetido cinco
     // veces era un ancho completo de naranja por tarjeta, sin agregar nada.
     Row(
