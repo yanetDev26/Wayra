@@ -204,20 +204,13 @@ fun StudentDetailScreen(
                         }
                     }
 
-                    Surface(
-                        color = if (student?.active == true) Success else Neutral,
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Text(
-                            text = if (student?.active == true)
-                                stringResource(R.string.students_active)
-                            else
-                                stringResource(R.string.students_inactive),
-                            color = OnDark,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
+                    StatusBadge(
+                        text = if (student?.active == true)
+                            stringResource(R.string.students_active)
+                        else
+                            stringResource(R.string.students_inactive),
+                        tone = if (student?.active == true) Tone.Success else Tone.Neutral
+                    )
                 }
             }
 
@@ -779,26 +772,18 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
             }
 
             // Badge de estado
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = when (payment.status) {
-                    com.app.wayra.data.model.PaymentStatus.PAGADO -> Success
-                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Warning
-                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> Danger
+            StatusBadge(
+                text = when (payment.status) {
+                    com.app.wayra.data.model.PaymentStatus.PAGADO -> "Pagado"
+                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> "Pendiente"
+                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> "Vencido"
+                },
+                tone = when (payment.status) {
+                    com.app.wayra.data.model.PaymentStatus.PAGADO -> Tone.Success
+                    com.app.wayra.data.model.PaymentStatus.PENDIENTE -> Tone.Warning
+                    com.app.wayra.data.model.PaymentStatus.VENCIDO -> Tone.Danger
                 }
-            ) {
-                Text(
-                    text = when (payment.status) {
-                        com.app.wayra.data.model.PaymentStatus.PAGADO -> "Pagado"
-                        com.app.wayra.data.model.PaymentStatus.PENDIENTE -> "Pendiente"
-                        com.app.wayra.data.model.PaymentStatus.VENCIDO -> "Vencido"
-                    },
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = OnDark
-                )
-            }
+            )
         }
     }
 }

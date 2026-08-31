@@ -397,7 +397,7 @@ fun AddStudentScreen(
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
-                            color = OnDark,
+                            color = OnBrand,
                             strokeWidth = 2.dp
                         )
                     } else {

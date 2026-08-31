@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,22 +54,24 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Toda la app se dibuja sobre fondo claro, así que los iconos de la
-        // barra de estado deben ser oscuros. La barra de navegación acompaña a
-        // la barra inferior, que es oscura.
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            )
-        )
+        enableEdgeToEdge()
 
         setContent {
-            WayraTheme {
+            val dark = isSystemInDarkTheme()
+
+            // Los iconos de las barras del sistema siguen al tema: oscuros
+            // sobre Pista, claros sobre Nocturna.
+            LaunchedEffect(dark) {
+                val transparent = android.graphics.Color.TRANSPARENT
+                enableEdgeToEdge(
+                    statusBarStyle = if (dark) SystemBarStyle.dark(transparent)
+                    else SystemBarStyle.light(transparent, transparent),
+                    navigationBarStyle = if (dark) SystemBarStyle.dark(transparent)
+                    else SystemBarStyle.light(transparent, transparent)
+                )
+            }
+
+            WayraTheme(darkTheme = dark) {
                 var showSplash by remember { mutableStateOf(true) }
 
                 if (showSplash) {
@@ -178,14 +182,14 @@ fun ModernBottomBar(
                         Icon(
                             painter = painterResource(
                                 id = when (index) {
-                                    0 -> R.drawable.home
-                                    1 -> R.drawable.runner
-                                    2 -> R.drawable.plan
-                                    else -> R.drawable.report
+                                    0 -> R.drawable.ic_home
+                                    1 -> R.drawable.ic_runner
+                                    2 -> R.drawable.ic_plan
+                                    else -> R.drawable.ic_report
                                 }
                             ),
                             contentDescription = item,
-                            tint = Color.Unspecified,
+                            tint = if (isSelected) WayraOrange else InkMuted,
                             modifier = Modifier.size(24.dp)
                         )
 

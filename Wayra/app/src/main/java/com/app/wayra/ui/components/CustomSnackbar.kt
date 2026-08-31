@@ -40,7 +40,7 @@ fun CustomSnackbarHost(
 
             Snackbar(
                 containerColor = backgroundColor,
-                contentColor = OnDark,
+                contentColor = OnBrand,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = displayMessage.trim())

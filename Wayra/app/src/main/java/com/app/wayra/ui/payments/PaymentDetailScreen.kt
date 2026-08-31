@@ -175,21 +175,14 @@ fun PaymentDetailScreen(
                                 text = "Estado:",
                                 fontWeight = FontWeight.Bold
                             )
-                            Surface(
-                                color = when (payment.status) {
-                                    PaymentStatus.PAGADO -> Success
-                                    PaymentStatus.PENDIENTE -> Warning
-                                    PaymentStatus.VENCIDO -> Danger
-                                },
-                                shape = MaterialTheme.shapes.small
-                            ) {
-                                Text(
-                                    text = payment.status.name,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                    color = OnDark,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                            StatusBadge(
+                                text = payment.status.name,
+                                tone = when (payment.status) {
+                                    PaymentStatus.PAGADO -> Tone.Success
+                                    PaymentStatus.PENDIENTE -> Tone.Warning
+                                    PaymentStatus.VENCIDO -> Tone.Danger
+                                }
+                            )
                         }
 
                         // Botones para cambiar estado

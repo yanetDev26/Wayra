@@ -138,3 +138,61 @@ val Typography = Typography(
         letterSpacing = 0.4.sp
     )
 )
+
+/**
+ * Estilos que Material no cubre y que el diseño de Wayra necesita nombrar.
+ *
+ * `amount` y `metric` activan cifras tabulares (`tnum`): en una columna de
+ * importes los dígitos quedan alineados, que es la mitad de la legibilidad de
+ * una pantalla de cobros.
+ */
+object WayraType {
+
+    /** Rótulo de sección. Versalita espaciada, para ordenar sin sumar cajas. */
+    val sectionLabel = TextStyle(
+        fontFamily = WayraBodyFont,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 1.1.sp
+    )
+
+    /** Etiqueta de estado dentro de un badge. */
+    val badge = TextStyle(
+        fontFamily = WayraBodyFont,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 15.sp,
+        letterSpacing = 0.2.sp
+    )
+
+    /** Importes en listas y filas de detalle. */
+    val amount = TextStyle(
+        fontFamily = WayraBodyFont,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.sp,
+        fontFeatureSettings = "tnum"
+    )
+
+    /** Cifra destacada de una métrica. Tipografía de marca. */
+    val metric = TextStyle(
+        fontFamily = AgenorNeue,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 32.sp,
+        letterSpacing = (-0.5).sp,
+        fontFeatureSettings = "tnum"
+    )
+
+    /** Cifra principal de la pantalla de inicio. */
+    val metricHero = TextStyle(
+        fontFamily = AgenorNeue,
+        fontWeight = FontWeight.Bold,
+        fontSize = 36.sp,
+        lineHeight = 40.sp,
+        letterSpacing = (-0.8).sp,
+        fontFeatureSettings = "tnum"
+    )
+}

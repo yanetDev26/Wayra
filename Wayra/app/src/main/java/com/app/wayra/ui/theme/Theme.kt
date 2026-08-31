@@ -1,75 +1,81 @@
 package com.app.wayra.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
 /**
- * La app se dibuja siempre sobre fondo claro, por lo que el esquema es claro.
- * Antes se usaba [androidx.compose.material3.darkColorScheme], lo que invertía
- * los roles `on*` y dejaba textos ilegibles en los componentes que confían en
- * `MaterialTheme.colorScheme`.
+ * Traduce la paleta de Wayra a los roles de Material 3, para que los
+ * componentes de la librería (TextField, AlertDialog, Menu, Snackbar) queden
+ * dentro del sistema en vez de recurrir a sus grises azulados por defecto.
  */
-private val WayraColorScheme = lightColorScheme(
-    primary = WayraOrange,
-    onPrimary = OnDark,
-    primaryContainer = WayraOrangeSoft,
-    onPrimaryContainer = WayraOrangeDark,
+private fun WayraColors.toMaterialScheme() = with(this) {
+    val base = if (isDark) darkColorScheme() else lightColorScheme()
+    base.copy(
+        primary = brand,
+        onPrimary = onBrand,
+        primaryContainer = brandSoft,
+        onPrimaryContainer = brandDeep,
 
-    secondary = WayraOrangeDark,
-    onSecondary = OnDark,
-    secondaryContainer = SurfaceAlt,
-    onSecondaryContainer = Ink,
+        secondary = brandDeep,
+        onSecondary = onBrand,
+        secondaryContainer = surfaceAlt,
+        onSecondaryContainer = ink,
 
-    tertiary = Info,
-    onTertiary = OnDark,
-    tertiaryContainer = InfoSoft,
-    onTertiaryContainer = Info,
+        tertiary = info,
+        onTertiary = onBrand,
+        tertiaryContainer = infoSoft,
+        onTertiaryContainer = info,
 
-    background = Paper,
-    onBackground = Ink,
+        background = paper,
+        onBackground = ink,
 
-    surface = SurfaceCard,
-    onSurface = Ink,
-    surfaceVariant = SurfaceAlt,
-    onSurfaceVariant = InkMuted,
+        surface = surface,
+        onSurface = ink,
+        surfaceVariant = surfaceAlt,
+        onSurfaceVariant = inkMuted,
 
-    // Roles de contenedor: los usan TextField, Menu, AlertDialog y NavigationBar.
-    // Sin definirlos, Material recurre a sus grises azulados por defecto.
-    surfaceContainerLowest = SurfaceCard,
-    surfaceContainerLow = Paper,
-    surfaceContainer = SurfaceAlt,
-    surfaceContainerHigh = SurfaceAlt,
-    surfaceContainerHighest = SurfaceAlt,
-    surfaceBright = SurfaceCard,
-    surfaceDim = SurfaceAlt,
+        surfaceContainerLowest = surface,
+        surfaceContainerLow = paper,
+        surfaceContainer = surfaceAlt,
+        surfaceContainerHigh = surfaceAlt,
+        surfaceContainerHighest = surfaceAlt,
+        surfaceBright = surface,
+        surfaceDim = surfaceAlt,
 
-    // Sin tinte de elevación: las tarjetas se mantienen blancas y limpias.
-    surfaceTint = Color.Transparent,
+        inverseSurface = hero,
+        inverseOnSurface = onHero,
 
-    inverseSurface = SurfaceDark,
-    inverseOnSurface = OnDark,
+        error = danger,
+        onError = onBrand,
+        errorContainer = dangerSoft,
+        onErrorContainer = danger,
 
-    error = Danger,
-    onError = OnDark,
-    errorContainer = DangerSoft,
-    onErrorContainer = Danger,
+        outline = border,
+        outlineVariant = surfaceAlt,
 
-    outline = BorderSoft,
-    outlineVariant = SurfaceAlt,
-
-    scrim = Ink
-)
+        // Sin tinte de elevación: las superficies se mantienen limpias.
+        surfaceTint = Color.Transparent,
+        scrim = Color(0xCC0B0F12)
+    )
+}
 
 @Composable
 fun WayraTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = WayraColorScheme,
-        typography = Typography,
-        shapes = WayraShapes,
-        content = content
-    )
+    val colors = if (darkTheme) NocturnaColors else PistaColors
+    CompositionLocalProvider(LocalWayraColors provides colors) {
+        MaterialTheme(
+            colorScheme = colors.toMaterialScheme(),
+            typography = Typography,
+            shapes = WayraShapes,
+            content = content
+        )
+    }
 }

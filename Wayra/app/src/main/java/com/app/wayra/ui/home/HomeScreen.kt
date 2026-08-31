@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -44,6 +45,11 @@ import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 
 @Composable
 fun HomeScreen(
@@ -91,105 +97,98 @@ fun HomeContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                // Inicio es la unica pantalla sin barra superior, asi que tiene
+                // que reservar ella misma el alto de la barra de estado: si no,
+                // el logo queda pegado al borde. Va antes del scroll para que
+                // el margen no se desplace al deslizar.
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 16.dp)
         ) {
-            // Header con logo
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp),
-                contentAlignment = Alignment.Center
+            // Encabezado alineado a la izquierda. Centrar todo es lo que hace
+            // que una pantalla se lea como una plantilla.
+            Column(
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 22.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Logo del gimnasio
-                    Image(
-                        painter = painterResource(id = R.drawable.logo_wayra),
-                        contentDescription = "Logo Wayra",
-                        modifier = Modifier.size(130.dp)
-                    )
-
-                    Text(
-                        text = currentDate,
-                        fontSize = 14.sp,
-                        color = Ink
-                    )
-                }
+                Image(
+                    painter = painterResource(id = R.drawable.logo_wayra),
+                    contentDescription = "Wayra Running Team",
+                    modifier = Modifier.height(64.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                SectionLabel(text = currentDate)
             }
 
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    StatCardCompact(
-                        title = stringResource(R.string.home_active_students),
-                        value = stats.activeStudents.toString(),
-                        iconRes = R.drawable.gym_active,
-                        backgroundColor = WayraOrangeSoft,
-                        contentColor = WayraOrangeDark,
-                        modifier = Modifier.weight(1f),
-                        onClick = onActiveStudentsClick
-                    )
+                SectionLabel(text = "Resumen del mes")
+                Spacer(modifier = Modifier.height(10.dp))
 
-                    StatCardCompact(
-                        title = "Nuevos este mes",
-                        value = stats.newStudentsThisMonth.toString(),
-                        iconRes = R.drawable.gym_new_active,
-                        backgroundColor = SuccessSoft,
-                        contentColor = Success,
-                        modifier = Modifier.weight(1f),
-                        onClick = onNewStudentsClick
-                    )
+                // Las cuatro metricas van en un solo panel separado por lineas,
+                // no en cuatro tarjetas flotantes: menos ruido y una sola caja
+                // que leer.
+                WayraPanel(modifier = Modifier.fillMaxWidth()) {
+                    Column {
+                        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                            MetricCell(
+                                label = stringResource(R.string.home_active_students),
+                                value = stats.activeStudents.toString(),
+                                iconRes = R.drawable.ic_stopwatch,
+                                tone = Tone.Brand,
+                                modifier = Modifier.weight(1f),
+                                onClick = onActiveStudentsClick
+                            )
+                            CellDivider()
+                            MetricCell(
+                                label = "Nuevos este mes",
+                                value = stats.newStudentsThisMonth.toString(),
+                                iconRes = R.drawable.ic_user_plus,
+                                tone = Tone.Success,
+                                modifier = Modifier.weight(1f),
+                                onClick = onNewStudentsClick
+                            )
+                        }
+                        PanelDivider(startIndent = 0)
+                        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                            MetricCell(
+                                label = "Pendientes este mes",
+                                value = stats.pendingThisMonth.toString(),
+                                iconRes = R.drawable.ic_clock,
+                                tone = Tone.Warning,
+                                modifier = Modifier.weight(1f),
+                                onClick = onPendingThisMonthClick
+                            )
+                            CellDivider()
+                            MetricCell(
+                                label = "Vencidos mes pasado",
+                                value = stats.pendingLastMonth.toString(),
+                                iconRes = R.drawable.ic_overdue,
+                                tone = Tone.Danger,
+                                modifier = Modifier.weight(1f),
+                                onClick = onPendingLastMonthClick
+                            )
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+                SectionLabel(text = "Caja")
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Tarjetas de deudores
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    StatCardCompact(
-                        title = "Pendientes abonar este mes",
-                        value = stats.pendingThisMonth.toString(),
-                        iconRes = R.drawable.gym_pay,
-                        backgroundColor = WarningSoft,
-                        contentColor = Warning,
-                        modifier = Modifier.weight(1f),
-                        onClick = onPendingThisMonthClick
-                    )
-
-                    StatCardCompact(
-                        title = "Pendientes abonar mes pasado",
-                        value = stats.pendingLastMonth.toString(),
-                        iconRes = R.drawable.gym_pay_past_month,
-                        backgroundColor = DangerSoft,
-                        contentColor = Danger,
-                        modifier = Modifier.weight(1f),
-                        onClick = onPendingLastMonthClick
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
+                // Unico bloque solido de la pantalla: el foco visual es uno.
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = SurfaceDark
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp),
+                            .padding(horizontal = 18.dp, vertical = 18.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -199,24 +198,20 @@ fun HomeContent(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.payment),
-                                    contentDescription = "Icono de pago",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
+                                    painter = painterResource(id = R.drawable.ic_wallet),
+                                    contentDescription = null,
+                                    tint = OnDark.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(16.dp)
                                 )
-
                                 Text(
-                                    text = stringResource(R.string.home_total_collected),
-                                    fontSize = 14.sp,
-                                    color = OnDark,
-                                    fontWeight = FontWeight.Medium
+                                    text = stringResource(R.string.home_total_collected).uppercase(),
+                                    style = WayraType.sectionLabel,
+                                    color = OnDark.copy(alpha = 0.6f)
                                 )
                             }
                             Text(
-                                text = if (showAmount) formatCurrency(stats.totalCollected) else "••••••",
-                                fontFamily = AgenorNeue,
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
+                                text = if (showAmount) formatCurrency(stats.totalCollected) else "\u2022\u2022\u2022\u2022\u2022\u2022",
+                                style = WayraType.metricHero,
                                 color = OnDark,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
@@ -227,45 +222,48 @@ fun HomeContent(
                                 .size(40.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    color = OnDark.copy(alpha = 0.12f),
+                                    color = OnDark.copy(alpha = 0.10f),
                                     shape = CircleShape
                                 )
                                 .clickable { showAmount = !showAmount },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (showAmount) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye_on),
-                                    contentDescription = "Icono de ojo",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.eye_off),
-                                    contentDescription = "Icono de ojo cerrado",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                            Icon(
+                                painter = painterResource(
+                                    id = if (showAmount) R.drawable.ic_eye else R.drawable.ic_eye_off
+                                ),
+                                contentDescription = if (showAmount) "Ocultar importe" else "Mostrar importe",
+                                tint = OnDark,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Acción principal: Registrar pago
-                FilledTonalButton(
+                // Accion principal: el unico naranja solido de la pantalla.
+                Button(
                     onClick = onRegisterPaymentClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp),
-                    shape = RoundedCornerShape(16.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = WayraOrange,
+                        contentColor = OnBrand
+                    )
                 ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_plus),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.home_register_payment),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.labelLarge,
+                        fontSize = 15.sp
                     )
                 }
             }
@@ -273,58 +271,62 @@ fun HomeContent(
     }
 }
 
+/** Separador vertical entre dos celdas de metrica. */
 @Composable
-fun StatCardCompact(
-    title: String,
+private fun CellDivider() {
+    Box(
+        modifier = Modifier
+            .width(1.dp)
+            .fillMaxHeight()
+            .background(BorderSoft)
+    )
+}
+
+/**
+ * Celda de metrica. El color vive en el icono y en la cifra; el fondo se
+ * mantiene neutro. Cuatro rectangulos pastel compiten entre si y no dejan leer
+ * cual importa.
+ */
+@Composable
+private fun MetricCell(
+    label: String,
     value: String,
-    iconRes: Int? = null,
-    backgroundColor: Color,
-    contentColor: Color,
+    iconRes: Int,
+    tone: Tone,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
-    Card(
-        modifier = modifier.then(
-            if (onClick != null) Modifier.clickable(onClick = onClick)
-            else Modifier
-        ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    val accent = when (tone) {
+        Tone.Success -> Success
+        Tone.Warning -> Warning
+        Tone.Danger -> Danger
+        Tone.Brand -> WayraOrangeDark
+        Tone.Neutral -> InkMuted
+    }
+    Column(
+        modifier = modifier
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            when {
-                iconRes != null -> {
-                    Image(
-                        painter = painterResource(id = iconRes),
-                        contentDescription = title,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = value,
-                fontFamily = AgenorNeue,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = contentColor
-            )
-            Text(
-                text = title,
-                fontSize = 12.sp,
-                color = contentColor.copy(alpha = 0.8f),
-                modifier = Modifier.padding(top = 4.dp),
-                maxLines = 2
-            )
-        }
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            tint = accent,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = value,
+            style = WayraType.metric,
+            color = if (value == "0") InkSubtle else accent
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = InkMuted,
+            maxLines = 2
+        )
     }
 }
 

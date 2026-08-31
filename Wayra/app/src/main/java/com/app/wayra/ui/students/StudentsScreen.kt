@@ -46,6 +46,10 @@ import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.*
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -169,13 +173,20 @@ private fun StudentsContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                SectionLabel(
+                    text = if (filteredStudents.size == 1) "1 alumno"
+                           else "${filteredStudents.size} alumnos"
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
                 ) {
-                    items(filteredStudents) { studentWithPlan ->
-                        StudentItemModern(
+                    itemsIndexed(filteredStudents) { index, studentWithPlan ->
+                        StudentRow(
                             studentWithPlan = studentWithPlan,
+                            isFirst = index == 0,
+                            isLast = index == filteredStudents.lastIndex,
                             onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
                         )
                     }
@@ -192,9 +203,9 @@ private fun StudentsContent(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.gym_ticket),
-                            contentDescription = "Icono de gym",
-                            tint = Color.Unspecified,
+                            painter = painterResource(id = R.drawable.ic_runner),
+                            contentDescription = null,
+                            tint = InkSubtle,
                             modifier = Modifier.size(40.dp)
                         )
 
@@ -222,136 +233,100 @@ private fun StudentsContent(
 }
 
 @Composable
-fun StudentItemModern(
+fun StudentRow(
     studentWithPlan: StudentWithPlan,
+    isFirst: Boolean,
+    isLast: Boolean,
     onClick: () -> Unit
 ) {
     val student = studentWithPlan.student
-    Card(
+    val shape = RoundedCornerShape(
+        topStart = if (isFirst) 12.dp else 0.dp,
+        topEnd = if (isFirst) 12.dp else 0.dp,
+        bottomStart = if (isLast) 12.dp else 0.dp,
+        bottomEnd = if (isLast) 12.dp else 0.dp
+    )
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        border = BorderStroke(1.dp, BorderSoft),
-        colors = CardDefaults.cardColors(
-            containerColor = SurfaceCard
-        )
+            .clip(shape)
+            .background(SurfaceCard)
+            .clickable(onClick = onClick)
     ) {
+        if (!isFirst) {
+            HorizontalDivider(
+                modifier = Modifier.padding(start = 62.dp),
+                thickness = 1.dp,
+                color = BorderSoft
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Avatar circle
+            // Inicial en cuadrado redondeado: el circulo perfecto es el
+            // avatar por defecto de cualquier plantilla.
             Box(
                 modifier = Modifier
-                    .size(52.dp)
+                    .size(36.dp)
                     .background(
-                        color = if (student.active)
-                            WayraOrange.copy(alpha = 0.15f)
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape
+                        color = if (student.active) WayraOrangeSoft else SurfaceAlt,
+                        shape = RoundedCornerShape(10.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = student.name.take(1).uppercase(),
                     fontFamily = AgenorNeue,
-                    fontSize = 22.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (student.active) WayraOrange else MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (student.active) WayraOrangeDark else InkSubtle
                 )
             }
 
-            // Student info
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
                     Text(
                         text = student.getFullName(),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.titleSmall,
+                        fontSize = 15.sp,
+                        color = if (student.active) Ink else InkMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    // Status indicator
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                color = if (student.active) Success else Neutral,
-                                shape = CircleShape
-                            )
-                    )
+                    StatusDot(tone = if (student.active) Tone.Success else Tone.Neutral)
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.email),
-                        contentDescription = "Icono de email",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                    Text(
-                        text = student.email,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.phone),
-                        contentDescription = "Icono de celular",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = student.phone,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-
-                // Plan Badge
-                if (studentWithPlan.planName != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Surface(
-                        color = WayraOrange.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = studentWithPlan.planName,
-                                fontSize = 12.sp,
-                                color = WayraOrange,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = student.email,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = InkMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
+
+            if (studentWithPlan.planName != null) {
+                StatusBadge(
+                    text = studentWithPlan.planName,
+                    tone = if (student.active) Tone.Brand else Tone.Neutral
+                )
+            }
+
+            Icon(
+                painter = painterResource(id = R.drawable.ic_chevron),
+                contentDescription = null,
+                tint = InkSubtle,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }

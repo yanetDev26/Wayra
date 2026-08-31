@@ -112,7 +112,7 @@ fun PendingPaymentsReportScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = Danger
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -123,7 +123,7 @@ fun PendingPaymentsReportScreen(
                                 Text(
                                     text = "Total Pendiente",
                                     fontSize = 16.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -132,13 +132,13 @@ fun PendingPaymentsReportScreen(
                                         .format(stats.totalPending),
                                     fontFamily = AgenorNeue,
                                     fontSize = 32.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "${stats.uniqueStudents} alumnos",
                                     fontSize = 14.sp,
-                                    color = OnDark.copy(alpha = 0.9f)
+                                    color = OnBrand.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -163,7 +163,7 @@ fun PendingPaymentsReportScreen(
                                 title = "Próximos",
                                 value = "${stats.upcomingSoonCount}",
                                 subtitle = "7 días",
-                                color = WayraOrange,
+                                color = Ink,
                                 modifier = Modifier.weight(1f)
                             )
 

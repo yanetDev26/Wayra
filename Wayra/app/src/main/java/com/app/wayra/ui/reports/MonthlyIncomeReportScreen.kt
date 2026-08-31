@@ -106,7 +106,7 @@ fun MonthlyIncomeReportScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = WayraOrange
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -117,7 +117,7 @@ fun MonthlyIncomeReportScreen(
                                 Text(
                                     text = getCurrentMonthName(),
                                     fontSize = 16.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -126,13 +126,13 @@ fun MonthlyIncomeReportScreen(
                                         .format(stats.totalIncome),
                                     fontFamily = AgenorNeue,
                                     fontSize = 32.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Total Recaudado",
                                     fontSize = 14.sp,
-                                    color = OnDark.copy(alpha = 0.9f)
+                                    color = OnBrand.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -164,7 +164,7 @@ fun MonthlyIncomeReportScreen(
                                         fontFamily = AgenorNeue,
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = WayraOrange
+                                        color = Ink
                                     )
                                     Text(
                                         text = "Pagos",
@@ -198,7 +198,7 @@ fun MonthlyIncomeReportScreen(
                                         fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = WayraOrange
+                                        color = Ink
                                     )
                                     Text(
                                         text = "Promedio",
@@ -277,16 +277,16 @@ fun PaymentMethodCard(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = WayraOrange.copy(alpha = 0.1f),
+                            color = WayraOrangeSoft,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(id = getPaymentMethodIcon(method)),
-                        contentDescription = "Icono de tipo de pago",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(40.dp)
+                        contentDescription = null,
+                        tint = WayraOrangeDark,
+                        modifier = Modifier.size(20.dp)
                     )
 
                 }
@@ -308,7 +308,7 @@ fun PaymentMethodCard(
                 text = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR")).format(total),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
-                color = WayraOrange
+                color = Ink
             )
         }
     }
@@ -319,7 +319,7 @@ fun PaymentMethodCard(
 fun PaymentDetailCard(payment: Payment) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(6.dp),
         border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
             containerColor = SurfaceCard
@@ -349,7 +349,7 @@ fun PaymentDetailCard(payment: Payment) {
                 text = "$ ${String.format("%.2f", payment.amount)}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = WayraOrange
+                color = Ink
             )
         }
     }
@@ -373,8 +373,8 @@ fun getPaymentMethodName(method: PaymentMethod): String {
 
 fun getPaymentMethodIcon(method: PaymentMethod): Int {
     return when (method) {
-        PaymentMethod.EFECTIVO -> R.drawable.pay
-        PaymentMethod.TRANSFERENCIA -> R.drawable.pay_metod
+        PaymentMethod.EFECTIVO -> R.drawable.ic_money
+        PaymentMethod.TRANSFERENCIA -> R.drawable.ic_transfer
     }
 }
 

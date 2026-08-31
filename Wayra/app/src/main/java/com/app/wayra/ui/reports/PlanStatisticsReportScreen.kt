@@ -103,7 +103,7 @@ fun PlanStatisticsReportScreen(
                             colors = CardDefaults.cardColors(
                                 containerColor = WayraOrange
                             ),
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -114,7 +114,7 @@ fun PlanStatisticsReportScreen(
                                 Text(
                                     text = "Resumen General",
                                     fontSize = 16.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -122,13 +122,13 @@ fun PlanStatisticsReportScreen(
                                     text = "${stats.totalActiveStudents}",
                                     fontFamily = AgenorNeue,
                                     fontSize = 32.sp,
-                                    color = OnDark,
+                                    color = OnBrand,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = "Alumnos Activos",
                                     fontSize = 14.sp,
-                                    color = OnDark.copy(alpha = 0.9f)
+                                    color = OnBrand.copy(alpha = 0.9f)
                                 )
                             }
                         }
@@ -161,7 +161,7 @@ fun PlanStatisticsReportScreen(
                                         fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = WayraOrange
+                                        color = Ink
                                     )
                                     Text(
                                         text = "Mes Actual",
@@ -192,7 +192,7 @@ fun PlanStatisticsReportScreen(
                                         fontFamily = AgenorNeue,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = WayraOrange
+                                        color = Ink
                                     )
                                     Text(
                                         text = "Total",
@@ -281,7 +281,7 @@ fun PlanStatCard(planStat: PlanStats) {
                         modifier = Modifier
                             .size(48.dp)
                             .background(
-                                color = WayraOrange.copy(alpha = 0.1f),
+                                color = WayraOrangeSoft,
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -291,7 +291,7 @@ fun PlanStatCard(planStat: PlanStats) {
                             fontFamily = AgenorNeue,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = WayraOrange
+                            color = Ink
                         )
                     }
                     Column {
@@ -323,7 +323,7 @@ fun PlanStatCard(planStat: PlanStats) {
                     modifier = Modifier.weight(1f),
                     label = "Alumnos",
                     value = "${planStat.activeStudents}",
-                    icon = R.drawable.student
+                    icon = R.drawable.ic_user
                 )
 
                 // Ingresos del mes
@@ -332,7 +332,7 @@ fun PlanStatCard(planStat: PlanStats) {
                     label = "Mes Actual",
                     value = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-AR"))
                         .format(planStat.monthlyRevenue),
-                    icon = R.drawable.calendar
+                    icon = R.drawable.ic_calendar
                 )
             }
 
@@ -341,9 +341,9 @@ fun PlanStatCard(planStat: PlanStats) {
             // Ingresos totales
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(6.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = WayraOrange.copy(alpha = 0.1f)
+                    containerColor = WayraOrangeSoft
                 )
             ) {
                 Row(
@@ -358,9 +358,9 @@ fun PlanStatCard(planStat: PlanStats) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.money),
-                            contentDescription = "Icono",
-                            tint = Color.Unspecified,
+                            painter = painterResource(id = R.drawable.ic_wallet),
+                            contentDescription = null,
+                            tint = WayraOrangeDark,
                             modifier = Modifier.size(20.dp)
                         )
 
@@ -376,7 +376,7 @@ fun PlanStatCard(planStat: PlanStats) {
                             .format(planStat.totalRevenue),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = WayraOrange
+                        color = Ink
                     )
                 }
             }
@@ -393,7 +393,7 @@ fun StatItem(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(6.dp),
         border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
             containerColor = SurfaceCard
@@ -407,8 +407,8 @@ fun StatItem(
         ) {
             Icon(
                 painter = painterResource(id = icon),
-                contentDescription = "Icono",
-                tint = Color.Unspecified,
+                contentDescription = null,
+                tint = InkMuted,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -417,7 +417,7 @@ fun StatItem(
                 text = value,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = WayraOrange
+                color = Ink
             )
             Text(
                 text = label,

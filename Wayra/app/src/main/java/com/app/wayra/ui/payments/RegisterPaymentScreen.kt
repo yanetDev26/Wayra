@@ -412,7 +412,7 @@ fun RegisterPaymentScreen(
                                         PaymentPeriod.NEXT_MONTH -> "Pago adelantado del próximo mes"
                                     },
                                     fontSize = 12.sp,
-                                    color = if (isSelected) OnDark.copy(alpha = 0.8f) else InkMuted,
+                                    color = if (isSelected) OnBrand.copy(alpha = 0.8f) else InkMuted,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
                             }

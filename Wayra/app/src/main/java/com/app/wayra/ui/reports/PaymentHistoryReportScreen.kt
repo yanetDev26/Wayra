@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -103,7 +104,7 @@ fun PaymentHistoryReportScreen(
                         Icon(
                             Icons.Default.Search,
                             contentDescription = "Filtros",
-                            tint = OnDark
+                            tint = OnBrand
                         )
                     }
                 }
@@ -137,7 +138,7 @@ fun PaymentHistoryReportScreen(
                         colors = CardDefaults.cardColors(
                             containerColor = WayraOrange
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Column(
                             modifier = Modifier
@@ -149,13 +150,13 @@ fun PaymentHistoryReportScreen(
                                 text = "${filteredPayments.size}",
                                 fontFamily = AgenorNeue,
                                 fontSize = 32.sp,
-                                color = OnDark,
+                                color = OnBrand,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = if (filteredPayments.size == 1) "Pago encontrado" else "Pagos encontrados",
                                 fontSize = 14.sp,
-                                color = OnDark.copy(alpha = 0.9f)
+                                color = OnBrand.copy(alpha = 0.9f)
                             )
                         }
                     }
@@ -187,7 +188,7 @@ fun PaymentHistoryReportScreen(
                                     fontFamily = AgenorNeue,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = WayraOrange
+                                    color = Ink
                                 )
                                 Text(
                                     text = "Total",
@@ -216,7 +217,7 @@ fun PaymentHistoryReportScreen(
                                     fontFamily = AgenorNeue,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = WayraOrange
+                                    color = Ink
                                 )
                                 Text(
                                     text = "Pagados",
@@ -283,7 +284,7 @@ fun PaymentHistoryReportScreen(
                                                 selectedMethod = null
                                             }
                                             .padding(vertical = 8.dp),
-                                        color = WayraOrange,
+                                        color = Ink,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 14.sp
                                     )
@@ -562,7 +563,7 @@ fun PaymentHistoryCard(
                     .format(payment.amount),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = WayraOrange
+                color = Ink
             )
         }
     }
@@ -574,7 +575,7 @@ fun StatusChip(status: PaymentStatus) {
         modifier = Modifier
             .background(
                 color = getStatusColor(status).copy(alpha = 0.2f),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(6.dp)
             )
             .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
@@ -595,6 +596,8 @@ fun getStatusName(status: PaymentStatus): String {
     }
 }
 
+@Composable
+@ReadOnlyComposable
 fun getStatusColor(status: PaymentStatus): Color {
     return when (status) {
         PaymentStatus.PAGADO -> Success

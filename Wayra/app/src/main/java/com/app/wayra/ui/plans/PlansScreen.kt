@@ -127,9 +127,9 @@ fun PlansScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.plan),
-                                contentDescription = "Icono de plan",
-                                tint = Color.Unspecified,
+                                painter = painterResource(id = R.drawable.ic_plan),
+                                contentDescription = null,
+                                tint = InkSubtle,
                                 modifier = Modifier.size(40.dp)
                             )
 
@@ -235,7 +235,7 @@ fun PlansScreen(
                             Text("Cancelar")
                         }
                     },
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(12.dp)
                 )
             }
         }
@@ -250,7 +250,7 @@ fun PlanItemModern(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         border = BorderStroke(1.dp, BorderSoft),
         colors = CardDefaults.cardColors(
@@ -294,7 +294,7 @@ fun PlanItemModern(
                         // Precio destacado
                         Surface(
                             color = Success.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(6.dp)
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -306,9 +306,9 @@ fun PlanItemModern(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.payment),
-                                        contentDescription = "Icono de pago",
-                                        tint = Color.Unspecified,
+                                        painter = painterResource(id = R.drawable.ic_money),
+                                        contentDescription = null,
+                                        tint = Success,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Text(
@@ -341,9 +341,9 @@ fun PlanItemModern(
                     )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.edit),
-                        contentDescription = "Icono de editar",
-                        tint = Color.Unspecified,
+                        painter = painterResource(id = R.drawable.ic_edit),
+                        contentDescription = null,
+                        tint = Ink,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -365,9 +365,9 @@ fun PlanItemModern(
                     )
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.delete),
-                        contentDescription = "Icono de eliminar",
-                        tint = Color.Unspecified,
+                        painter = painterResource(id = R.drawable.ic_trash),
+                        contentDescription = null,
+                        tint = Danger,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -475,7 +475,7 @@ fun EditPlanDialog(
                 Text("Cancelar")
             }
         },
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(12.dp)
     )
 }
 

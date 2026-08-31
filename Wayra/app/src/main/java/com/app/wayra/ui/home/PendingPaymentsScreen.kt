@@ -370,7 +370,7 @@ fun PendingPaymentCard(
                     text = formatter.format(studentWithPayment.payment.amount),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = WayraOrange
+                    color = Ink
                 )
             }
 
@@ -447,7 +447,7 @@ fun PaymentConfirmationDialog(
                         fontFamily = AgenorNeue,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = WayraOrange
+                        color = Ink
                     )
                 }
 

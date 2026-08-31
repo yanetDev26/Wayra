@@ -172,7 +172,7 @@ fun NewStudentCard(student: Student) {
                         text = dateFormat.format(timestamp.toDate()),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = WayraOrange
+                        color = Ink
                     )
                 }
             }

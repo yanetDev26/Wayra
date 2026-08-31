@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de ventana y splash en tema oscuro. Debe coincidir con
+         `NocturnaColors.paper` de Color.kt para que no haya destello. -->
+    <color name="wayra_window_background">#0F1418</color>
+</resources>

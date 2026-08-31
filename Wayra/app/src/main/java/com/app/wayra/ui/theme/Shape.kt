@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 val WayraShapes = Shapes(
     extraSmall = RoundedCornerShape(6.dp),
     small = RoundedCornerShape(10.dp),
-    medium = RoundedCornerShape(14.dp),
-    large = RoundedCornerShape(20.dp),
-    extraLarge = RoundedCornerShape(28.dp)
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(12.dp),
+    extraLarge = RoundedCornerShape(12.dp)
 )
