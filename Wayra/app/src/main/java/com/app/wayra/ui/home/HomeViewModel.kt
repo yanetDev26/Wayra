@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.wayra.data.model.Payment
+import com.app.wayra.data.repository.MonthlyDuesRepository
 import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.StudentRepository
 import kotlinx.coroutines.flow.catch
@@ -26,6 +27,7 @@ class HomeViewModel : ViewModel() {
 
     private val studentRepository = StudentRepository()
     private val paymentRepository = PaymentRepository()
+    private val monthlyDuesRepository = MonthlyDuesRepository()
 
     private val _stats = MutableLiveData<HomeStats>().apply {
         value = HomeStats()
@@ -78,28 +80,20 @@ class HomeViewModel : ViewModel() {
                 }
         }
 
-        // Cargar estadísticas
-        viewModelScope.launch {
-            val (_, _, totalCollected) = paymentRepository.getMonthlyStats()
-            val pendingThisMonth = paymentRepository.getStudentsWithPendingPaymentsThisMonth()
-            val pendingLastMonth = paymentRepository.getStudentsWithPendingPaymentsLastMonth()
-            val newStudentsThisMonth = studentRepository.getNewStudentsThisMonth()
-
-            statsMutex.withLock {
-                val currentStats = _stats.value ?: HomeStats()
-                _stats.value = currentStats.copy(
-                    newStudentsThisMonth = newStudentsThisMonth,
-                    totalCollected = totalCollected,
-                    pendingThisMonth = pendingThisMonth,
-                    pendingLastMonth = pendingLastMonth
-                )
-            }
-        }
+        loadStats()
     }
 
     fun refreshData() {
         // Recargar solo las estadísticas, no relanzar los listeners de Flow
+        loadStats()
+    }
+
+    private fun loadStats() {
         viewModelScope.launch {
+            // Primero la cuota del mes de cada alumno, para que "Pendientes"
+            // ya la cuente. Corre una vez por mes; las siguientes vuelven enseguida.
+            monthlyDuesRepository.ensureCurrentMonthDues()
+
             val (_, _, totalCollected) = paymentRepository.getMonthlyStats()
             val pendingThisMonth = paymentRepository.getStudentsWithPendingPaymentsThisMonth()
             val pendingLastMonth = paymentRepository.getStudentsWithPendingPaymentsLastMonth()

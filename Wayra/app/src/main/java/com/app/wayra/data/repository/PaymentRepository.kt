@@ -148,6 +148,16 @@ class PaymentRepository {
         }
     }
 
+    /**
+     * Todos los pagos leídos del servidor; lanza excepción si no se puede.
+     * Para decisiones que escriben datos (generar cuotas): una lista vacía por
+     * error o una caché vieja harían creer que nadie pagó.
+     */
+    suspend fun getAllPaymentsFromServer(): List<Payment> =
+        paymentsCollection.get(com.google.firebase.firestore.Source.SERVER).await()
+            .documents
+            .mapNotNull { doc -> doc.toObject(Payment::class.java)?.copy(id = doc.id) }
+
     // Obtener todos los pagos (una sola vez)
     suspend fun getAllPayments(): List<Payment> {
         return try {
