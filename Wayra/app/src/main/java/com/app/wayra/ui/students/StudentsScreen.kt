@@ -16,12 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -44,6 +43,7 @@ import com.app.wayra.ui.components.WayraBackground
 import com.app.wayra.ui.theme.AgenorNeue
 import com.app.wayra.ui.theme.BorderSoft
 import com.app.wayra.ui.theme.Ink
+import com.app.wayra.ui.theme.OnBrand
 import com.app.wayra.ui.theme.InkMuted
 import com.app.wayra.ui.theme.InkSubtle
 import com.app.wayra.ui.theme.Paper
@@ -69,64 +69,47 @@ fun StudentsScreen(
     val filteredStudents by viewModel.filteredStudents.observeAsState(emptyList())
     val searchQuery by viewModel.searchQuery.observeAsState("")
 
-    if (showTopBar) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.students_title)) },
-                    actions = {
-                        IconButton(onClick = onNavigateToAddStudent) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(R.string.students_add)
-                            )
-                        }
-                    },
-                    colors = wayraTopAppBarColors()
-                )
-            },
-            containerColor = Paper,
-            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
-        ) { paddingValues ->
-            StudentsContent(
-                filteredStudents = filteredStudents,
-                searchQuery = searchQuery,
-                viewModel = viewModel,
-                onNavigateToStudentDetail = onNavigateToStudentDetail,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.students_title)) },
+                colors = wayraTopAppBarColors()
             )
-        }
-    } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.students_title)) },
-                    actions = {
-                        IconButton(onClick = onNavigateToAddStudent) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = stringResource(R.string.students_add)
-                            )
-                        }
-                    },
-                    colors = wayraTopAppBarColors()
-                )
-            },
-            containerColor = Paper,
-            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
-        ) { paddingValues ->
-            StudentsContent(
-                filteredStudents = filteredStudents,
-                searchQuery = searchQuery,
-                viewModel = viewModel,
-                onNavigateToStudentDetail = onNavigateToStudentDetail,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onNavigateToAddStudent,
+                shape = RoundedCornerShape(16.dp),
+                containerColor = WayraOrange,
+                contentColor = OnBrand,
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_plus),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.students_new),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontSize = 15.sp
+                    )
+                }
             )
-        }
+        },
+        containerColor = Paper,
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
+    ) { paddingValues ->
+        StudentsContent(
+            filteredStudents = filteredStudents,
+            searchQuery = searchQuery,
+            viewModel = viewModel,
+            onNavigateToStudentDetail = onNavigateToStudentDetail,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        )
     }
 }
 
@@ -187,7 +170,8 @@ private fun StudentsContent(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 LazyColumn(
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                    // Espacio extra para que el boton flotante no tape el ultimo alumno.
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 88.dp)
                 ) {
                     itemsIndexed(filteredStudents) { index, studentWithPlan ->
                         StudentRow(

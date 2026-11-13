@@ -32,6 +32,7 @@
     <!-- Students -->
     <string name="students_title">Alumnos</string>
     <string name="students_add">Agregar Alumno</string>
+    <string name="students_new">Nuevo alumno</string>
     <string name="students_search">Buscar alumno…</string>
     <string name="students_empty">No hay alumnos registrados</string>
     <string name="students_active">Activo</string>

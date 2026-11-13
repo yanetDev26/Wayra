@@ -21,9 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -106,6 +105,7 @@ fun HomeContent(
     var showAmount by remember { mutableStateOf(false) }
 
     WayraBackground(modifier = modifier) {
+        Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,7 +115,8 @@ fun HomeContent(
                 // el margen no se desplace al deslizar.
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 16.dp)
+                // Espacio extra para que el boton flotante no tape el ultimo bloque.
+                .padding(bottom = 88.dp)
         ) {
             // Encabezado alineado a la izquierda. Centrar todo es lo que hace
             // que una pantalla se lea como una plantilla.
@@ -252,33 +253,33 @@ fun HomeContent(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Accion principal: el unico naranja solido de la pantalla.
-                Button(
-                    onClick = onRegisterPaymentClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = WayraOrange,
-                        contentColor = OnBrand
-                    )
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_plus),
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.home_register_payment),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 15.sp
-                    )
-                }
             }
+        }
+
+        // Accion principal: boton flotante, siempre visible sin importar el scroll.
+        ExtendedFloatingActionButton(
+            onClick = onRegisterPaymentClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            containerColor = WayraOrange,
+            contentColor = OnBrand,
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_plus),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.home_register_payment),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontSize = 15.sp
+                )
+            }
+        )
         }
     }
 }
