@@ -276,7 +276,6 @@ fun HomeContent(
                 Text(
                     text = stringResource(R.string.home_register_payment),
                     style = MaterialTheme.typography.labelLarge,
-                    fontSize = 15.sp
                 )
             }
         )

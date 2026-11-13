@@ -120,6 +120,17 @@ class SubscriptionRepository {
         }
     }
 
+    // Obtener todas las suscripciones (activas e históricas), una sola vez
+    suspend fun getAllSubscriptionsOnce(): List<Subscription> {
+        return try {
+            subscriptionsCollection.get().await().documents.mapNotNull { doc ->
+                doc.toObject(Subscription::class.java)?.copy(id = doc.id)
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
     // Obtener todas las suscripciones activas
     suspend fun getAllActiveSubscriptions(): List<Subscription> {
         return try {

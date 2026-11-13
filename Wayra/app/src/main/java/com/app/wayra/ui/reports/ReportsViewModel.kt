@@ -39,6 +39,14 @@ class ReportsViewModel : ViewModel() {
     private val _incomeProjection = MutableLiveData<IncomeProjectionReport>()
     val incomeProjection: LiveData<IncomeProjectionReport> = _incomeProjection
 
+    /** id de alumno -> nombre completo, para que las filas digan de quien es cada pago. */
+    private val _studentNames = MutableLiveData<Map<String, String>>(emptyMap())
+    val studentNames: LiveData<Map<String, String>> = _studentNames
+
+    private suspend fun loadStudentNames() {
+        _studentNames.value = studentRepository.getAllStudents().associate { it.id to it.getFullName() }
+    }
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -47,6 +55,7 @@ class ReportsViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 val stats = paymentRepository.getMonthlyIncomeDetails()
+                loadStudentNames()
                 _monthlyIncomeStats.value = stats
             } catch (_: Exception) {
                 _monthlyIncomeStats.value = MonthlyIncomeStats(0.0, 0, emptyMap(), emptyList())
@@ -61,6 +70,7 @@ class ReportsViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 val stats = paymentRepository.getPendingPaymentsStats()
+                loadStudentNames()
                 _pendingPaymentsStats.value = stats
             } catch (_: Exception) {
                 _pendingPaymentsStats.value = PendingPaymentsStats(0.0, 0.0, 0, 0, 0, 0, emptyList(), emptyList(), emptyList())
@@ -90,7 +100,7 @@ class ReportsViewModel : ViewModel() {
             try {
                 val payments = paymentRepository.getAllPayments()
                 val students = studentRepository.getAllStudents()
-                _allPayments.value = payments.sortedByDescending { it.paymentDate ?: it.dueDate ?: 0L }
+                _allPayments.value = payments
                 _allStudents.value = students
             } catch (_: Exception) {
                 _allPayments.value = emptyList()

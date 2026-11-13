@@ -1,5 +1,7 @@
 package com.app.wayra.ui.payments
 
+import com.app.wayra.domain.PaymentRules
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +53,7 @@ import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
-import com.app.wayra.ui.home.PaymentPeriod
+import com.app.wayra.domain.PaymentPeriod
 import com.app.wayra.ui.theme.Ink
 import com.app.wayra.ui.theme.InkMuted
 import com.app.wayra.ui.theme.OnBrand
@@ -66,7 +68,9 @@ import kotlinx.coroutines.launch
 fun RegisterPaymentScreen(
     viewModel: PaymentViewModel,
     onNavigateBack: () -> Unit,
-    onPaymentRegistered: () -> Unit
+    onPaymentRegistered: () -> Unit,
+    /** Si viene del detalle de un alumno, ese alumno queda elegido de entrada. */
+    preselectedStudentId: String? = null
 ) {
     val students by viewModel.students.observeAsState(emptyList())
     val selectedStudent by viewModel.selectedStudent.observeAsState()
@@ -83,6 +87,14 @@ fun RegisterPaymentScreen(
     var isLoading by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
+
+    // Los alumnos se cargan de forma asincronica: se elige el preseleccionado
+    // cuando aparece en la lista, una sola vez, sin pisar un cambio manual.
+    LaunchedEffect(students, preselectedStudentId) {
+        if (preselectedStudentId != null && selectedStudent == null) {
+            students.find { it.id == preselectedStudentId }?.let { viewModel.selectStudent(it) }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -263,21 +275,8 @@ fun RegisterPaymentScreen(
                             return@launch
                         }
 
-                        if (amount.isBlank()) {
-                            snackbarHostState.showErrorSnackbar("Por favor ingresa un monto")
-                            isLoading = false
-                            return@launch
-                        }
-
-                        val amountValue = amount.toDoubleOrNull()
-                        if (amountValue == null) {
-                            snackbarHostState.showErrorSnackbar("El monto debe ser un número válido")
-                            isLoading = false
-                            return@launch
-                        }
-
-                        if (amountValue <= 0) {
-                            snackbarHostState.showErrorSnackbar("El monto debe ser mayor a 0")
+                        PaymentRules.validateAmount(amount).errorMessage?.let { message ->
+                            snackbarHostState.showErrorSnackbar(message)
                             isLoading = false
                             return@launch
                         }
@@ -406,7 +405,7 @@ fun RegisterPaymentScreen(
                                         PaymentPeriod.CURRENT_MONTH -> "Mes Actual"
                                         PaymentPeriod.NEXT_MONTH -> "Mes Próximo"
                                     },
-                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                     color = if (isSelected) Paper else Ink
                                 )
@@ -416,7 +415,7 @@ fun RegisterPaymentScreen(
                                         PaymentPeriod.CURRENT_MONTH -> "Pago del mes actual (por defecto)"
                                         PaymentPeriod.NEXT_MONTH -> "Pago adelantado del próximo mes"
                                     },
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = if (isSelected) OnBrand.copy(alpha = 0.8f) else InkMuted,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )

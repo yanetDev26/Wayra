@@ -1,5 +1,6 @@
 package com.app.wayra.ui.reports
 
+import com.app.wayra.ui.theme.WayraType
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -128,8 +129,7 @@ fun ReportStatStrip(
                 ) {
                     Text(
                         text = stat.value,
-                        style = WayraType.metric,
-                        fontSize = 22.sp,
+                        style = WayraType.metricCompact,
                         color = stat.tone.accent(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -236,7 +236,6 @@ fun ReportRowItem(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
-                    fontSize = 14.sp,
                     color = Ink,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -412,7 +411,6 @@ fun ReportShareRow(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall,
-                        fontSize = 14.sp,
                         color = Ink,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

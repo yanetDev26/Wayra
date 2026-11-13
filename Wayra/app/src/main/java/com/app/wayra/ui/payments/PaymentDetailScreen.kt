@@ -1,5 +1,6 @@
 package com.app.wayra.ui.payments
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.data.model.PaymentStatus
-import com.app.wayra.ui.theme.AgenorNeue
 import com.app.wayra.ui.theme.Danger
 import com.app.wayra.ui.theme.Paper
 import com.app.wayra.ui.theme.StatusBadge
@@ -156,9 +156,7 @@ fun PaymentDetailScreen(
                     ) {
                         Text(
                             text = "Información del Pago",
-                            fontFamily = AgenorNeue,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleLarge,
                         )
 
                         HorizontalDivider(

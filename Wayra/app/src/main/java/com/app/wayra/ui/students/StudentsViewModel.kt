@@ -8,6 +8,8 @@ import com.app.wayra.data.model.Student
 import com.app.wayra.data.repository.PlanRepository
 import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.data.repository.SubscriptionRepository
+import com.app.wayra.domain.StudentRules
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -51,8 +53,12 @@ class StudentsViewModel : ViewModel() {
         }
     }
 
+    private var loadJob: Job? = null
+
     private fun loadStudents() {
-        viewModelScope.launch {
+        // Cada recarga reemplaza la escucha anterior en lugar de sumar otra.
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             combine(
                 studentRepository.getStudents(),
                 subscriptionRepository.getSubscriptions(),
@@ -94,17 +100,8 @@ class StudentsViewModel : ViewModel() {
         val query = _searchQuery.value ?: ""
         val allStudentsWithPlan = _studentsWithPlan.value ?: emptyList()
 
-        val filtered = if (query.isBlank()) {
-            allStudentsWithPlan
-        } else {
-            allStudentsWithPlan.filter {
-                it.student.name.contains(query, ignoreCase = true) ||
-                it.student.surname.contains(query, ignoreCase = true) ||
-                it.student.getFullName().contains(query, ignoreCase = true) ||
-                it.student.email.contains(query, ignoreCase = true) ||
-                it.student.phone.contains(query, ignoreCase = true) ||
-                (it.planName?.contains(query, ignoreCase = true) == true)
-            }
+        val filtered = allStudentsWithPlan.filter {
+            StudentRules.matchesSearch(it.student, it.planName, query)
         }
 
         _filteredStudents.value = filtered.sortedBy { it.student.name.lowercase() }

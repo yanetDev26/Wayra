@@ -147,8 +147,7 @@ fun StudentCard(
         ) {
             Text(
                 text = student.getFullName(),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
                 color = Ink
             )
 
@@ -159,12 +158,12 @@ fun StudentCard(
                 ) {
                     Text(
                         text = "Email:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = student.email,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = InkMuted
                     )
                 }
@@ -177,12 +176,12 @@ fun StudentCard(
                 ) {
                     Text(
                         text = "Teléfono:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = student.phone,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = InkMuted
                     )
                 }

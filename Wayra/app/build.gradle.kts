@@ -40,6 +40,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        // Los modelos referencian clases de Firebase/Android; en tests de JVM
+        // sus metodos devuelven valores por defecto en vez de fallar.
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {

@@ -1,5 +1,12 @@
 package com.app.wayra.ui.students
 
+import com.app.wayra.domain.StudentRules
+import com.app.wayra.ui.theme.WayraType
+import com.app.wayra.ui.theme.WayraOrange
+import com.app.wayra.ui.theme.OnBrand
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,6 +90,8 @@ import java.util.Locale
 fun StudentDetailScreen(
     studentId: String,
     onNavigateBack: () -> Unit,
+    /** Abre el registro de pago con este alumno elegido. Null oculta el boton. */
+    onRegisterPayment: ((String) -> Unit)? = null,
     viewModel: StudentsViewModel = viewModel(),
     plansViewModel: PlansViewModel = viewModel(),
     subscriptionViewModel: SubscriptionViewModel = viewModel()
@@ -157,6 +166,30 @@ fun StudentDetailScreen(
                 colors = wayraTopAppBarColors()
             )
         },
+        floatingActionButton = {
+            // Solo alumnos activos: el formulario de pago lista unicamente activos.
+            if (onRegisterPayment != null && student?.active == true) {
+                ExtendedFloatingActionButton(
+                    onClick = { onRegisterPayment(studentId) },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = WayraOrange,
+                    contentColor = OnBrand,
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_plus),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.home_register_payment),
+                            style = MaterialTheme.typography.labelLarge,
+                        )
+                    }
+                )
+            }
+        },
         containerColor = Paper,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { CustomSnackbarHost(snackbarHostState) }
@@ -184,8 +217,7 @@ fun StudentDetailScreen(
                 ) {
                     Text(
                         text = "Información Personal",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
                     )
 
                     DetailRow(label = "Nombre", value = student?.getFullName() ?: "Cargando...")
@@ -195,8 +227,7 @@ fun StudentDetailScreen(
                     if (!student?.emergencyContact.isNullOrBlank() || !student?.emergencyPhone.isNullOrBlank()) {
                         Text(
                             text = "Contacto de Emergencia",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -229,8 +260,7 @@ fun StudentDetailScreen(
                 ) {
                     Text(
                         text = "Suscripción Actual",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
                     )
 
                     if (currentPlan != null && activeSubscription != null) {
@@ -262,8 +292,7 @@ fun StudentDetailScreen(
                 ) {
                     Text(
                         text = "Historial de Pagos",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
                     )
 
                     if (studentPayments.isEmpty()) {
@@ -283,7 +312,7 @@ fun StudentDetailScreen(
                             if (studentPayments.size > 5) {
                                 Text(
                                     text = "Mostrando últimos 5 de ${studentPayments.size} pagos",
-                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
@@ -415,24 +444,10 @@ fun EditStudentDialog(
     var emergencyPhoneError by remember { mutableStateOf(false) }
 
     // Función para validar número de celular argentino
-    fun isValidPhone(phone: String): Boolean {
-        val digits = phone.replace(Regex("[^0-9]"), "").length
-        return digits == 10
-    }
+    fun isValidPhone(phone: String): Boolean = StudentRules.isValidPhone(phone)
 
     // Función para formatear el número con espacios
-    fun formatPhone(phone: String): String {
-        return when {
-            phone.isEmpty() -> ""
-            phone.length <= 4 -> phone
-            phone.length <= 10 -> {
-                val part1 = phone.substring(0, minOf(4, phone.length))
-                val part2 = phone.substring(4)
-                "$part1${if (part2.isNotEmpty()) " $part2" else ""}"
-            }
-            else -> phone
-        }
-    }
+    fun formatPhone(phone: String): String = StudentRules.formatPhone(phone)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -506,7 +521,7 @@ fun EditStudentDialog(
                 OutlinedTextField(
                     value = emergencyContact,
                     onValueChange = { emergencyContact = it },
-                    label = { Text("Contacto de Emergencia") },
+                    label = { Text("Nombre de contacto de emergencia") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                 )
@@ -691,12 +706,12 @@ fun DetailRow(label: String, value: String) {
     Column {
         Text(
             text = label,
-            fontSize = 12.sp,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 4.dp)
         )
@@ -732,8 +747,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                 // Monto
                 Text(
                     text = currencyFormat.format(payment.amount),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = WayraType.amount,
                     color = Ink
                 )
 
@@ -747,7 +761,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             com.app.wayra.data.model.PaymentStatus.PAGADO -> "Pagado:"
                             else -> "Vence:"
                         },
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = Ink
                     )
                     Text(
@@ -757,7 +771,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             else ->
                                 payment.dueDate?.let { dateFormat.format(Date(it)) } ?: "-"
                         },
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = Ink
                     )
                 }
@@ -769,7 +783,7 @@ private fun PaymentHistoryItem(payment: com.app.wayra.data.model.Payment) {
                             com.app.wayra.data.model.PaymentMethod.EFECTIVO -> "Efectivo"
                             com.app.wayra.data.model.PaymentMethod.TRANSFERENCIA -> "Transferencia"
                         },
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

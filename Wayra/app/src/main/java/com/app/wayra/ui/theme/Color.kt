@@ -34,6 +34,8 @@ data class WayraColors(
     val hero: Color,
     val onHero: Color,
     val border: Color,
+    /** Contorno de campos y controles. Más fuerte que [border], que es para divisores. */
+    val outline: Color,
     // Texto
     val ink: Color,
     val inkMuted: Color,
@@ -67,6 +69,7 @@ val PistaColors = WayraColors(
     hero = Color(0xFF22303A),
     onHero = Color(0xFFF4F7F9),
     border = Color(0xFFE2E6EA),
+    outline = Color(0xFFE2E6EA),
 
     ink = Color(0xFF14181C),
     inkMuted = Color(0xFF626F7B),
@@ -98,28 +101,33 @@ val NocturnaColors = WayraColors(
     brandSoft = Color(0xFF2C1B12),
     onBrand = Color(0xFF190C05),
 
+    // Escalones de superficie con salto visible (~1.2:1 entre cada nivel):
+    // con menos, tarjetas, filas y campos se funden en un solo bloque oscuro.
     paper = Color(0xFF0F1418),
-    surface = Color(0xFF171E24),
-    surfaceAlt = Color(0xFF1E262D),
-    hero = Color(0xFF202B33),
+    surface = Color(0xFF1F2830),
+    surfaceAlt = Color(0xFF2B353E),
+    hero = Color(0xFF2E3C47),
     onHero = Color(0xFFE9EEF2),
-    border = Color(0xFF242D35),
+    border = Color(0xFF34404A),
+    // 3:1 contra fondo y tarjeta: el borde de un campo tiene que verse.
+    outline = Color(0xFF66737E),
 
+    // Todo el texto llega a 4.5:1 sobre fondo y tarjeta.
     ink = Color(0xFFE9EEF2),
-    inkMuted = Color(0xFF8A98A4),
-    inkSubtle = Color(0xFF64717C),
+    inkMuted = Color(0xFFA3AFB9),
+    inkSubtle = Color(0xFF8794A0),
 
-    success = Color(0xFF3FA37D),
+    success = Color(0xFF4AB088),
     successSoft = Color(0xFF14261F),
     warning = Color(0xFFD9A03C),
     warningSoft = Color(0xFF2A2114),
-    danger = Color(0xFFE4614C),
+    danger = Color(0xFFEE7360),
     dangerSoft = Color(0xFF2C1815),
     info = Color(0xFF6BA8C6),
     infoSoft = Color(0xFF14212A),
     neutral = Color(0xFF64717C),
     dataAccent = Color(0xFF2790C0),
-    dataTrack = Color(0xFF232C34),
+    dataTrack = Color(0xFF2B353E),
     isDark = true
 )
 

@@ -25,9 +25,17 @@ val WayraBodyFont = FontFamily.Default
 /**
  * Escala tipográfica.
  *
- * Pasos permitidos: 12 · 14 · 16 · 18 · 20 · 22 · 24 · 28 · 32 · 40 sp.
- * Nada baja de 12 sp y cada estilo lleva su `lineHeight`, para que el ritmo
- * vertical sea el mismo en todas las pantallas.
+ * Pasos permitidos: 12 · 14 · 16 · 18 · 20 · 22 · 24 · 28 · 32 · 36 · 40 sp
+ * (36 solo para la cifra principal de Inicio). Nada baja de 12 sp y cada estilo
+ * lleva su `lineHeight`, para que el ritmo vertical sea el mismo en todas las
+ * pantallas.
+ *
+ * Reglas de uso en pantallas:
+ * - No escribir `fontSize` a mano: elegir un estilo de esta escala.
+ * - 12 sp (`labelMedium`, `bodySmall`) es para rótulos y metadatos. El dato que
+ *   el usuario viene a leer (email, teléfono, fecha, nota) va en 14 sp o más.
+ * - Agenor Neue solo tiene peso Regular: nunca combinarla con `fontWeight`
+ *   Bold/SemiBold, porque Android sintetiza la negrita y se ve borrosa.
  *
  * Los estilos no fijan `color`: lo aporta `colorScheme` según la superficie.
  */
@@ -56,8 +64,8 @@ val Typography = Typography(
     headlineLarge = TextStyle(
         fontFamily = AgenorNeue,
         fontWeight = FontWeight.Normal,
-        fontSize = 26.sp,
-        lineHeight = 34.sp,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
         letterSpacing = (-0.2).sp
     ),
     headlineMedium = TextStyle(
@@ -170,8 +178,8 @@ object WayraType {
     val amount = TextStyle(
         fontFamily = WayraBodyFont,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 15.sp,
-        lineHeight = 20.sp,
+        fontSize = 16.sp,
+        lineHeight = 22.sp,
         letterSpacing = 0.sp,
         fontFeatureSettings = "tnum"
     )
@@ -179,17 +187,27 @@ object WayraType {
     /** Cifra destacada de una métrica. Tipografía de marca. */
     val metric = TextStyle(
         fontFamily = AgenorNeue,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 28.sp,
         lineHeight = 32.sp,
         letterSpacing = (-0.5).sp,
         fontFeatureSettings = "tnum"
     )
 
+    /** Cifra de métrica en grillas de dos columnas, donde 28 sp no entra. */
+    val metricCompact = TextStyle(
+        fontFamily = AgenorNeue,
+        fontWeight = FontWeight.Normal,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = (-0.3).sp,
+        fontFeatureSettings = "tnum"
+    )
+
     /** Cifra principal de la pantalla de inicio. */
     val metricHero = TextStyle(
         fontFamily = AgenorNeue,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 36.sp,
         lineHeight = 40.sp,
         letterSpacing = (-0.8).sp,

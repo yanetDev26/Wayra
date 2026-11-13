@@ -181,8 +181,7 @@ private fun ReportRow(entry: ReportEntry) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = entry.title,
-                style = MaterialTheme.typography.titleSmall,
-                fontSize = 15.sp,
+                style = MaterialTheme.typography.titleMedium,
                 color = Ink
             )
             Spacer(modifier = Modifier.height(2.dp))

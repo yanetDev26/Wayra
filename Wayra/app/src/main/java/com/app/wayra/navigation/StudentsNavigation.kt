@@ -1,5 +1,7 @@
 package com.app.wayra.navigation
 
+import com.app.wayra.ui.payments.RegisterPaymentScreen
+import com.app.wayra.ui.payments.PaymentViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,6 +21,9 @@ sealed class StudentsScreens(val route: String) {
     object AddStudent : StudentsScreens("add_student")
     object StudentDetail : StudentsScreens("student_detail/{studentId}") {
         fun createRoute(studentId: String) = "student_detail/$studentId"
+    }
+    object RegisterPayment : StudentsScreens("student_register_payment/{studentId}") {
+        fun createRoute(studentId: String) = "student_register_payment/$studentId"
     }
 }
 
@@ -71,7 +76,31 @@ fun StudentsNavHost(
                     studentsViewModel.refreshData()
                     navController.popBackStack()
                 },
+                onRegisterPayment = { id ->
+                    navController.navigate(StudentsScreens.RegisterPayment.createRoute(id))
+                },
                 viewModel = studentsViewModel
+            )
+        }
+
+        composable(
+            route = StudentsScreens.RegisterPayment.route,
+            arguments = listOf(navArgument("studentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
+            val paymentViewModel: PaymentViewModel = viewModel()
+            RegisterPaymentScreen(
+                viewModel = paymentViewModel,
+                preselectedStudentId = studentId,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onPaymentRegistered = {
+                    // Al volver, el detalle recarga su historial de pagos.
+                    studentsViewModel.refreshData()
+                    homeViewModel.refreshData()
+                    navController.popBackStack()
+                }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.app.wayra.ui.reports
 
+import com.app.wayra.domain.DateRanges
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -46,7 +47,6 @@ import com.app.wayra.data.model.PaymentMethod
 import com.app.wayra.ui.theme.*
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 import androidx.compose.foundation.lazy.itemsIndexed
 
@@ -59,6 +59,7 @@ fun MonthlyIncomeReportScreen(
 ) {
     val monthlyStats by viewModel.monthlyIncomeStats.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val studentNames by viewModel.studentNames.observeAsState(emptyMap())
 
     LaunchedEffect(Unit) {
         viewModel.loadMonthlyIncomeReport()
@@ -151,11 +152,13 @@ fun MonthlyIncomeReportScreen(
                             item { ReportEmpty(text = "Sin movimientos en el período.") }
                         } else {
                             itemsIndexed(stats.payments) { index, payment ->
+                                // El detalle tiene que decir quien pago; antes solo
+                                // mostraba el metodo y la fecha.
                                 ReportRowItem(
-                                    title = getPaymentMethodName(
+                                    title = studentNames[payment.studentId] ?: "Alumno no encontrado",
+                                    subtitle = getPaymentMethodName(
                                         payment.paymentMethod ?: PaymentMethod.EFECTIVO
-                                    ),
-                                    subtitle = formatDate(payment.paymentDate ?: 0L),
+                                    ) + " · " + formatDate(payment.paymentDate ?: 0L),
                                     amount = currency.format(payment.amount),
                                     amountTone = Tone.Success,
                                     isFirst = index == 0,
@@ -170,14 +173,7 @@ fun MonthlyIncomeReportScreen(
     }
 }
 
-fun getCurrentMonthName(): String {
-    val calendar = Calendar.getInstance()
-    val monthNames = arrayOf(
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    )
-    return "${monthNames[calendar.get(Calendar.MONTH)]} ${calendar.get(Calendar.YEAR)}"
-}
+fun getCurrentMonthName(): String = DateRanges.monthLabel(System.currentTimeMillis())
 
 fun getPaymentMethodName(method: PaymentMethod): String {
     return when (method) {

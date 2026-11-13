@@ -95,20 +95,27 @@ fun PlanStatisticsReportScreen(
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 100.dp)
                     ) {
                         item {
+                            // "por mes" es lo esperado (alumnos x precio). Antes
+                            // mostraba lo cobrado en el mes en curso con esa etiqueta.
                             ReportHero(
                                 caption = "Alumnos activos",
                                 value = "${stats.totalActiveStudents}",
-                                note = "${currency.format(stats.totalMonthlyRevenue)} por mes"
+                                note = "${currency.format(stats.totalExpectedMonthlyIncome)} esperados por mes"
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             ReportStatStrip(
                                 stats = listOf(
-                                    ReportStat("Planes con alumnos", "${plans.size}"),
+                                    ReportStat("Planes con alumnos", "${plans.count { it.activeStudents > 0 }}"),
                                     ReportStat(
-                                        "Ingreso por alumno",
+                                        "Por alumno",
                                         if (stats.totalActiveStudents > 0)
-                                            currency.format(stats.totalMonthlyRevenue / stats.totalActiveStudents)
+                                            currency.format(stats.totalExpectedMonthlyIncome / stats.totalActiveStudents)
                                         else currency.format(0)
+                                    ),
+                                    ReportStat(
+                                        "Cobrado este mes",
+                                        currency.format(stats.totalMonthlyRevenue),
+                                        Tone.Success
                                     )
                                 )
                             )
@@ -126,8 +133,9 @@ fun PlanStatisticsReportScreen(
                                     title = planStat.planName,
                                     subtitle = "${planStat.activeStudents} " +
                                             (if (planStat.activeStudents == 1) "alumno" else "alumnos") +
-                                            " · ${(share * 100).roundToInt()}%",
-                                    amount = currency.format(planStat.monthlyRevenue),
+                                            " · ${(share * 100).roundToInt()}%" +
+                                            " · cobrado ${currency.format(planStat.monthlyRevenue)}",
+                                    amount = currency.format(planStat.expectedMonthlyIncome),
                                     fraction = share,
                                     isFirst = index == 0,
                                     isLast = index == plans.lastIndex

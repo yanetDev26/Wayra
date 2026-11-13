@@ -1,5 +1,6 @@
 package com.app.wayra.ui.reports
 
+import com.app.wayra.domain.PaymentRules
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -62,6 +63,7 @@ fun PendingPaymentsReportScreen(
 ) {
     val pendingStats by viewModel.pendingPaymentsStats.observeAsState()
     val isLoading by viewModel.isLoading.observeAsState(false)
+    val studentNames by viewModel.studentNames.observeAsState(emptyMap())
     var selectedTab by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
@@ -146,21 +148,23 @@ fun PendingPaymentsReportScreen(
                             }
                         } else {
                             itemsIndexed(paymentsToShow) { index, payment ->
-                                val due = payment.dueDate ?: Long.MAX_VALUE
-                                val isOverdue = due < System.currentTimeMillis()
-                                val days = ((System.currentTimeMillis() - (payment.dueDate ?: 0L)) /
-                                        (1000 * 60 * 60 * 24)).toInt()
+                                val now = System.currentTimeMillis()
+                                val isOverdue = PaymentRules.isOverdue(payment, now)
+                                val days = PaymentRules.daysOverdue(payment, now)
+                                val dueText = payment.dueDate?.let { "Vence ${formatPendingDate(it)}" } ?: "Sin vencimiento"
+                                // Lo primero que se necesita saber de una deuda es quien la tiene.
                                 ReportRowItem(
-                                    title = if (payment.notes.isNotEmpty()) payment.notes
-                                            else "Vence ${formatPendingDate(payment.dueDate ?: 0L)}",
-                                    subtitle = if (payment.notes.isNotEmpty())
-                                        "Vence ${formatPendingDate(payment.dueDate ?: 0L)}" else null,
+                                    title = studentNames[payment.studentId] ?: "Alumno no encontrado",
+                                    subtitle = if (payment.notes.isNotEmpty()) "$dueText · ${payment.notes}" else dueText,
                                     iconRes = if (isOverdue) R.drawable.ic_overdue else R.drawable.ic_clock,
                                     iconTone = if (isOverdue) Tone.Danger else Tone.Warning,
                                     amount = currency.format(payment.amount),
                                     amountTone = if (isOverdue) Tone.Danger else Tone.Neutral,
-                                    badgeText = if (isOverdue)
-                                        "$days ${if (days == 1) "día" else "días"}" else null,
+                                    badgeText = when {
+                                        !isOverdue -> null
+                                        days == 0 -> "Hoy"
+                                        else -> "$days ${if (days == 1) "día" else "días"}"
+                                    },
                                     badgeTone = Tone.Danger,
                                     isFirst = index == 0,
                                     isLast = index == paymentsToShow.lastIndex

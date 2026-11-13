@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -40,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.wayra.R
 import com.app.wayra.ui.components.WayraBackground
-import com.app.wayra.ui.theme.AgenorNeue
 import com.app.wayra.ui.theme.BorderSoft
 import com.app.wayra.ui.theme.Ink
 import com.app.wayra.ui.theme.OnBrand
@@ -67,6 +68,7 @@ fun StudentsScreen(
     showTopBar: Boolean = true
 ) {
     val filteredStudents by viewModel.filteredStudents.observeAsState(emptyList())
+    val allStudents by viewModel.students.observeAsState(emptyList())
     val searchQuery by viewModel.searchQuery.observeAsState("")
 
     Scaffold(
@@ -93,7 +95,6 @@ fun StudentsScreen(
                     Text(
                         text = stringResource(R.string.students_new),
                         style = MaterialTheme.typography.labelLarge,
-                        fontSize = 15.sp
                     )
                 }
             )
@@ -102,6 +103,7 @@ fun StudentsScreen(
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         StudentsContent(
+            hasStudents = allStudents.isNotEmpty(),
             filteredStudents = filteredStudents,
             searchQuery = searchQuery,
             viewModel = viewModel,
@@ -115,6 +117,7 @@ fun StudentsScreen(
 
 @Composable
 private fun StudentsContent(
+    hasStudents: Boolean,
     filteredStudents: List<StudentWithPlan>,
     searchQuery: String,
     viewModel: StudentsViewModel,
@@ -132,8 +135,10 @@ private fun StudentsContent(
                 .padding(top = 16.dp, bottom = 16.dp)
         ) {
 
-            // Search Bar
-            if (filteredStudents.isNotEmpty()) {
+            // El buscador depende de que existan alumnos, no de que la busqueda
+            // tenga resultados: si no, al no encontrar nada desaparecia el campo
+            // y no habia forma de borrar lo escrito.
+            if (hasStudents) {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { viewModel.searchStudents(it) },
@@ -151,6 +156,13 @@ private fun StudentsContent(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.searchStudents("") }) {
+                                Icon(Icons.Default.Close, contentDescription = "Borrar búsqueda")
+                            }
+                        }
+                    },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = androidx.compose.material3.TextFieldDefaults.colors(
@@ -163,6 +175,14 @@ private fun StudentsContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                if (filteredStudents.isEmpty()) {
+                    Text(
+                        text = "No se encontraron alumnos para \u201c${searchQuery.trim()}\u201d",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = InkMuted,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                } else {
                 SectionLabel(
                     text = if (filteredStudents.size == 1) "1 alumno"
                            else "${filteredStudents.size} alumnos"
@@ -181,6 +201,7 @@ private fun StudentsContent(
                             onClick = { onNavigateToStudentDetail(studentWithPlan.student.id) }
                         )
                     }
+                }
                 }
             } else {
                 // Students List
@@ -212,7 +233,7 @@ private fun StudentsContent(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Presiona el botón + para agregar un alumno",
+                            text = "Tocá \u201cNuevo alumno\u201d para agregar uno",
                             color = Ink,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -271,9 +292,7 @@ fun StudentRow(
             ) {
                 Text(
                     text = student.name.take(1).uppercase(),
-                    fontFamily = AgenorNeue,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge,
                     color = if (student.active) WayraOrangeDark else InkSubtle
                 )
             }
@@ -285,8 +304,7 @@ fun StudentRow(
                 ) {
                     Text(
                         text = student.getFullName(),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (student.active) Ink else InkMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

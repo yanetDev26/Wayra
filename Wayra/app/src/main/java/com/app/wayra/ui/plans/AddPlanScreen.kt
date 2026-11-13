@@ -1,5 +1,6 @@
 package com.app.wayra.ui.plans
 
+import com.app.wayra.domain.PlanRules
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -125,11 +126,12 @@ fun AddPlanScreen(
 
                 Button(
                     onClick = {
-                        if (activityName.isNotBlank() && price.isNotBlank()) {
+                        val parsedPrice = PlanRules.parsePrice(price)
+                        if (activityName.isNotBlank() && parsedPrice != null) {
                             coroutineScope.launch {
                                 val plan = Plan(
                                     activityName = activityName,
-                                    price = price.toDoubleOrNull() ?: 0.0,
+                                    price = parsedPrice,
                                     description = description
                                 )
                                 val result = viewModel.addPlan(plan)
@@ -140,7 +142,7 @@ fun AddPlanScreen(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = activityName.isNotBlank() && price.isNotBlank()
+                    enabled = PlanRules.canSave(activityName, price)
                 ) {
                     Text(stringResource(R.string.save))
                 }

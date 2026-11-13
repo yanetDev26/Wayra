@@ -43,6 +43,7 @@ class SubscriptionViewModel : ViewModel() {
                 // Solo crear el pago si no existe uno pendiente
                 val payment = Payment(
                     studentId = student.id,
+                    subscriptionId = result.getOrNull().orEmpty(),
                     amount = plan.price,
                     dueDate = dueDate,
                     status = PaymentStatus.PENDIENTE,
@@ -83,6 +84,7 @@ class SubscriptionViewModel : ViewModel() {
                 // Solo crear el pago si no existe uno pendiente
                 val payment = Payment(
                     studentId = studentId,
+                    subscriptionId = result.getOrNull().orEmpty(),
                     amount = newPlan.price,
                     dueDate = dueDate,
                     status = PaymentStatus.PENDIENTE,

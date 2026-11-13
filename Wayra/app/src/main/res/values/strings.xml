@@ -45,6 +45,7 @@
     <!-- Plans -->
     <string name="plans_title">Planes</string>
     <string name="plans_add">Agregar Plan</string>
+    <string name="plans_create">Crear plan</string>
     <string name="plans_empty">No hay planes disponibles</string>
     <string name="plan_name">Nombre del plan</string>
     <string name="plan_price_hint">Precio</string>

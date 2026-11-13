@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +26,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -99,15 +99,28 @@ fun PlansScreen(
                         maxLines = 1
                     )
                 },
-                actions = {
-                    IconButton(onClick = onNavigateToAddPlan) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = stringResource(R.string.plans_add)
-                        )
-                    }
-                },
                 colors = wayraTopAppBarColors()
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onNavigateToAddPlan,
+                shape = RoundedCornerShape(16.dp),
+                containerColor = WayraOrange,
+                contentColor = OnBrand,
+                icon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_plus),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.plans_create),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             )
         },
         containerColor = Paper,
@@ -155,27 +168,6 @@ fun PlansScreen(
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(horizontal = 32.dp)
                             )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            // Una accion, en vez de explicar donde esta el boton
-                            Button(
-                                onClick = onNavigateToAddPlan,
-                                shape = RoundedCornerShape(10.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = WayraOrange,
-                                    contentColor = OnBrand
-                                )
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_plus),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(17.dp)
-                                )
-                                Spacer(modifier = Modifier.width(7.dp))
-                                Text(
-                                    text = stringResource(R.string.plans_add),
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                            }
                         }
                     }
                 } else {
@@ -185,7 +177,8 @@ fun PlansScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     LazyColumn(
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp)
+                        // Espacio extra para que el boton flotante no tape el ultimo plan.
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 88.dp)
                     ) {
                         itemsIndexed(plans) { index, plan ->
                             PlanRow(
@@ -313,8 +306,7 @@ fun PlanRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = plan.activityName,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.titleMedium,
                     color = Ink,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

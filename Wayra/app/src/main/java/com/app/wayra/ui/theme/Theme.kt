@@ -55,7 +55,7 @@ private fun WayraColors.toMaterialScheme() = with(this) {
         errorContainer = dangerSoft,
         onErrorContainer = danger,
 
-        outline = border,
+        outline = outline,
         outlineVariant = surfaceAlt,
 
         // Sin tinte de elevación: las superficies se mantienen limpias.

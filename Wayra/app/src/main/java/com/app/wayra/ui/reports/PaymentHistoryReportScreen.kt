@@ -1,5 +1,7 @@
 package com.app.wayra.ui.reports
 
+import com.app.wayra.domain.ReportCalculator
+import com.app.wayra.domain.PaymentRules
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -84,12 +86,13 @@ fun PaymentHistoryReportScreen(
 
     // Aplicar filtros
     val filteredPayments = remember(allPayments, selectedStudent, selectedStatus, selectedMethod) {
-        allPayments.filter { payment ->
-            val matchesStudent = selectedStudent == null || payment.studentId == selectedStudent?.id
-            val matchesStatus = selectedStatus == null || payment.status == selectedStatus
-            val matchesMethod = selectedMethod == null || payment.paymentMethod == selectedMethod
-            matchesStudent && matchesStatus && matchesMethod
-        }
+        ReportCalculator.paymentHistory(
+            payments = allPayments,
+            studentId = selectedStudent?.id,
+            status = selectedStatus,
+            method = selectedMethod,
+            now = System.currentTimeMillis()
+        )
     }
 
     Scaffold(
@@ -227,12 +230,14 @@ fun PaymentHistoryReportScreen(
                     } else {
                         itemsIndexed(filteredPayments) { index, payment ->
                             val student = allStudents.find { it.id == payment.studentId }
+                            // Una cuota pendiente con fecha pasada se muestra como vencida.
+                            val status = PaymentRules.effectiveStatus(payment, System.currentTimeMillis())
                             ReportRowItem(
                                 title = student?.getFullName() ?: "Alumno no encontrado",
                                 subtitle = formatDate(payment.paymentDate ?: payment.dueDate ?: 0L),
                                 amount = currency.format(payment.amount),
-                                badgeText = getStatusName(payment.status),
-                                badgeTone = when (payment.status) {
+                                badgeText = getStatusName(status),
+                                badgeTone = when (status) {
                                     PaymentStatus.PAGADO -> Tone.Success
                                     PaymentStatus.PENDIENTE -> Tone.Warning
                                     PaymentStatus.VENCIDO -> Tone.Danger

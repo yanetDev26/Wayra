@@ -165,15 +165,14 @@ fun NewStudentCard(student: Student) {
             ) {
                 Text(
                     text = student.getFullName(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     color = Ink
                 )
 
                 student.registrationDate?.let { timestamp ->
                     Text(
                         text = dateFormat.format(timestamp.toDate()),
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = Ink
                     )
@@ -187,12 +186,12 @@ fun NewStudentCard(student: Student) {
                 ) {
                     Text(
                         text = "Email:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = student.email,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = InkMuted
                     )
                 }
@@ -205,12 +204,12 @@ fun NewStudentCard(student: Student) {
                 ) {
                     Text(
                         text = "Teléfono:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = student.phone,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = InkMuted
                     )
                 }

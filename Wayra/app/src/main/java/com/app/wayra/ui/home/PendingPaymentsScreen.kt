@@ -1,5 +1,10 @@
 package com.app.wayra.ui.home
 
+import com.app.wayra.domain.ReportCalculator
+import com.app.wayra.domain.PaymentRules
+import com.app.wayra.domain.DateRanges
+import com.app.wayra.domain.PaymentPeriod
+import com.app.wayra.ui.theme.WayraType
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.BorderStroke
@@ -53,7 +58,6 @@ import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.ui.components.CustomSnackbarHost
 import com.app.wayra.ui.components.showErrorSnackbar
 import com.app.wayra.ui.components.showSuccessSnackbar
-import com.app.wayra.ui.theme.AgenorNeue
 import com.app.wayra.ui.theme.BorderSoft
 import com.app.wayra.ui.theme.Danger
 import com.app.wayra.ui.theme.Ink
@@ -95,54 +99,11 @@ fun PendingPaymentsScreen(
         isLoading = true
 
         try {
-            // Obtener rango de fechas según el período
-            val calendar = Calendar.getInstance()
-
-            if (periodType == "last_month") {
-                calendar.add(Calendar.MONTH, -1)
-            }
-
-            // Inicio del mes
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            val startOfMonth = calendar.timeInMillis
-
-            // Fin del mes
-            val endCalendar = Calendar.getInstance()
-            if (periodType == "last_month") {
-                endCalendar.add(Calendar.MONTH, -1)
-            }
-            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-            endCalendar.set(Calendar.MINUTE, 59)
-            endCalendar.set(Calendar.SECOND, 59)
-            endCalendar.set(Calendar.MILLISECOND, 999)
-            val endOfMonth = endCalendar.timeInMillis
-
-            // Obtener todos los pagos (de todos los estados) y luego filtrar por pendientes/vencidos y fecha
-            val allPayments = paymentRepository.getAllPayments()
-
-            android.util.Log.d("PendingPayments", "Total payments: ${allPayments.size}")
-            android.util.Log.d("PendingPayments", "Period: $periodType, Start: ${Date(startOfMonth)}, End: ${Date(endOfMonth)}")
-
-            val filteredPayments = allPayments.filter { payment ->
-                // Solo incluir pagos pendientes o vencidos
-                val isPendingOrOverdue = payment.status == PaymentStatus.PENDIENTE ||
-                                         payment.status == PaymentStatus.VENCIDO
-
-                // Verificar que la fecha de vencimiento esté en el rango del mes
-                val dueDate = payment.dueDate ?: 0L
-                val isInRange = dueDate > 0L && dueDate >= startOfMonth && dueDate <= endOfMonth
-
-                android.util.Log.d("PendingPayments", "Payment ${payment.id}: status=${payment.status}, dueDate=${if (dueDate > 0) Date(dueDate) else "null"}, inRange=$isInRange, pending=$isPendingOrOverdue")
-
-                isPendingOrOverdue && isInRange
-            }
-
-            android.util.Log.d("PendingPayments", "Filtered payments: ${filteredPayments.size}")
+            val month = DateRanges.month(
+                System.currentTimeMillis(),
+                offset = if (periodType == "last_month") -1 else 0
+            )
+            val filteredPayments = ReportCalculator.outstandingIn(paymentRepository.getAllPayments(), month)
 
             // Obtener todos los estudiantes
             val allStudents = studentRepository.getAllStudents()
@@ -244,19 +205,7 @@ fun PendingPaymentsScreen(
                 onDismiss = { showPaymentDialog = false },
                 onConfirm = { paymentMethod, notes, paymentPeriod ->
                     coroutineScope.launch {
-                        // Calcular la nueva fecha de vencimiento según el período seleccionado
-                        val calendar = Calendar.getInstance()
-                        when (paymentPeriod) {
-                            PaymentPeriod.LAST_MONTH -> calendar.add(Calendar.MONTH, -1)
-                            PaymentPeriod.CURRENT_MONTH -> { /* No hacer nada, usar mes actual */ }
-                            PaymentPeriod.NEXT_MONTH -> calendar.add(Calendar.MONTH, 1)
-                        }
-                        // Establecer al último día del mes seleccionado
-                        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-                        calendar.set(Calendar.HOUR_OF_DAY, 23)
-                        calendar.set(Calendar.MINUTE, 59)
-                        calendar.set(Calendar.SECOND, 59)
-                        val newDueDate = calendar.timeInMillis
+                        val newDueDate = PaymentRules.dueDateFor(paymentPeriod, System.currentTimeMillis())
 
                         // Actualizar el pago a PAGADO
                         val updatedPayment = selectedPayment!!.payment.copy(
@@ -277,35 +226,13 @@ fun PendingPaymentsScreen(
                             showPaymentDialog = false
                             // Recargar la lista
                             isLoading = true
-                            // Repetir la lógica de carga
-                            val calendar = Calendar.getInstance()
-                            if (periodType == "last_month") {
-                                calendar.add(Calendar.MONTH, -1)
-                            }
-                            calendar.set(Calendar.DAY_OF_MONTH, 1)
-                            calendar.set(Calendar.HOUR_OF_DAY, 0)
-                            calendar.set(Calendar.MINUTE, 0)
-                            calendar.set(Calendar.SECOND, 0)
-                            val startOfMonth = calendar.timeInMillis
-
-                            val endCalendar = Calendar.getInstance()
-                            if (periodType == "last_month") {
-                                endCalendar.add(Calendar.MONTH, -1)
-                            }
-                            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-                            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-                            endCalendar.set(Calendar.MINUTE, 59)
-                            endCalendar.set(Calendar.SECOND, 59)
-                            val endOfMonth = endCalendar.timeInMillis
-
-                            val allPayments = paymentRepository.getAllPayments()
-                            val filteredPayments = allPayments.filter { payment ->
-                                val isPendingOrOverdue = payment.status == PaymentStatus.PENDIENTE ||
-                                                         payment.status == PaymentStatus.VENCIDO
-                                val dueDate = payment.dueDate ?: 0L
-                                val isInRange = dueDate in startOfMonth..endOfMonth
-                                isPendingOrOverdue && isInRange
-                            }
+                            val month = DateRanges.month(
+                                System.currentTimeMillis(),
+                                offset = if (periodType == "last_month") -1 else 0
+                            )
+                            val filteredPayments = ReportCalculator.outstandingIn(
+                                paymentRepository.getAllPayments(), month
+                            )
 
                             val allStudents = studentRepository.getAllStudents()
                             val studentsWithPaymentsList = filteredPayments.mapNotNull { payment ->
@@ -361,15 +288,14 @@ fun PendingPaymentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = studentWithPayment.student.getFullName(),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = Ink
                     )
 
                     if (studentWithPayment.payment.notes.isNotBlank()) {
                         Text(
                             text = studentWithPayment.payment.notes,
-                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = InkMuted
                         )
                     }
@@ -377,8 +303,7 @@ fun PendingPaymentCard(
 
                 Text(
                     text = formatter.format(studentWithPayment.payment.amount),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = WayraType.amount,
                     color = Ink
                 )
             }
@@ -389,7 +314,7 @@ fun PendingPaymentCard(
             ) {
                 Text(
                     text = "Vencimiento:",
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.labelMedium,
                     color = InkMuted
                 )
 
@@ -397,7 +322,7 @@ fun PendingPaymentCard(
                     val isOverdue = dueDate < System.currentTimeMillis()
                     Text(
                         text = dateFormat.format(Date(dueDate)),
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = if (isOverdue) Danger else InkMuted,
                         fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal
                     )
@@ -407,11 +332,6 @@ fun PendingPaymentCard(
     }
 }
 
-enum class PaymentPeriod {
-    LAST_MONTH,
-    CURRENT_MONTH,
-    NEXT_MONTH
-}
 
 @Composable
 fun PaymentConfirmationDialog(
@@ -436,27 +356,24 @@ fun PaymentConfirmationDialog(
                 Column {
                     Text(
                         text = "Alumno:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = studentWithPayment.student.getFullName(),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
 
                 Column {
                     Text(
                         text = "Monto:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted
                     )
                     Text(
                         text = formatter.format(studentWithPayment.payment.amount),
-                        fontFamily = AgenorNeue,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineSmall,
                         color = Ink
                     )
                 }
@@ -465,7 +382,7 @@ fun PaymentConfirmationDialog(
                 Column {
                     Text(
                         text = "Corresponde al mes:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -496,7 +413,7 @@ fun PaymentConfirmationDialog(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(12.dp),
-                                    fontSize = 14.sp,
+                                    style = MaterialTheme.typography.labelLarge,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                     color = if (isSelected) Paper else Ink
                                 )
@@ -509,7 +426,7 @@ fun PaymentConfirmationDialog(
                 Column {
                     Text(
                         text = "Método de pago:",
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelMedium,
                         color = InkMuted,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -539,7 +456,7 @@ fun PaymentConfirmationDialog(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(12.dp),
-                                    fontSize = 14.sp,
+                                    style = MaterialTheme.typography.labelLarge,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                     color = if (isSelected) Paper else Ink
                                 )

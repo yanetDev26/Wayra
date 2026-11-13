@@ -11,6 +11,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import com.app.wayra.domain.DateRanges
+import com.app.wayra.domain.PaymentRules
+import com.app.wayra.domain.ReportCalculator
 import java.util.Calendar
 
 class PaymentRepository {
@@ -110,123 +113,36 @@ class PaymentRepository {
     // Obtener estadísticas del mes actual
     suspend fun getMonthlyStats(): Triple<Int, Int, Double> {
         return try {
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val startOfMonth = calendar.timeInMillis
-
-            // Pagos pendientes
-            val pendingSnapshot = paymentsCollection
-                .whereEqualTo("status", PaymentStatus.PENDIENTE.name)
-                .get()
-                .await()
-            val pendingCount = pendingSnapshot.size()
-
-            // Total recaudado este mes - obtener todos los pagos pagados y filtrar por fecha
-            val paidSnapshot = paymentsCollection
-                .whereEqualTo("status", PaymentStatus.PAGADO.name)
-                .get()
-                .await()
-
-            val totalCollected = paidSnapshot.documents
-                .mapNotNull { doc -> doc.toObject(Payment::class.java) }
-                .filter { payment ->
-                    val paymentDate = payment.paymentDate ?: 0L
-                    paymentDate >= startOfMonth
-                }
-                .sumOf { it.amount }
-
+            val payments = getAllPayments()
+            val pendingCount = payments.count { PaymentRules.isOutstanding(it) }
+            val totalCollected = ReportCalculator.totalCollected(
+                payments, DateRanges.month(System.currentTimeMillis())
+            )
             Triple(0, pendingCount, totalCollected) // El primer valor (active students) vendrá de StudentRepository
         } catch (_: Exception) {
             Triple(0, 0, 0.0)
         }
     }
 
-    // Obtener estudiantes con pagos pendientes este mes
-    suspend fun getStudentsWithPendingPaymentsThisMonth(): Int {
+    // Alumnos con cuotas adeudadas este mes
+    suspend fun getStudentsWithPendingPaymentsThisMonth(): Int =
+        studentsWithDebtInMonth(offset = 0)
+
+    // Alumnos con cuotas adeudadas del mes pasado
+    suspend fun getStudentsWithPendingPaymentsLastMonth(): Int =
+        studentsWithDebtInMonth(offset = -1)
+
+    private suspend fun studentsWithDebtInMonth(offset: Int): Int {
         return try {
-            val calendar = Calendar.getInstance()
-            // Inicio del mes actual
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            val startOfMonth = calendar.timeInMillis
-
-            // Fin del mes actual
-            val endCalendar = Calendar.getInstance()
-            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-            endCalendar.set(Calendar.MINUTE, 59)
-            endCalendar.set(Calendar.SECOND, 59)
-            endCalendar.set(Calendar.MILLISECOND, 999)
-            val endOfMonth = endCalendar.timeInMillis
-
-            // Obtener todos los pagos pendientes y vencidos - forzar desde servidor
+            // Forzar servidor: el número de Inicio tiene que reflejar un pago recién registrado.
             val snapshot = paymentsCollection
                 .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
                 .get(com.google.firebase.firestore.Source.SERVER)
                 .await()
-
-            // Filtrar por fecha en memoria y contar estudiantes únicos
-            val pendingPayments = snapshot.documents
-                .mapNotNull { doc -> doc.toObject(Payment::class.java) }
-                .filter { payment ->
-                    val dueDate = payment.dueDate ?: 0L
-                    dueDate in startOfMonth..endOfMonth
-                }
-
-            // Contar estudiantes únicos, no total de pagos
-            pendingPayments.map { it.studentId }.distinct().size
-        } catch (_: Exception) {
-            0
-        }
-    }
-
-    // Obtener estudiantes con pagos pendientes del mes pasado
-    suspend fun getStudentsWithPendingPaymentsLastMonth(): Int {
-        return try {
-            val calendar = Calendar.getInstance()
-            // Retroceder un mes
-            calendar.add(Calendar.MONTH, -1)
-
-            // Inicio del mes pasado
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            val startOfLastMonth = calendar.timeInMillis
-
-            // Fin del mes pasado
-            val endCalendar = Calendar.getInstance()
-            endCalendar.add(Calendar.MONTH, -1)
-            endCalendar.set(Calendar.DAY_OF_MONTH, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-            endCalendar.set(Calendar.MINUTE, 59)
-            endCalendar.set(Calendar.SECOND, 59)
-            endCalendar.set(Calendar.MILLISECOND, 999)
-            val endOfLastMonth = endCalendar.timeInMillis
-
-            // Obtener todos los pagos pendientes y vencidos - forzar desde servidor
-            val snapshot = paymentsCollection
-                .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
-                .get(com.google.firebase.firestore.Source.SERVER)
-                .await()
-
-            // Filtrar por fecha en memoria y contar estudiantes únicos
-            val pendingPayments = snapshot.documents
-                .mapNotNull { doc -> doc.toObject(Payment::class.java) }
-                .filter { payment ->
-                    val dueDate = payment.dueDate ?: 0L
-                    dueDate in startOfLastMonth..endOfLastMonth
-                }
-
-            // Contar estudiantes únicos, no total de pagos
-            pendingPayments.map { it.studentId }.distinct().size
+            val payments = snapshot.documents.mapNotNull { doc -> doc.toObject(Payment::class.java) }
+            ReportCalculator.studentsWithDebtIn(
+                payments, DateRanges.month(System.currentTimeMillis(), offset)
+            )
         } catch (_: Exception) {
             0
         }
@@ -246,45 +162,20 @@ class PaymentRepository {
 
     // Obtener estadísticas detalladas de ingresos del mes
     suspend fun getMonthlyIncomeDetails(): MonthlyIncomeStats {
-        return try {
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val startOfMonth = calendar.timeInMillis
+        val now = System.currentTimeMillis()
+        return ReportCalculator.monthlyIncome(getPaidPayments(), DateRanges.month(now))
+    }
 
-            // Obtener todos los pagos pagados y filtrar por fecha en memoria
-            val snapshot = paymentsCollection
+    private suspend fun getPaidPayments(): List<Payment> {
+        return try {
+            paymentsCollection
                 .whereEqualTo("status", PaymentStatus.PAGADO.name)
                 .get()
                 .await()
-
-            val payments = snapshot.documents
-                .mapNotNull { doc ->
-                    doc.toObject(Payment::class.java)?.copy(id = doc.id)
-                }
-                .filter { payment ->
-                    val paymentDate = payment.paymentDate ?: 0L
-                    paymentDate >= startOfMonth
-                }
-
-            // Calcular estadísticas
-            val totalIncome = payments.sumOf { it.amount }
-            val totalPayments = payments.size
-            val paymentsByMethod = payments.groupBy { it.paymentMethod ?: PaymentMethod.EFECTIVO }
-                .mapValues { entry ->
-                    Pair(entry.value.size, entry.value.sumOf { it.amount })
-                }
-
-            MonthlyIncomeStats(
-                totalIncome = totalIncome,
-                totalPayments = totalPayments,
-                paymentsByMethod = paymentsByMethod,
-                payments = payments
-            )
+                .documents
+                .mapNotNull { doc -> doc.toObject(Payment::class.java)?.copy(id = doc.id) }
         } catch (_: Exception) {
-            MonthlyIncomeStats(0.0, 0, emptyMap(), emptyList())
+            emptyList()
         }
     }
 
@@ -305,51 +196,17 @@ class PaymentRepository {
         }
     }
 
-    // Obtener estadísticas de pagos pendientes
+    // Obtener estadísticas de pagos pendientes (incluye vencidos)
     suspend fun getPendingPaymentsStats(): PendingPaymentsStats {
         return try {
-            val today = Calendar.getInstance().timeInMillis
-
-            // Todos los pagos pendientes
-            val allPendingSnapshot = paymentsCollection
-                .whereEqualTo("status", PaymentStatus.PENDIENTE.name)
+            val snapshot = paymentsCollection
+                .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
                 .get()
                 .await()
-
-            val allPending = allPendingSnapshot.documents.mapNotNull { doc ->
+            val outstanding = snapshot.documents.mapNotNull { doc ->
                 doc.toObject(Payment::class.java)?.copy(id = doc.id)
             }
-
-            // Pagos vencidos
-            val overdue = allPending.filter {
-                (it.dueDate ?: Long.MAX_VALUE) < today
-            }
-
-            // Pagos próximos a vencer (próximos 7 días)
-            val sevenDaysFromNow = today + (7 * 24 * 60 * 60 * 1000)
-            val upcomingSoon = allPending.filter {
-                val dueDate = it.dueDate ?: Long.MAX_VALUE
-                dueDate >= today && dueDate <= sevenDaysFromNow
-            }
-
-            // Total pendiente
-            val totalPending = allPending.sumOf { it.amount }
-            val totalOverdue = overdue.sumOf { it.amount }
-
-            // Estudiantes únicos con pagos pendientes
-            val uniqueStudents = allPending.map { it.studentId }.distinct().size
-
-            PendingPaymentsStats(
-                totalPending = totalPending,
-                totalOverdue = totalOverdue,
-                pendingCount = allPending.size,
-                overdueCount = overdue.size,
-                upcomingSoonCount = upcomingSoon.size,
-                uniqueStudents = uniqueStudents,
-                allPendingPayments = allPending,
-                overduePayments = overdue,
-                upcomingPayments = upcomingSoon
-            )
+            ReportCalculator.pendingStats(outstanding, System.currentTimeMillis())
         } catch (_: Exception) {
             PendingPaymentsStats(0.0, 0.0, 0, 0, 0, 0, emptyList(), emptyList(), emptyList())
         }
@@ -358,40 +215,16 @@ class PaymentRepository {
     // Buscar pago pendiente de un estudiante para un mes específico
     suspend fun findPendingPaymentForMonth(studentId: String, dueDate: Long): Payment? {
         return try {
-            // Calcular el rango del mes basado en la fecha de vencimiento proporcionada
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = dueDate
-
-            // Inicio del mes
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val startOfMonth = calendar.timeInMillis
-
-            // Fin del mes
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            calendar.set(Calendar.HOUR_OF_DAY, 23)
-            calendar.set(Calendar.MINUTE, 59)
-            calendar.set(Calendar.SECOND, 59)
-            val endOfMonth = calendar.timeInMillis
-
-            // Buscar pagos pendientes o vencidos del estudiante en ese mes
+            val month = DateRanges.month(dueDate)
             val snapshot = paymentsCollection
                 .whereEqualTo("studentId", studentId)
                 .whereIn("status", listOf(PaymentStatus.PENDIENTE.name, PaymentStatus.VENCIDO.name))
                 .get()
                 .await()
 
-            // Filtrar por rango de fecha en memoria
             snapshot.documents
-                .mapNotNull { doc ->
-                    doc.toObject(Payment::class.java)?.copy(id = doc.id)
-                }
-                .firstOrNull { payment ->
-                    val paymentDueDate = payment.dueDate ?: 0L
-                    paymentDueDate in startOfMonth..endOfMonth
-                }
+                .mapNotNull { doc -> doc.toObject(Payment::class.java)?.copy(id = doc.id) }
+                .firstOrNull { payment -> payment.dueDate != null && payment.dueDate in month }
         } catch (_: Exception) {
             null
         }
@@ -426,12 +259,16 @@ data class PlanStats(
     val price: Double,
     val activeStudents: Int,
     val totalRevenue: Double,
-    val monthlyRevenue: Double
+    /** Cobrado en el mes en curso. */
+    val monthlyRevenue: Double,
+    /** Lo que deberia entrar por mes: alumnos activos x precio del plan. */
+    val expectedMonthlyIncome: Double = 0.0
 )
 
 data class PlanStatisticsReport(
     val planStats: List<PlanStats>,
     val totalActiveStudents: Int,
     val totalMonthlyRevenue: Double,
-    val totalRevenue: Double
+    val totalRevenue: Double,
+    val totalExpectedMonthlyIncome: Double = 0.0
 )

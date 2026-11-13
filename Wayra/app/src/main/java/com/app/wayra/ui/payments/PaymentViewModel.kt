@@ -1,5 +1,7 @@
 package com.app.wayra.ui.payments
 
+import com.app.wayra.domain.AmountResult
+import com.app.wayra.domain.PaymentRules
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,7 +15,7 @@ import com.app.wayra.data.repository.PaymentRepository
 import com.app.wayra.data.repository.PlanRepository
 import com.app.wayra.data.repository.StudentRepository
 import com.app.wayra.data.repository.SubscriptionRepository
-import com.app.wayra.ui.home.PaymentPeriod
+import com.app.wayra.domain.PaymentPeriod
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -129,54 +131,36 @@ class PaymentViewModel : ViewModel() {
 
     suspend fun registerPayment(): Boolean {
         val student = _selectedStudent.value ?: return false
-        val amountValue = _amount.value?.toDoubleOrNull() ?: return false
-
-        if (amountValue <= 0) return false
+        val amountValue = (PaymentRules.validateAmount(_amount.value.orEmpty()) as? AmountResult.Valid)?.value
+            ?: return false
 
         // Obtener suscripción activa del estudiante
         val subscription = subscriptionRepository.getActiveSubscription(student.id)
 
-        // Calcular la fecha de vencimiento según el período seleccionado
-        val calendar = Calendar.getInstance()
-        when (_selectedPaymentPeriod.value) {
-            PaymentPeriod.LAST_MONTH -> calendar.add(Calendar.MONTH, -1)
-            PaymentPeriod.CURRENT_MONTH -> { /* No hacer nada, usar mes actual */ }
-            PaymentPeriod.NEXT_MONTH -> calendar.add(Calendar.MONTH, 1)
-            null -> { /* Por defecto, mes actual */ }
-        }
-        // Establecer al último día del mes seleccionado
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
-        calendar.set(Calendar.SECOND, 59)
-        val dueDate = calendar.timeInMillis
+        val now = System.currentTimeMillis()
+        val dueDate = PaymentRules.dueDateFor(
+            _selectedPaymentPeriod.value ?: PaymentPeriod.CURRENT_MONTH, now
+        )
 
         // Buscar si existe un pago pendiente para este estudiante en este mes
         val existingPendingPayment = paymentRepository.findPendingPaymentForMonth(student.id, dueDate)
 
+        val payment = PaymentRules.registeredPayment(
+            existingPending = existingPendingPayment,
+            studentId = student.id,
+            subscriptionId = subscription?.id,
+            amount = amountValue,
+            method = _selectedPaymentMethod.value ?: PaymentMethod.EFECTIVO,
+            notes = _notes.value.orEmpty(),
+            dueDate = dueDate,
+            now = now
+        )
+
+        // Si ya habia una cuota pendiente ese mes se salda; si no, se crea el pago.
+        // Antes el resultado de la actualizacion se ignoraba y siempre se informaba exito.
         val result = if (existingPendingPayment != null) {
-            // Si existe un pago pendiente, actualizarlo a PAGADO
-            val updatedPayment = existingPendingPayment.copy(
-                amount = amountValue,
-                paymentDate = System.currentTimeMillis(),
-                paymentMethod = _selectedPaymentMethod.value,
-                status = PaymentStatus.PAGADO,
-                notes = _notes.value ?: existingPendingPayment.notes
-            )
-            paymentRepository.updatePayment(existingPendingPayment.id, updatedPayment)
-            Result.success(existingPendingPayment.id)
+            paymentRepository.updatePayment(existingPendingPayment.id, payment)
         } else {
-            // Si no existe, crear un nuevo pago
-            val payment = Payment(
-                studentId = student.id,
-                subscriptionId = subscription?.id ?: "",
-                amount = amountValue,
-                dueDate = dueDate,
-                paymentDate = System.currentTimeMillis(),
-                paymentMethod = _selectedPaymentMethod.value,
-                status = PaymentStatus.PAGADO,
-                notes = _notes.value ?: ""
-            )
             paymentRepository.addPayment(payment)
         }
 
@@ -219,9 +203,10 @@ class PaymentViewModel : ViewModel() {
 
     // Actualizar pago existente
     suspend fun updatePayment(paymentId: String): Result<Unit> {
-        val amountValue = _amount.value?.toDoubleOrNull() ?: return Result.failure(Exception("Monto inválido"))
-
-        if (amountValue <= 0) return Result.failure(Exception("El monto debe ser mayor a 0"))
+        val amountValue = when (val r = PaymentRules.validateAmount(_amount.value.orEmpty())) {
+            is AmountResult.Valid -> r.value
+            else -> return Result.failure(Exception(r.errorMessage))
+        }
 
         val currentPayment = _currentPayment.value ?: return Result.failure(Exception("No hay pago cargado"))
 

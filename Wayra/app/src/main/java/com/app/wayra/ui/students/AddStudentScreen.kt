@@ -1,5 +1,6 @@
 package com.app.wayra.ui.students
 
+import com.app.wayra.domain.StudentRules
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,30 +89,13 @@ fun AddStudentScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // Función para validar email
-    fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
+    fun isValidEmail(email: String): Boolean = StudentRules.isValidEmail(email)
 
     // Función para validar número de celular argentino
-    fun isValidPhone(phone: String): Boolean {
-        // Celulares argentinos: 10 dígitos (código de área + número)
-        val digits = phone.replace(Regex("[^0-9]"), "").length
-        return digits == 10
-    }
+    fun isValidPhone(phone: String): Boolean = StudentRules.isValidPhone(phone)
 
     // Función para formatear el número con espacios (sin el 9 inicial)
-    fun formatPhone(phone: String): String {
-        return when {
-            phone.isEmpty() -> ""
-            phone.length <= 4 -> phone
-            phone.length <= 10 -> {
-                val part1 = phone.substring(0, minOf(4, phone.length))
-                val part2 = phone.substring(4)
-                "$part1${if (part2.isNotEmpty()) " $part2" else ""}"
-            }
-            else -> phone
-        }
-    }
+    fun formatPhone(phone: String): String = StudentRules.formatPhone(phone)
 
     Scaffold(
         topBar = {
@@ -231,7 +215,7 @@ fun AddStudentScreen(
             OutlinedTextField(
                 value = emergencyContact,
                 onValueChange = { emergencyContact = it },
-                label = { Text("Contacto de Emergencia") },
+                label = { Text("Nombre de contacto de emergencia") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -388,12 +372,14 @@ fun AddStudentScreen(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = !isLoading && name.isNotBlank() &&
-                            surname.isNotBlank() &&
-                            email.isNotBlank() && !emailError && isValidEmail(email) &&
-                            phone.isNotBlank() && !phoneError && isValidPhone(phone) &&
-                            (emergencyPhone.isBlank() || (!emergencyPhoneError && isValidPhone(emergencyPhone))) &&
-                            selectedPlan != null
+                    enabled = !isLoading && StudentRules.canCreateStudent(
+                        name = name,
+                        surname = surname,
+                        email = email,
+                        phone = phone,
+                        emergencyPhone = emergencyPhone,
+                        hasPlan = selectedPlan != null
+                    )
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
